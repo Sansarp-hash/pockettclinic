@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PockettClinic</title>
+    <meta name="description" content="An application built with Google AI Studio." />
+    <meta property="og:title" content="PockettClinic" />
+    <meta property="og:description" content="An application built with Google AI Studio." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      (function() {
+        try {
+          var _cookieStore = "";
+          // 1. Define cookie safely on Document.prototype, HTMLDocument.prototype, and document
+          function ensureCookie(proto) {
+            if (proto) {
+              try {
+                Object.defineProperty(proto, "cookie", {
+                  get: function() { return _cookieStore || ""; },
+                  set: function(v) { _cookieStore = String(v || ""); return true; },
+                  configurable: true,
+                  enumerable: true
+                });
+              } catch(e) {}
+            }
+          }
+          if (typeof Document !== "undefined") ensureCookie(Document.prototype);
+          if (typeof HTMLDocument !== "undefined") ensureCookie(HTMLDocument.prototype);
+          if (typeof document !== "undefined") {
+            try {
+              if (typeof document.cookie !== "string") {
+                ensureCookie(document);
+              }
+            } catch(e) {
+              ensureCookie(document);
+            }
+          }
+
+          // 2. Define userAgent & navigator properties safely
+          var defaultUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+          if (typeof Navigator !== "undefined") {
+            try {
+              Object.defineProperty(Navigator.prototype, "userAgent", {
+                get: function() { return defaultUA; },
+                configurable: true,
+                enumerable: true
+              });
+            } catch(e) {}
+          }
+          if (typeof navigator !== "undefined") {
+            try {
+              if (typeof navigator.userAgent !== "string" || !navigator.userAgent) {
+                Object.defineProperty(navigator, "userAgent", {
+                  get: function() { return defaultUA; },
+                  configurable: true,
+                  enumerable: true
+                });
+              }
+              if (!Array.isArray(navigator.languages)) {
+                Object.defineProperty(navigator, "languages", {
+                  get: function() { return ["en-US", "en"]; },
+                  configurable: true,
+                  enumerable: true
+                });
+              }
+              if (typeof navigator.language !== "string") {
+                Object.defineProperty(navigator, "language", {
+                  get: function() { return "en-US"; },
+                  configurable: true,
+                  enumerable: true
+                });
+              }
+            } catch(e) {}
+          }
+
+          // 3. Storage fallbacks
+          if (typeof window !== "undefined") {
+            try {
+              var testKey = "__test_storage__";
+              window.localStorage.setItem(testKey, testKey);
+              window.localStorage.removeItem(testKey);
+            } catch(e) {
+              var memStorage = {};
+              var mockStorage = new Proxy(memStorage, {
+                get: function(target, prop) {
+                  if (prop === 'getItem') return function(k) { return target[k] !== undefined ? target[k] : null; };
+                  if (prop === 'setItem') return function(k, v) { target[k] = String(v); };
+                  if (prop === 'removeItem') return function(k) { delete target[k]; };
+                  if (prop === 'clear') return function() { Object.keys(target).forEach(function(k){ delete target[k]; }); };
+                  if (prop === 'key') return function(i) { return Object.keys(target)[i] || null; };
+                  if (prop === 'length') return Object.keys(target).length;
+                  return target[prop];
+                },
+                set: function(target, prop, val) {
+                  target[prop] = String(val);
+                  return true;
+                }
+              });
+              try {
+                Object.defineProperty(window, "localStorage", { value: mockStorage, configurable: true, writable: true });
+                Object.defineProperty(window, "sessionStorage", { value: mockStorage, configurable: true, writable: true });
+              } catch(e2) {}
+            }
+          }
+        } catch(globalErr) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

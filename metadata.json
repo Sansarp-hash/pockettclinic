@@ -1,0 +1,11 @@
+{
+  "name": "PockettClinic",
+  "description": "Secure video consultations featuring digital QR code prescriptions and integrated Paystack payments for patients and healthcare consultants.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,313 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        (request.auth.token.email != null && request.auth.token.email.lower() in ['missty2k@gmail.com', 'pockettclinic@gmail.com', 'pharmabridgeghana@gmail.com'])
+      );
+    }
+
+    // Global Safety Net (default-deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Allow public read access to settings, but strictly restrict writes to Admin only
+    match /settings/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Platform configuration
+    match /app_settings/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /rescheduling_tickets/{ticketId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.patientId || 
+        request.auth.uid == resource.data.consultantId ||
+        isAdmin()
+      );
+      allow create: if isAdmin();
+      allow update: if isAdmin() || (
+        isAuthenticated() &&
+        resource.data.patientId == request.auth.uid &&
+        (!('remainingGHS' in request.resource.data) || (
+          request.resource.data.remainingGHS >= 0 && 
+          request.resource.data.remainingGHS <= (resource.data.keys().hasAll(['remainingGHS']) ? resource.data.remainingGHS : (resource.data.keys().hasAll(['valueGHS']) ? resource.data.valueGHS : 30))
+        )) &&
+        (!('patientId' in request.resource.data) || request.resource.data.patientId == resource.data.patientId) &&
+        (!('valueGHS' in request.resource.data) || request.resource.data.valueGHS == resource.data.valueGHS) &&
+        (!('ticketId' in request.resource.data) || request.resource.data.ticketId == resource.data.ticketId)
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /user_notifications/{userId}/items/{notificationId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow create: if isAuthenticated(); // Allow platform and relevant actors to push notifications
+      allow update: if isAuthenticated() && request.auth.uid == userId;
+      allow delete: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated(); // Only signed-in users can read profiles (eliminates public scan)
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAuthenticated() && (
+        isAdmin() || (
+          request.auth.uid == userId &&
+          // Explicit allowlist of user-editable fields
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'displayName', 'fullName', 'phone', 'avatarUrl', 'profilePhotoUrl', 
+            'isOnline', 'activeSessionId', 'lastActiveAt', 'termsAccepted', 
+            'termsAcceptedAt', 'hasAcceptedCareTerms', 'independentContractorAffirmed', 
+            'indemnityStatus', 'legalSignature', 'preferredLanguage', 'bio',
+            'pendingProfileChanges', 'indemnityDocUrl', 'indemnityPolicyNo',
+            'indemnityInsuranceProvider', 'indemnityExpiryDate', 'ghanaCardNo', 'licenseNo',
+            'councilPin', 'cadre', 'indemnityAgreed'
+          ]) &&
+          // Prevent role modification by non-admins
+          request.resource.data.role == resource.data.role
+        )
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /consultations/{sessionId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.patientId || 
+        request.auth.uid == resource.data.consultantId ||
+        request.auth.uid == resource.data.assignedConsultantId ||
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'consultant' && 
+         (resource.data.dispatchStatus == 'ringing' || resource.data.dispatchStatus == 'escalated' || resource.data.dispatchStatus == 're-routing')) ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.patientId == request.auth.uid ||
+        request.resource.data.consultantId == request.auth.uid ||
+        request.resource.data.assignedConsultantId == request.auth.uid ||
+        isAdmin()
+      );
+      allow update: if isAuthenticated() && (
+        isAdmin() || (
+          (request.auth.uid == resource.data.patientId || 
+           request.auth.uid == resource.data.consultantId ||
+           request.auth.uid == resource.data.assignedConsultantId) &&
+          // Prevent tempering with ownership fields
+          request.resource.data.patientId == resource.data.patientId &&
+          request.resource.data.consultantId == resource.data.consultantId &&
+          (!('assignedConsultantId' in resource.data) || !('assignedConsultantId' in request.resource.data) || request.resource.data.assignedConsultantId == resource.data.assignedConsultantId) &&
+          // Lock down payout and processing fields
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+            'amountPaidGHS', 'platformCutGHS', 'payoutAmountGHS', 'paystackReference', 'ledgerProcessed'
+          ])
+        )
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /prescriptions/{rxId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.patientId || 
+        request.auth.uid == resource.data.consultantId ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.consultantId == request.auth.uid || 
+        isAdmin()
+      );
+      allow update: if isAuthenticated() && (
+        isAdmin() || (
+          request.auth.uid == resource.data.consultantId &&
+          request.resource.data.patientId == resource.data.patientId &&
+          request.resource.data.consultantId == resource.data.consultantId
+        )
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /payout_requests/{requestId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.consultantId ||
+        isAdmin()
+      );
+      allow create: if false; // Blocked: Must go through secure backend API (/api/payouts/request)
+      allow update: if isAdmin(); // Only admins can process/complete payout requests
+      allow delete: if isAdmin();
+    }
+
+    match /system_errors/{errorId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    match /admin_audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    match /consultant_follow_ups/{id} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.patientId || 
+        request.auth.uid == resource.data.consultantId ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.consultantId == request.auth.uid || 
+        isAdmin()
+      );
+      allow update: if isAuthenticated() && (
+        isAdmin() || (
+          request.auth.uid == resource.data.consultantId &&
+          request.resource.data.patientId == resource.data.patientId &&
+          request.resource.data.consultantId == resource.data.consultantId
+        )
+      );
+    }
+
+    match /council_registry/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /deletion_requests/{id} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated() && (
+        request.resource.data.userId == request.auth.uid || 
+        isAdmin()
+      );
+      allow update, delete: if isAdmin();
+    }
+
+    match /family_members/{id} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.patientId || 
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.patientId == request.auth.uid || 
+        isAdmin()
+      );
+      allow update, delete: if isAuthenticated() && (
+        isAdmin() || (
+          request.auth.uid == resource.data.patientId &&
+          request.resource.data.patientId == resource.data.patientId
+        )
+      );
+    }
+
+    match /medical_documents/{id} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.patientId || 
+        request.auth.uid == resource.data.consultantId ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.patientId == request.auth.uid || 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'consultant' ||
+        isAdmin()
+      );
+      allow update, delete: if isAuthenticated() && (
+        isAdmin() || (
+          request.auth.uid == resource.data.patientId &&
+          request.resource.data.patientId == resource.data.patientId &&
+          (!('consultantId' in resource.data) || !('consultantId' in request.resource.data) || request.resource.data.consultantId == resource.data.consultantId)
+        )
+      );
+    }
+
+    match /medication_reminders/{id} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.patientId || 
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.patientId == request.auth.uid || 
+        isAdmin()
+      );
+      allow update, delete: if isAuthenticated() && (
+        isAdmin() || (
+          request.auth.uid == resource.data.patientId &&
+          request.resource.data.patientId == resource.data.patientId
+        )
+      );
+    }
+
+    match /specialist_referrals/{id} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.patientId || 
+        request.auth.uid == resource.data.consultantId ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.patientId == request.auth.uid ||
+        request.resource.data.consultantId == request.auth.uid ||
+        isAdmin()
+      );
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /system_broadcasts/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /vitals/{id} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.patientId || 
+        request.auth.uid == resource.data.consultantId ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.patientId == request.auth.uid || 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'consultant' ||
+        isAdmin()
+      );
+      allow update, delete: if isAuthenticated() && (
+        isAdmin() || (
+          request.auth.uid == resource.data.patientId &&
+          request.resource.data.patientId == resource.data.patientId &&
+          (!('consultantId' in resource.data) || !('consultantId' in request.resource.data) || request.resource.data.consultantId == resource.data.consultantId)
+        )
+      );
+    }
+
+    match /consultation_rooms/{sessionId}/messages/{messageId} {
+      allow read: if isAuthenticated() && (
+        get(/databases/$(database)/documents/consultations/$(sessionId)).data.patientId == request.auth.uid ||
+        get(/databases/$(database)/documents/consultations/$(sessionId)).data.consultantId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated();
+    }
+
+    match /consultations/{sessionId}/messages/{messageId} {
+      allow read, create, update, delete: if isAuthenticated() && (
+        get(/databases/$(database)/documents/consultations/$(sessionId)).data.patientId == request.auth.uid ||
+        get(/databases/$(database)/documents/consultations/$(sessionId)).data.consultantId == request.auth.uid ||
+        get(/databases/$(database)/documents/consultations/$(sessionId)).data.assignedConsultantId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    match /tickets/{ticketId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.patientId || 
+        isAdmin()
+      );
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+  }
+}

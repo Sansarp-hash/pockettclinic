@@ -1,0 +1,240 @@
+{
+  "entities": {
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "A single chat message from a consultation session",
+      "type": "object",
+      "properties": {
+        "sessionId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "message": { "type": "string", "maxLength": 2000 },
+        "attachmentUrl": { "type": "string", "maxLength": 1000 },
+        "timestamp": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["sessionId", "senderId", "senderName", "timestamp", "createdAt"]
+    },
+    "DigitalPrescription": {
+      "title": "DigitalPrescription",
+      "description": "Tamper-proof digital prescription slip",
+      "type": "object",
+      "properties": {
+        "rxId": { "type": "string" },
+        "sessionId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientAge": { "type": "number" },
+        "patientGender": { "type": "string" },
+        "consultantId": { "type": "string" },
+        "consultantName": { "type": "string" },
+        "consultantPin": { "type": "string" },
+        "consultantCadre": { "type": "string" },
+        "medications": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "diagnosisNotes": { "type": "string" },
+        "qrCodeVerificationUrl": { "type": "string" },
+        "isFulfilled": { "type": "boolean" },
+        "fulfilledAtPharmacy": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["rxId", "sessionId", "patientName", "consultantId", "medications", "isFulfilled"]
+    },
+    "ConsultationSession": {
+      "title": "ConsultationSession",
+      "description": "Consultation booking and session state",
+      "type": "object",
+      "properties": {
+        "sessionId": { "type": "string" },
+        "patientId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientAge": { "type": "number" },
+        "patientGender": { "type": "string" },
+        "consultantId": { "type": "string" },
+        "consultantName": { "type": "string" },
+        "assignedConsultantId": { "type": "string" },
+        "declinedBy": { "type": "array", "items": { "type": "string" } },
+        "dispatchStatus": { "type": "string", "enum": ["ringing", "accepted", "re-routing", "escalated"] },
+        "ringingExpiresAt": { "type": "number" },
+        "tierDurationMinutes": { "type": "number" },
+        "sessionType": { "type": "string" },
+        "status": { "type": "string", "enum": ["PENDING", "PAID", "IN_PROGRESS", "COMPLETED", "CANCELLED"] },
+        "roomId": { "type": "string" },
+        "scheduledAt": { "type": "string" },
+        "paystackReference": { "type": "string" },
+        "amountPaidGHS": { "type": "number" },
+        "platformCutGHS": { "type": "number" },
+        "payoutAmountGHS": { "type": "number" },
+        "chiefComplaints": { "type": "string" },
+        "symptoms": { "type": "array", "items": { "type": "string" } },
+        "clinicalNotes": { "type": "string" },
+        "prescriptionId": { "type": "string" },
+        "rating": { "type": "number" },
+        "feedback": { "type": "string" },
+        "recordingUrl": { "type": "string" }
+      },
+      "required": ["sessionId", "patientId", "status", "roomId", "scheduledAt"]
+    },
+    "VerifiedRegistryEntry": {
+      "title": "VerifiedRegistryEntry",
+      "description": "Public health council registry for verification",
+      "type": "object",
+      "properties": {
+        "councilPin": { "type": "string" },
+        "fullName": { "type": "string" },
+        "cadre": { "type": "string" },
+        "isGoodStanding": { "type": "boolean" }
+      },
+      "required": ["councilPin", "fullName", "cadre", "isGoodStanding"]
+    },
+    "VitalsRecord": {
+      "title": "VitalsRecord",
+      "description": "Patient vitals records",
+      "type": "object",
+      "properties": {
+        "vitalId": { "type": "string" },
+        "patientId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "weight": { "type": "number" },
+        "height": { "type": "number" },
+        "bloodPressure": { "type": "string" },
+        "temperature": { "type": "number" },
+        "pulse": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["vitalId", "patientId", "createdAt"]
+    },
+    "MedicalDocument": {
+      "title": "MedicalDocument",
+      "description": "Patient medical documents in the vault",
+      "type": "object",
+      "properties": {
+        "docId": { "type": "string" },
+        "patientId": { "type": "string" },
+        "title": { "type": "string" },
+        "type": { "type": "string", "enum": ["lab_report", "imaging", "referral", "other"] },
+        "fileUrl": { "type": "string" },
+        "uploadedAt": { "type": "string" }
+      },
+      "required": ["docId", "patientId", "title", "fileUrl", "uploadedAt"]
+    },
+    "PayoutRequest": {
+      "title": "PayoutRequest",
+      "description": "Consultant payout requests",
+      "type": "object",
+      "properties": {
+        "requestId": { "type": "string" },
+        "consultantId": { "type": "string" },
+        "consultantName": { "type": "string" },
+        "amountGHS": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "processed", "rejected"] },
+        "requestedAt": { "type": "string" },
+        "processedAt": { "type": "string" },
+        "feeAgreementAcceptedAt": { "type": "string" }
+      },
+      "required": ["requestId", "consultantId", "amountGHS", "status", "requestedAt"]
+    },
+    "SystemNotification": {
+      "title": "SystemNotification",
+      "description": "General system notifications",
+      "type": "object",
+      "properties": {
+        "targetUid": { "type": "string" },
+        "targetEmail": { "type": "string" },
+        "type": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["targetUid", "title", "message", "createdAt"]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "System administrators with master access",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    },
+    "User": {
+      "title": "User",
+      "description": "Application users, both patients and consultants",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "role": { "type": "string", "enum": ["patient", "consultant"] },
+        "isVerified": { "type": "boolean" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "councilPin": { "type": "string" },
+        "cadre": { "type": "string" },
+        "payoutBank": { "type": "string" },
+        "payoutAccount": { "type": "string" },
+        "languages": { "type": "array", "items": { "type": "string" } },
+        "isOnline": { "type": "boolean" },
+        "activeSessionId": { "type": "string" },
+        "lastActiveAt": { "type": "string" },
+        "bio": { "type": "string" },
+        "availabilityDays": { "type": "array", "items": { "type": "string" } },
+        "availabilityHours": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "role", "email"]
+    }
+  },
+  "firestore": {
+    "verified_registry/{registryId}": {
+      "schema": "VerifiedRegistryEntry",
+      "description": "Official public council registry entries"
+    },
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "consultation_rooms/{sessionId}/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Messages sent during a consultation room session for auditing"
+    },
+    "prescriptions/{rxId}": {
+      "schema": "DigitalPrescription",
+      "description": "Verifiable prescription slips"
+    },
+    "consultations/{sessionId}": {
+      "schema": "ConsultationSession",
+      "description": "Consultation sessions"
+    },
+    "vitals/{vitalId}": {
+      "schema": "VitalsRecord",
+      "description": "Patient vital signs"
+    },
+    "medical_documents/{docId}": {
+      "schema": "MedicalDocument",
+      "description": "Stored medical documents"
+    },
+    "payout_requests/{requestId}": {
+      "schema": "PayoutRequest",
+      "description": "Financial payout requests"
+    },
+    "notifications/{notifId}": {
+      "schema": "SystemNotification",
+      "description": "Admin and system notifications"
+    },
+    "admins/{userId}": {
+      "schema": "AdminUser",
+      "description": "System administrators directory"
+    },
+    "council_registry/{pinId}": {
+      "schema": "VerifiedRegistryEntry",
+      "description": "Official health council registry"
+    },
+    "deletion_requests/{requestId}": {
+      "schema": "AccountDeletionRequest",
+      "description": "Queue for user-initiated account deletion requests awaiting admin approval and backend purge"
+    }
+  }
+}

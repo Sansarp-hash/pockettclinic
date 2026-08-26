@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="65%" stop-color="#ffffff"/>
+      <stop offset="90%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </radialGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#15803d"/>
+    </linearGradient>
+    <linearGradient id="crossGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <path id="topTextPath" d="M 55,200 A 145,145 0 0,1 345,200" fill="none"/>
+    <path id="bottomTextPath1" d="M 315,225 A 130,130 0 0,1 85,225" fill="none"/>
+    <path id="bottomTextPath2" d="M 295,245 A 110,110 0 0,1 105,245" fill="none"/>
+  </defs>
+
+  <!-- Outer metallic bezel -->
+  <circle cx="200" cy="200" r="192" fill="url(#bgGrad)" stroke="#94a3b8" stroke-width="6"/>
+  <circle cx="200" cy="200" r="184" fill="#ffffff" stroke="#e2e8f0" stroke-width="3"/>
+
+  <!-- Curved text top: POCKETTICLINIC -->
+  <text font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="32" fill="#1e3a8a" letter-spacing="5">
+    <textPath href="#topTextPath" startOffset="50%" text-anchor="middle">POCKETTICLINIC</textPath>
+  </text>
+
+  <!-- Curved text bottom line 1: GET DIAGNOSED. GET MEDICINE. FAST!! -->
+  <text font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="12.5" fill="#1e293b" letter-spacing="1">
+    <textPath href="#bottomTextPath1" startOffset="50%" text-anchor="middle">GET DIAGNOSED. GET MEDICINE. FAST!!</textPath>
+  </text>
+
+  <!-- Curved text bottom line 2: Telehealth • Prescriptions -->
+  <text font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="14" fill="#2563eb" letter-spacing="1.5">
+    <textPath href="#bottomTextPath2" startOffset="50%" text-anchor="middle">Telehealth • Prescriptions</textPath>
+  </text>
+
+  <!-- Left Wi-Fi Signal Waves -->
+  <g stroke="#2563eb" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M 95,150 A 65,65 0 0,0 95,250" opacity="0.35"/>
+    <path d="M 110,165 A 48,48 0 0,0 110,235" opacity="0.65"/>
+    <path d="M 125,180 A 30,30 0 0,0 125,220"/>
+  </g>
+
+  <!-- Right Wi-Fi Signal Waves -->
+  <g stroke="#2563eb" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M 305,150 A 65,65 0 0,1 305,250" opacity="0.35"/>
+    <path d="M 290,165 A 48,48 0 0,1 290,235" opacity="0.65"/>
+    <path d="M 275,180 A 30,30 0 0,1 275,220"/>
+  </g>
+
+  <!-- Center Medical Cross / Pill -->
+  <rect x="168" y="105" width="64" height="175" rx="32" fill="url(#crossGrad)" filter="drop-shadow(0px 4px 6px rgba(0,0,0,0.15))"/>
+  
+  <!-- Horizontal bar of cross -->
+  <rect x="115" y="150" width="170" height="64" rx="32" fill="url(#crossGrad)" filter="drop-shadow(0px 4px 6px rgba(0,0,0,0.15))"/>
+
+  <!-- Center Shield with Checkmark -->
+  <g transform="translate(152, 122) scale(1.3)">
+    <path d="M33 3.5 C33 3.5 48 6 56 10 C56 32 48 51 33 60 C18 51 10 32 10 10 C18 6 33 3.5 33 3.5 Z" fill="url(#shieldGrad)" stroke="#ffffff" stroke-width="3" filter="drop-shadow(0px 3px 5px rgba(0,0,0,0.2))"/>
+    <!-- Checkmark -->
+    <path d="M 22 31 L 29 38 L 44 21" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+
+  <!-- Doctors / Medical Staff avatars on left and right -->
+  <!-- Left Doctor -->
+  <g transform="translate(138, 238)">
+    <circle cx="0" cy="0" r="15" fill="#fde68a" stroke="#ffffff" stroke-width="2"/>
+    <path d="M -12 15 Q 0 8 12 15 L 16 28 H -16 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <!-- Stethoscope -->
+    <path d="M -5 -2 C -2 5 2 5 5 -2" stroke="#64748b" stroke-width="1.5" fill="none"/>
+  </g>
+
+  <!-- Right Doctor -->
+  <g transform="translate(262, 238)">
+    <circle cx="0" cy="0" r="15" fill="#fde68a" stroke="#ffffff" stroke-width="2"/>
+    <path d="M -12 15 Q 0 8 12 15 L 16 28 H -16 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <!-- Head mirror / cap -->
+    <circle cx="0" cy="-9" r="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+  </g>
+</svg>

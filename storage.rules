@@ -1,0 +1,57 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Core helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) && 
+         firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+        (request.auth.token.email != null && request.auth.token.email.lower() in ['missty2k@gmail.com', 'pockettclinic@gmail.com', 'pharmabridgeghana@gmail.com'])
+      );
+    }
+
+    function isConsultant() {
+      return isSignedIn() && (
+        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'consultant'
+      );
+    }
+
+    // Default deny
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // Profile photos: Anyone authenticated can view (to render consultant/patient photos), but only the owner or admins can write.
+    match /profile_photos/{userId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // Professional certificates: Only the consultant owner or admins can write, but strictly only Admins can read/verify.
+    match /certificates/{userId}/{fileName} {
+      allow read: if isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // Prescription PDFs/Files: Accessible by patient owner, prescribing consultant, or admin
+    match /prescriptions/{userId}/{fileName} {
+      allow read: if isOwner(userId) || isAdmin() || isConsultant();
+      allow write: if isOwner(userId) || isAdmin() || isConsultant();
+    }
+
+    // Patient medical vault documents (lab reports, imaging): strictly read/write by owner and admins.
+    match /medical_documents/{userId}/{fileName} {
+      allow read, write: if isOwner(userId) || isAdmin();
+    }
+  }
+}
