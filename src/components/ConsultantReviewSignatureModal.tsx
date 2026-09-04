@@ -25,7 +25,7 @@ export default function ConsultantReviewSignatureModal({
   onClose,
   onSignedSuccess
 }: ConsultantReviewSignatureModalProps) {
-  const { showToast } = useAppContext();
+  const { showToast, prescriptions } = useAppContext();
   const [isGenerating, setIsGenerating] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
   const [isSigned, setIsSigned] = useState(Boolean(consultation.isConsultantSigned));
@@ -298,7 +298,6 @@ export default function ConsultantReviewSignatureModal({
                   </h4>
 
                   {(() => {
-                    const { prescriptions } = useAppContext();
                     const sessionRx = (prescriptions || []).find((p: any) => p.sessionId === consultation.sessionId);
 
                     if (sessionRx) {

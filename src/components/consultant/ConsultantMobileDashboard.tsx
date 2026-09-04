@@ -192,6 +192,12 @@ export default function ConsultantMobileDashboard({
         return <Share2 size={18} className="text-blue-600 stroke-[1.8]" />;
       case 'stg-reference':
         return <BookOpen size={18} className="text-emerald-600 stroke-[1.8]" />;
+      case 'chat':
+        return <MessageSquare size={18} className="text-violet-600 stroke-[1.8]" />;
+      case 'follow-ups':
+        return <CalendarDays size={18} className="text-emerald-600 stroke-[1.8]" />;
+      case 'payout-hub':
+        return <Wallet size={18} className="text-blue-600 stroke-[1.8]" />;
       case 'feedback':
         return <Star size={18} className="text-amber-500 stroke-[1.8] fill-amber-500/10" />;
       case 'subscription':
@@ -250,7 +256,7 @@ export default function ConsultantMobileDashboard({
       schedPatient: "Kojo Mensah",
       schedTag: "MEDICATION VERIFICATION",
       activity: [["rx", "Verified prescription GHS-9182", "11:30 AM · Antibiotics Check", "Completed"]],
-      nav: ["Dashboard", "Patients", "Schedule", "Earnings", "More"]
+      nav: ["Dashboard", "Patients", "Schedule", "MoMo Payout", "More"]
     };
   } else if (cadre === 'PHYSICIAN_ASSISTANT') {
     roleConfig = {
@@ -279,7 +285,7 @@ export default function ConsultantMobileDashboard({
       schedPatient: "Amma Serwaa",
       schedTag: "DIAGNOSIS & RECOMMEND",
       activity: [["soap", "Drafted SOAP report for Amma S.", "12:05 PM · Voice Guided", "Sent"]],
-      nav: ["Dashboard", "Patients", "Schedule", "Earnings", "More"]
+      nav: ["Dashboard", "Patients", "Schedule", "MoMo Payout", "More"]
     };
   } else if (cadre === 'PHARM_TECH') {
     roleConfig = {
@@ -308,7 +314,7 @@ export default function ConsultantMobileDashboard({
       schedPatient: "Michael Darko",
       schedTag: "REFILL CONFIRMATION",
       activity: [["triage", "Processed OTC Allergy Meds", "10:45 AM · Triage Assist", "Completed"]],
-      nav: ["Dashboard", "Patients", "Schedule", "Earnings", "More"]
+      nav: ["Dashboard", "Patients", "Schedule", "MoMo Payout", "More"]
     };
   } else if (cadre === 'SPECIALIST') {
     roleConfig = {
@@ -337,7 +343,7 @@ export default function ConsultantMobileDashboard({
       schedPatient: "Abena Mansah",
       schedTag: "SPECIALIST REVIEW",
       activity: [["queue", "New patient added to queue", "10:15 AM · Kofi Agyeman", "High Priority"]],
-      nav: ["Dashboard", "Patients", "Schedule", "Earnings", "More"]
+      nav: ["Dashboard", "Patients", "Schedule", "MoMo Payout", "More"]
     };
   } else if (cadre === 'UNASSIGNED') {
     roleConfig = {
@@ -356,7 +362,7 @@ export default function ConsultantMobileDashboard({
       ],
       stats: [
         ["users", "var(--accent-green-light)", 0, "Patients Triaged"],
-        ["wallet", "var(--blue-light)", "GHS 0.00", "Earnings"],
+        ["wallet", "var(--blue-light)", "GHS 0.00", "MoMo Payout"],
         ["star", "var(--amber-light)", averageRating, "Rating"],
         ["clock", "var(--purple-light)", "N/A", "Status"]
       ],
@@ -365,7 +371,7 @@ export default function ConsultantMobileDashboard({
       schedPatient: "None",
       schedTag: "CADRE PENDING",
       activity: [["queue", "Profile created. Awaiting cadre selection & admin review.", "Just now", "Pending"]],
-      nav: ["Dashboard", "Patients", "Schedule", "Earnings", "More"]
+      nav: ["Dashboard", "Patients", "Schedule", "MoMo Payout", "More"]
     };
   } else {
     // Default or Doctor Configuration
@@ -395,7 +401,7 @@ export default function ConsultantMobileDashboard({
       schedPatient: "Abena Mansah",
       schedTag: "VIDEO CALL SCHEDULED",
       activity: [["queue", "New patient added to queue", "10:15 AM · Kofi Agyeman", "High Priority"]],
-      nav: ["Dashboard", "Patients", "Schedule", "Earnings", "More"]
+      nav: ["Dashboard", "Patients", "Schedule", "MoMo Payout", "More"]
     };
   }
 
@@ -406,7 +412,7 @@ export default function ConsultantMobileDashboard({
     else if (idx === 2) setActiveDashboardTab('schedule');
     else if (idx === 3) setActiveDashboardTab('payout-hub');
     else if (idx === 4) {
-      const isAlreadyInMore = ['more', 'portfolio', 'soap', 'drug-safety', 'referrals', 'stg-reference', 'feedback'].includes(activeDashboardTab);
+      const isAlreadyInMore = ['more', 'portfolio', 'soap', 'drug-safety', 'referrals', 'stg-reference', 'feedback', 'follow-ups', 'chat', 'payout-hub', 'subscription'].includes(activeDashboardTab);
       if (isAlreadyInMore) {
         setActiveDashboardTab('appointments');
       } else {
@@ -787,7 +793,7 @@ export default function ConsultantMobileDashboard({
                 <div 
                   className="pm-back-bar" 
                   onClick={() => {
-                    if (['portfolio', 'soap', 'drug-safety', 'referrals', 'stg-reference', 'feedback'].includes(activeDashboardTab)) {
+                    if (['portfolio', 'soap', 'drug-safety', 'referrals', 'stg-reference', 'feedback', 'follow-ups', 'chat', 'payout-hub', 'subscription'].includes(activeDashboardTab)) {
                       setActiveDashboardTab('more');
                     } else {
                       setActiveDashboardTab('appointments');
@@ -795,7 +801,7 @@ export default function ConsultantMobileDashboard({
                   }}
                 >
                   <ArrowLeft size={14} className="stroke-[2]" />
-                  <span>{['portfolio', 'soap', 'drug-safety', 'referrals', 'stg-reference', 'feedback'].includes(activeDashboardTab) ? 'Back to Utilities Menu' : 'Back to Dashboard'}</span>
+                  <span>{['portfolio', 'soap', 'drug-safety', 'referrals', 'stg-reference', 'feedback', 'follow-ups', 'chat', 'payout-hub', 'subscription'].includes(activeDashboardTab) ? 'Back to Utilities Menu' : 'Back to Dashboard'}</span>
                 </div>
                 
                 {activeDashboardTab === 'more' ? (
@@ -808,6 +814,9 @@ export default function ConsultantMobileDashboard({
                         { id: 'drug-safety', title: 'Drug Interaction & Safety Checker', sub: 'Check safety warnings, contraindications, STGs', bg: 'var(--amber-light)' },
                         { id: 'referrals', title: 'Specialist Referral Registry', sub: 'Request and process referrals across networks', bg: 'var(--blue-light)' },
                         { id: 'stg-reference', title: 'Clinical Treatment Guidelines', sub: 'Ghana Authorized Standard Treatment Guidelines', bg: 'var(--accent-green-light)' },
+                        { id: 'follow-ups', title: 'Follow-up Scheduler', sub: 'Schedule patient follow-ups and reviews', bg: 'var(--purple-light)' },
+                        { id: 'chat', title: 'Follow-up Chat', sub: 'Secure text communication with patients', bg: 'var(--amber-light)' },
+                        { id: 'payout-hub', title: 'Earnings & MoMo Payout', sub: 'Mobile Money (MTN, Telecel) withdrawals', bg: 'var(--blue-light)' },
                         { id: 'feedback', title: 'Patient Feedback & Ratings', sub: 'Check historical patient reviews and stats', bg: 'var(--amber-light)' },
                         { id: 'subscription', title: 'Subscription & Plan', sub: 'View and manage your active partner tier', bg: 'var(--purple-light)' },
                         { id: 'settings', title: 'Settings & Preferences', sub: 'Configure notifications, alerts, and user settings', bg: 'var(--blue-light)', action: 'settings' },

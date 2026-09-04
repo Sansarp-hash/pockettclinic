@@ -245,6 +245,8 @@ export interface ConsultationSession {
   visitSummary?: string;
   escalationReason?: string;
   escalationNotes?: string;
+  inconclusiveReason?: string;
+  inconclusiveContext?: string;
   advisoryTags?: string[];
   isReferralToDoctor?: boolean;
   isReferralToPharmacist?: boolean;

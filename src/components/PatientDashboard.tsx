@@ -7,7 +7,7 @@ import {
   Pill, ArrowRight, Star, Loader2, X, HeartPulse, Plus, ShieldCheck, 
   LayoutDashboard, Users, Award, Menu, Settings, ChevronRight,
   CreditCard, Search, Sparkles, FolderLock, Stethoscope, AlertCircle, Phone, Lock,
-  Home, Bell, MoreHorizontal, Heart, Ticket, LogOut, UserCheck
+  Home, Bell, MoreHorizontal, Heart, Ticket, LogOut, UserCheck, AlertTriangle
 } from 'lucide-react';
 import { collection, query, where, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
@@ -628,8 +628,8 @@ export default function PatientDashboard({
   const pastConsultations = effectiveConsultations.filter(c => 
     c.status === 'COMPLETED' || 
     c.status === 'CANCELLED' || 
-    c.status === 'INCONCLUSIVE' || 
-    c.status === 'CLINICAL_ESCALATION' || 
+    (c.status as string) === 'INCONCLUSIVE' || 
+    ((c.status as string) === 'CLINICAL_ESCALATION' || (c.status as string) === 'INCONCLUSIVE') || 
     c.status === 'TICKET_ISSUED' || 
     c.status === 'TERMINATED_SYSTEM_FAILURE' || 
     c.status === 'FAILED' ||
@@ -1229,7 +1229,7 @@ export default function PatientDashboard({
                     </div>
                     
                     <div className="flex flex-wrap gap-2 mt-1">
-                      {c.status === 'CLINICAL_ESCALATION' && (
+                      {(c.status === 'CLINICAL_ESCALATION' || c.status === 'INCONCLUSIVE') && (
                         <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
                           <AlertTriangle size={12} /> INCONCLUSIVE / ESCALATED
                         </span>
@@ -1243,7 +1243,7 @@ export default function PatientDashboard({
                           PRESCRIPTION
                         </Link>
                       )}
-                      {c.status === 'CLINICAL_ESCALATION' && c.escalationNotes && (
+                      {(c.status === 'CLINICAL_ESCALATION' || c.status === 'INCONCLUSIVE') && c.escalationNotes && (
                         <button 
                           onClick={() => setEscalationViewSessionId(c.sessionId)}
                           className="bg-slate-50 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 border border-indigo-100 uppercase tracking-wide cursor-pointer"
@@ -1882,11 +1882,11 @@ export default function PatientDashboard({
                 <div className="space-y-6 text-left">
                   <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
                     <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider mb-2">Escalation Reason</h4>
-                    <p className="text-sm font-semibold text-slate-800">{session.escalationReason}</p>
+                    <p className="text-sm font-semibold text-slate-800">{session.escalationReason || session.inconclusiveReason}</p>
                   </div>
                   <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 whitespace-pre-wrap font-mono text-xs text-slate-700 leading-relaxed">
                     <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3 font-sans">Preliminary Findings (Add-Up)</h4>
-                    {session.escalationNotes}
+                    {session.escalationNotes || session.inconclusiveContext}
                   </div>
                   <div className="text-center pt-4">
                      <p className="text-xs text-slate-500 font-medium max-w-md mx-auto">
