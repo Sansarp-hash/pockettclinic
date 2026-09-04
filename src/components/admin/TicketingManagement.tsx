@@ -10,9 +10,9 @@ export default function TicketingManagement() {
   const [isCreating, setIsCreating] = useState(false);
   const [patientName, setPatientName] = useState('');
   const [patientId, setPatientId] = useState('');
-  const [reason, setReason] = useState('Network Interruption Credit');
+  const [reason, setReason] = useState('');
   const [notes, setNotes] = useState('');
-  const [amountGHS, setAmountGHS] = useState('50');
+  const [amountGHS, setAmountGHS] = useState('');
   
   const [patients, setPatients] = useState<any[]>([]);
   const [isPatientDropdownOpen, setIsPatientDropdownOpen] = useState(false);

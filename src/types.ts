@@ -230,7 +230,7 @@ export interface ConsultationSession {
   specialtyNeeded?: string;
   sessionType?: 'AUDIO_ONLY' | 'VIDEO' | 'CHAT_ONLY';
   type?: 'chat' | 'video';
-  status: 'PENDING' | 'ACCEPTED' | 'PAID' | 'IN_PROGRESS' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'CANCELLED_BY_USER' | 'CANCELLED_BY_CONSULTANT' | 'INCONCLUSIVE' | 'TERMINATED_SYSTEM_FAILURE' | 'TICKET_ISSUED' | 'MISSED' | 'FAILED';
+  status: 'PENDING' | 'ACCEPTED' | 'PAID' | 'IN_PROGRESS' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'CANCELLED_BY_USER' | 'CANCELLED_BY_CONSULTANT' | 'INCONCLUSIVE' | 'CLINICAL_ESCALATION' | 'TERMINATED_SYSTEM_FAILURE' | 'TICKET_ISSUED' | 'MISSED' | 'FAILED';
   roomId: string;                 // WebRTC / Daily.co / Agora Channel
   scheduledAt: string;
   paystackReference?: string;
@@ -243,10 +243,13 @@ export interface ConsultationSession {
   symptoms?: string[];
   clinicalNotes?: string;
   visitSummary?: string;
+  escalationReason?: string;
+  escalationNotes?: string;
   advisoryTags?: string[];
   isReferralToDoctor?: boolean;
   isReferralToPharmacist?: boolean;
   consultantCadre?: 'DOCTOR' | 'PHARMACIST' | 'PHYSICIAN_ASSISTANT' | 'PHARM_TECH' | 'SPECIALIST' | string;
+  adminPresent?: boolean;
   
   // Inter-Consultant Referral Workflow Fields
   referralState?: 'NONE' | 'PROPOSED' | 'BROADCASTING' | 'ACCEPTED' | 'COMPLETED' | 'DECLINED';

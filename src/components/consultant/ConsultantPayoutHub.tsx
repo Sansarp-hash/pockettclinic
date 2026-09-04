@@ -27,10 +27,11 @@ export default function ConsultantPayoutHub({
   const [amountGHS, setAmountGHS] = useState<number | ''>('');
   const [channelType, setChannelType] = useState<'mobile_money' | 'bank_transfer'>('mobile_money');
   const [networkProvider, setNetworkProvider] = useState<'MTN' | 'TELECEL' | 'AT'>('MTN');
-  const [momoNumber, setMomoNumber] = useState('0244123456');
-  const [accountName, setAccountName] = useState(consultantName || 'Consultant');
-  const [bankName, setBankName] = useState('GCB Bank');
+  const [payoutNumber, setPayoutNumber] = useState('');
+  const [accountName, setAccountName] = useState('');
+  const [bankName, setBankName] = useState('');
   const [bankAccountNumber, setBankAccountNumber] = useState('');
+  const [branchCode, setBranchCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -93,9 +94,9 @@ export default function ConsultantPayoutHub({
       amountGHS: withdrawAmt,
       channelType,
       networkProvider: channelType === 'mobile_money' ? networkProvider : null,
-      bankCode: null,
+      bankCode: channelType === 'bank_transfer' ? branchCode : null,
       bankName: channelType === 'bank_transfer' ? bankName : null,
-      accountNumber: channelType === 'mobile_money' ? momoNumber : bankAccountNumber,
+      accountNumber: channelType === 'mobile_money' ? payoutNumber : bankAccountNumber,
       accountName,
       status: 'processing',
       requestDayOfWeek: days.includes(currentDay) ? currentDay : 'Monday',
@@ -125,7 +126,7 @@ export default function ConsultantPayoutHub({
       const finalRequest = { ...newRequest, requestId: result.requestId || newId };
 
       setPayouts(prev => [finalRequest, ...prev]);
-      setSuccessMessage(`Payout request for GHS ${withdrawAmt.toFixed(2)} submitted successfully! Disbursing via ${channelType === 'mobile_money' ? `${networkProvider} MoMo` : bankName}.`);
+      setSuccessMessage(`Payout request for GHS ${withdrawAmt.toFixed(2)} submitted successfully! Disbursing via ${channelType === 'mobile_money' ? `${networkProvider} Mobile Wallet` : bankName}.`);
       setTimeout(() => {
         setIsWithdrawModalOpen(false);
         setSuccessMessage(null);
@@ -150,14 +151,14 @@ export default function ConsultantPayoutHub({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-lg font-black text-slate-800 tracking-tight">
-                Consultant Earnings & MoMo Payout Hub
+                Consultant Earnings & Mobile Wallet Payout Hub
               </h3>
               <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md">
                 70% Guaranteed Take
               </span>
             </div>
             <p className="text-xs text-slate-600 mt-0.5">
-              Direct Mobile Money disbursement (MTN MoMo, Telecel Cash) and automated settlement tracking.
+              Direct Mobile Money disbursement (MTN Mobile Wallet, Telecel Cash) and automated settlement tracking.
             </p>
           </div>
         </div>
@@ -168,7 +169,7 @@ export default function ConsultantPayoutHub({
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-slate-600 px-5 py-2.5 rounded-2xl text-xs font-black shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 shadow-emerald-600/20 transition-all cursor-pointer"
         >
           <ArrowUpRight size={16} />
-          <span>Withdraw to MoMo / Bank</span>
+          <span>Withdraw to Mobile Wallet / Bank</span>
         </button>
       </div>
 
@@ -242,7 +243,7 @@ export default function ConsultantPayoutHub({
                     </td>
                     <td className="p-3">
                       <div className="font-bold text-slate-800">
-                        {p.channelType === 'mobile_money' ? `${p.networkProvider} MoMo` : p.bankName}
+                        {p.channelType === 'mobile_money' ? `${p.networkProvider} Mobile Wallet` : p.bankName}
                       </div>
                       <span className="text-[11px] text-slate-600">{p.accountNumber} ({p.accountName})</span>
                     </td>
@@ -291,9 +292,9 @@ export default function ConsultantPayoutHub({
             ) : (
               <form onSubmit={handleRequestPayout} className="space-y-4 text-xs">
                 <div>
-                  <label className="block font-bold text-slate-800 mb-1">Withdrawal Amount (GHS) *</label>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Withdrawal Amount (GHS) *</label>
                   <div className="relative">
-                    <span className="absolute left-3.5 top-2.5 font-black text-slate-500">GHS</span>
+                    <span className="absolute left-4 top-3 font-black text-slate-400">GHS</span>
                     <input
                       type="number"
                       required
@@ -302,32 +303,31 @@ export default function ConsultantPayoutHub({
                       placeholder={`Max ${availableBalanceGHS.toFixed(2)}`}
                       value={amountGHS}
                       onChange={(e) => setAmountGHS(e.target.value ? Number(e.target.value) : '')}
-                      className="w-full pl-14 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl font-black text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      className="w-full pl-14 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
                     />
                   </div>
                 </div>
-
                 <div>
-                  <label className="block font-bold text-slate-800 mb-1">Payout Channel *</label>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Payout Channel *</label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={() => setChannelType('mobile_money')}
-                      className={`p-2.5 rounded-xl font-bold border transition-all ${
+                      className={`p-3 rounded-xl font-bold border transition-all text-sm ${
                         channelType === 'mobile_money'
-                          ? 'bg-emerald-50 border-emerald-400 text-emerald-900 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300'
-                          : 'bg-white border-slate-200 text-slate-600'
+                          ? 'bg-slate-800 border-slate-800 text-white shadow-md transform -translate-y-0.5'
+                          : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                       }`}
                     >
-                      Mobile Money (MoMo)
+                      Mobile Wallet
                     </button>
                     <button
                       type="button"
                       onClick={() => setChannelType('bank_transfer')}
-                      className={`p-2.5 rounded-xl font-bold border transition-all ${
+                      className={`p-3 rounded-xl font-bold border transition-all text-sm ${
                         channelType === 'bank_transfer'
-                          ? 'bg-emerald-50 border-emerald-400 text-emerald-900 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300'
-                          : 'bg-white border-slate-200 text-slate-600'
+                          ? 'bg-slate-800 border-slate-800 text-white shadow-md transform -translate-y-0.5'
+                          : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                       }`}
                     >
                       Bank Transfer
@@ -343,69 +343,76 @@ export default function ConsultantPayoutHub({
                           key={net}
                           type="button"
                           onClick={() => setNetworkProvider(net)}
-                          className={`py-2 rounded-xl font-black border text-center transition-all ${
+                          className={`py-3 rounded-xl font-black border text-center transition-all ${
                             networkProvider === net
-                              ? 'bg-white text-slate-600 border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300'
-                              : 'bg-white border-slate-200 text-slate-800'
+                              ? 'bg-slate-800 text-white border-slate-800 shadow-md transform -translate-y-0.5'
+                              : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                           }`}
                         >
                           {net}
                         </button>
                       ))}
                     </div>
-
                     <div>
-                      <label className="block font-bold text-slate-800 mb-1">MoMo Mobile Number *</label>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Mobile Wallet Number *</label>
                       <input
                         type="tel"
                         required
-                        placeholder="0244 000 000"
-                        value={momoNumber}
-                        onChange={(e) => setMomoNumber(e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                        placeholder="e.g. 0244 000 000"
+                        value={payoutNumber}
+                        onChange={(e) => setPayoutNumber(e.target.value)}
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
                       />
                     </div>
                   </>
                 ) : (
                   <>
                     <div>
-                      <label className="block font-bold text-slate-800 mb-1">Bank Name *</label>
-                      <select
-                        value={bankName}
-                        onChange={(e) => setBankName(e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                      >
-                        <option value="GCB Bank">GCB Bank</option>
-                        <option value="Ecobank Ghana">Ecobank Ghana</option>
-                        <option value="Stanbic Bank">Stanbic Bank</option>
-                        <option value="Absa Bank Ghana">Absa Bank Ghana</option>
-                        <option value="Fidelity Bank">Fidelity Bank</option>
-                        <option value="CalBank">CalBank</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-slate-800 mb-1">Account Number *</label>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Bank Name *</label>
                       <input
                         type="text"
                         required
-                        placeholder="e.g. 1041010000000"
-                        value={bankAccountNumber}
-                        onChange={(e) => setBankAccountNumber(e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                        placeholder="e.g. GCB Bank, Ecobank"
+                        value={bankName}
+                        onChange={(e) => setBankName(e.target.value)}
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
                       />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Account Number *</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. 1041010000000"
+                          value={bankAccountNumber}
+                          onChange={(e) => setBankAccountNumber(e.target.value)}
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Branch Code (Optional)</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. 001"
+                          value={branchCode}
+                          onChange={(e) => setBranchCode(e.target.value)}
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
+                        />
+                      </div>
                     </div>
                   </>
                 )}
 
                 <div>
-                  <label className="block font-bold text-slate-800 mb-1">Registered Account Name *</label>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Registered Account Name *</label>
                   <input
                     type="text"
                     required
+                    placeholder="Exact name registered on the account"
                     value={accountName}
                     onChange={(e) => setAccountName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
                   />
                 </div>
 

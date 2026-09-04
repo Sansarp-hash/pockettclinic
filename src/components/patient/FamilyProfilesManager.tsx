@@ -26,7 +26,7 @@ export default function FamilyProfilesManager({
   const [relationship, setRelationship] = useState<FamilyMember['relationship']>('CHILD');
   const [age, setAge] = useState<number | ''>('');
   const [gender, setGender] = useState<FamilyMember['gender']>('MALE');
-  const [bloodGroup, setBloodGroup] = useState('O+');
+  const [bloodGroup, setBloodGroup] = useState('');
   const [allergies, setAllergies] = useState('');
   const [chronicConditions, setChronicConditions] = useState('');
   const [emergencyPhone, setEmergencyPhone] = useState('');

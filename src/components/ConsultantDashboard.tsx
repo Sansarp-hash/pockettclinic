@@ -381,7 +381,7 @@ export default function ConsultantDashboard({
     return isMine || isBroadcast || statusUpper === 'COMPLETED';
   });
 
-  const completedConsultations = effectiveConsultations.filter(c => c.status === 'COMPLETED');
+  const completedConsultations = effectiveConsultations.filter(c => c.status === 'COMPLETED' || c.status === 'CLINICAL_ESCALATION');
   
   const isProTier = user?.subscriptionTier === 'pro_partner';
   const consultantSharePct = isProTier ? 0.75 : 0.70;
@@ -546,7 +546,7 @@ export default function ConsultantDashboard({
                   <ConsultantFeedbackView reviews={reviews} />
                 );
               case 'chat': {
-                const chatSessions = effectiveConsultations.filter(c => c.status === 'COMPLETED' || c.status === 'IN_PROGRESS' || c.status === 'ACTIVE' || c.status === 'PAID' || c.status === 'PENDING');
+                const chatSessions = effectiveConsultations.filter(c => c.status === 'COMPLETED' || c.status === 'CLINICAL_ESCALATION' || c.status === 'IN_PROGRESS' || c.status === 'ACTIVE' || c.status === 'PAID' || c.status === 'PENDING');
                 const activeSession = chatSessions.find(s => ((s as any).id || s.sessionId) === selectedChatSessionId) || chatSessions[0];
                 const currentChatId = activeSession ? ((activeSession as any).id || activeSession.sessionId) : null;
   
@@ -616,7 +616,7 @@ export default function ConsultantDashboard({
                   { id: 'drug-safety', label: 'Drug Safety', icon: ShieldAlert },
                   { id: 'referrals', label: 'Referrals', icon: Building2 },
                   { id: 'follow-ups', label: 'Follow-ups', icon: Clock },
-                  { id: 'payout-hub', label: 'Earnings & MoMo', icon: Landmark },
+                  { id: 'payout-hub', label: 'Earnings & Payouts', icon: Landmark },
                   { id: 'schedule', label: 'Schedule', icon: Calendar },
                   { id: 'chat', label: 'Messages', icon: MessageSquare },
                   { id: 'portfolio', label: 'Portfolio', icon: UserCircle },
@@ -1072,7 +1072,7 @@ export default function ConsultantDashboard({
             )}
 
             {activeDashboardTab === 'chat' && (() => {
-              const chatSessions = effectiveConsultations.filter(c => c.status === 'COMPLETED' || c.status === 'IN_PROGRESS' || c.status === 'ACTIVE' || c.status === 'PAID' || c.status === 'PENDING');
+              const chatSessions = effectiveConsultations.filter(c => c.status === 'COMPLETED' || c.status === 'CLINICAL_ESCALATION' || c.status === 'IN_PROGRESS' || c.status === 'ACTIVE' || c.status === 'PAID' || c.status === 'PENDING');
               const activeSession = chatSessions.find(s => ((s as any).id || s.sessionId) === selectedChatSessionId) || chatSessions[0];
               const currentChatId = activeSession ? ((activeSession as any).id || activeSession.sessionId) : null;
 

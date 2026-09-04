@@ -85,7 +85,6 @@ import ReferralGuidanceBanner from '../components/ReferralGuidanceBanner';
 import OcrScannerModal from '../components/OcrScannerModal';
 import ConsultantReviewSignatureModal from '../components/ConsultantReviewSignatureModal';
 import ClinicalTriageSlipModal from '../components/ClinicalTriageSlipModal';
-import DualFaceBiometrics from '../components/DualFaceBiometrics';
 import ConsultantGuidelinesDrawer, { ConsultantGuidelinesContent } from '../components/ConsultantGuidelinesDrawer';
 import RichTextEditor from '../components/RichTextEditor';
 import ConsultantReferralModal from '../components/ConsultantReferralModal';
@@ -351,7 +350,6 @@ function WaitingOverlay({
     </div>
   );
 }
-
 function VideoStageWithHardwareStream({ 
   onEndCall, 
   isFullScreen, 
@@ -414,7 +412,7 @@ function VideoStageWithHardwareStream({
   const [isVideoOn, setIsVideoOn] = useState(!isChatType);
   const isConsultantInitial = isConsultantRole(role) || !!user?.cadre;
   const [showFolderDropdown, setShowFolderDropdown] = useState(false);
-  const [activeOverlay, setActiveOverlay] = useState<null | 'chat' | 'soap' | 'imaging' | 'history' | 'vitals' | 'stg' | 'verify'>(null);
+  const [activeOverlay, setActiveOverlay] = useState<null | 'chat' | 'soap' | 'imaging' | 'history' | 'vitals' | 'stg'>(null);
   
   const [showControls, setShowControls] = useState(true);
 
@@ -669,7 +667,6 @@ function VideoStageWithHardwareStream({
                   {activeOverlay === 'history' && <FileText size={16} className="text-blue-400" />}
                   {activeOverlay === 'vitals' && <HeartPulse size={16} className="text-rose-400" />}
                   {activeOverlay === 'stg' && <BookOpen size={16} className="text-teal-400" />}
-                  {activeOverlay === 'verify' && <ShieldCheck size={16} className="text-purple-400" />}
                   <span className="tracking-widest">
                     {activeOverlay === 'chat' && 'Secure Chat Room'}
                     {activeOverlay === 'soap' && 'SOAP Note Documentation'}
@@ -677,7 +674,6 @@ function VideoStageWithHardwareStream({
                     {activeOverlay === 'history' && 'Patient Medical History'}
                     {activeOverlay === 'vitals' && 'Patient Vitals Overview'}
                     {activeOverlay === 'stg' && 'Clinical Treatment Guidelines'}
-                    {activeOverlay === 'verify' && 'Identity Verification'}
                   </span>
                 </div>
                 <button
@@ -701,15 +697,6 @@ function VideoStageWithHardwareStream({
                     isCompleted={activeConsultation?.status === 'COMPLETED'}
                     className="h-full border-0 rounded-none shadow-none text-slate-100 bg-transparent"
                   />
-                )}
-                {activeOverlay === 'verify' && (
-                  <div className="flex-1 p-6 flex flex-col overflow-y-auto">
-                    <h3 className="font-extrabold text-white mb-1 uppercase tracking-wider text-xs">Dual Face Biometrics</h3>
-                    <p className="text-[11px] text-slate-300 mb-4">Verify patient identity against ID records.</p>
-                    <div className="bg-slate-950/60 p-4 rounded-2xl border border-white/5">
-                      <DualFaceBiometrics />
-                    </div>
-                  </div>
                 )}
                 {activeOverlay === 'soap' && (
                   <div className="flex-1 p-6 flex flex-col overflow-y-auto">
@@ -1047,19 +1034,7 @@ function VideoStageWithHardwareStream({
                     <span>Patient Vitals</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveOverlay(activeOverlay === 'verify' ? null : 'verify');
-                      setShowFolderDropdown(false);
-                    }}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left font-semibold cursor-pointer ${
-                      activeOverlay === 'verify' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'hover:bg-white/10 text-slate-200'
-                    }`}
-                  >
-                    <ShieldCheck size={15} className="text-purple-400" />
-                    <span>Identity Verification</span>
-                  </button>
+                  
 
                   <button
                     type="button"
@@ -1364,19 +1339,7 @@ function VideoStageWithHardwareStream({
                     <span>Patient Vitals</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveOverlay(activeOverlay === 'verify' ? null : 'verify');
-                      setShowFolderDropdown(false);
-                    }}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left font-semibold cursor-pointer ${
-                      activeOverlay === 'verify' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'hover:bg-white/10 text-slate-200'
-                    }`}
-                  >
-                    <ShieldCheck size={15} className="text-purple-400" />
-                    <span>Identity Verification</span>
-                  </button>
+                  
 
                   <button
                     type="button"
@@ -1464,19 +1427,7 @@ function VideoStageWithHardwareStream({
                     <span>Scan / Upload Prescription</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveOverlay(activeOverlay === 'verify' ? null : 'verify');
-                      setShowFolderDropdown(false);
-                    }}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left font-semibold cursor-pointer ${
-                      activeOverlay === 'verify' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'hover:bg-white/10 text-slate-200'
-                    }`}
-                  >
-                    <ShieldCheck size={15} className="text-purple-400" />
-                    <span>My Identity Verification</span>
-                  </button>
+                  
                 </>
               )}
             </motion.div>
@@ -1554,7 +1505,7 @@ function ConnectionMonitor({
 export default function ConsultationRoom() {
   const agoraClient = useMemo(() => {
     const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
-    AgoraRTC.setLogLevel(1); // Set to Info level
+    AgoraRTC.setLogLevel(4); // Set to NONE to suppress internal WS_ABORT and subscription race condition console errors
     
     // Safely wrap client.subscribe to catch and suppress INVALID_REMOTE_USER and channel subscription race conditions
     const anyClient = client as any;
@@ -1602,7 +1553,6 @@ export default function ConsultationRoom() {
     showToast,
     showConfirm
   } = useAppContext();
-
   const isConsultant = useMemo(() => isConsultantRole(role) || !!user?.cadre, [role, user?.cadre]);
   const navigate = useNavigate();
   const [localConsultation, setLocalConsultation] = useState<ConsultationSession | null>(null);
@@ -2752,21 +2702,21 @@ export default function ConsultationRoom() {
   const isWarningTimer = isAcceptedSession && secondsRemaining > 0 && secondsRemaining <= 180;
   const isExpiredTimer = isAcceptedSession && (secondsRemaining === 0 || activeConsultation.isOnHold);
 
-  const isPatientFaceTimeMode = !isConsultant && activeConsultation?.type !== 'chat' && activeConsultation?.sessionType !== 'CHAT_ONLY';
+  const isVideoMode = activeConsultation?.type !== 'chat' && activeConsultation?.sessionType !== 'CHAT_ONLY';
 
   return (
     <AgoraRTCProvider client={agoraClient}>
-      <div className={`fixed inset-0 z-[100] md:z-auto ${isPatientFaceTimeMode ? 'bg-black p-0 overflow-hidden' : 'bg-[#F8FAFC] md:bg-transparent p-0 sm:p-4 lg:p-6'} flex-1 w-full flex flex-col transition-all duration-300 ${isConsultant ? 'md:h-[calc(100vh-64px)] md:max-h-[calc(100vh-64px)] md:overflow-hidden' : (isPatientFaceTimeMode ? 'h-[100dvh]' : 'md:min-h-[calc(100vh-4rem)]')}`}>
+      <div className={`fixed inset-0 z-[100] md:z-auto ${isVideoMode ? 'bg-black p-0 overflow-hidden' : 'bg-[#F8FAFC] md:bg-transparent p-0 sm:p-4 lg:p-6'} flex-1 w-full flex flex-col transition-all duration-300 ${isConsultant ? 'md:h-[calc(100vh-64px)] md:max-h-[calc(100vh-64px)] md:overflow-hidden' : (isVideoMode ? 'h-[100dvh]' : 'md:min-h-[calc(100vh-4rem)]')}`}>
       
-      <div className={`flex flex-col lg:flex-row ${isPatientFaceTimeMode ? 'gap-0' : 'gap-4 lg:gap-6'} flex-1 items-stretch overflow-hidden`}>
-        <div className={`${isPatientFaceTimeMode ? 'space-y-0 h-full' : 'space-y-4'} flex flex-col transition-all duration-300 ease-in-out flex-1 min-w-0 ${
+      <div className={`flex flex-col lg:flex-row ${isVideoMode ? 'gap-0' : 'gap-4 lg:gap-6'} flex-1 items-stretch overflow-hidden`}>
+        <div className={`${isVideoMode ? 'space-y-0 h-full' : 'space-y-4'} flex flex-col transition-all duration-300 ease-in-out flex-1 min-w-0 ${
           isConsultant 
-            ? (isWorkspaceCollapsed ? 'h-full' : 'h-[50vh] lg:h-auto') 
+            ? (isWorkspaceCollapsed ? 'h-full' : 'h-full lg:h-auto') 
             : ''
         } ${activeConsultation?.type === 'chat' || activeConsultation?.sessionType === 'CHAT_ONLY' ? 'hidden lg:flex w-full h-auto' : ''} flex`}>
           
           {/* Header Row */}
-          {!isPatientFaceTimeMode && (
+          {!isVideoMode && (
           <div className="flex items-center justify-between bg-white md:bg-white p-3 md:p-4 rounded-b-[24px] md:rounded-2xl border-b md:border border-slate-200 shadow-sm shrink-0 z-10 sticky top-[48px] md:relative">
              <div className="flex items-center gap-2 md:gap-3">
                <button 
@@ -3084,20 +3034,20 @@ export default function ConsultationRoom() {
               </button>
             </div>
           )}
-          <div className={`bg-slate-950 overflow-hidden relative flex items-center justify-center transition-all duration-300 ${isPatientFaceTimeMode ? 'rounded-none shadow-none w-full h-full flex-1' : `rounded-[32px] shadow-2xl ${activeConsultation?.type === 'chat' || activeConsultation?.sessionType === 'CHAT_ONLY' ? 'hidden' : (role === 'consultant' ? 'aspect-video md:flex-1' : (!isAcceptedSession ? 'w-full min-h-[420px] lg:aspect-auto lg:flex-1' : 'w-full aspect-video lg:aspect-auto lg:flex-1'))}`}`}>
+          <div className={`bg-slate-950 overflow-hidden relative flex items-center justify-center transition-all duration-300 ${isVideoMode ? 'rounded-none shadow-none w-full h-full flex-1' : `rounded-[32px] shadow-2xl ${activeConsultation?.type === 'chat' || activeConsultation?.sessionType === 'CHAT_ONLY' ? 'hidden' : (role === 'consultant' ? 'aspect-video md:flex-1' : (!isAcceptedSession ? 'w-full min-h-[420px] lg:aspect-auto lg:flex-1' : 'w-full aspect-video lg:aspect-auto lg:flex-1'))}`}`}>
              {!isAcceptedSession ? (
-               <div className={`w-full h-full z-10 flex flex-col items-center justify-center p-6 text-center ${isPatientFaceTimeMode ? 'bg-slate-950 text-slate-300' : 'bg-white text-slate-600 min-h-[420px] rounded-[32px]'}`}>
+               <div className={`w-full h-full z-10 flex flex-col items-center justify-center p-6 text-center ${isVideoMode ? 'bg-slate-950 text-slate-300' : 'bg-white text-slate-600 min-h-[420px] rounded-[32px]'}`}>
                  <div className="relative flex items-center justify-center mb-6">
                    <div className="absolute inset-0 bg-emerald-600 rounded-full animate-ping opacity-25"></div>
-                   <div className={`w-20 h-20 rounded-full flex items-center justify-center relative z-10 shadow-2xl ${isPatientFaceTimeMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200/80'}`}>
+                   <div className={`w-20 h-20 rounded-full flex items-center justify-center relative z-10 shadow-2xl ${isVideoMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200/80'}`}>
                       <Clock size={32} className="text-emerald-600 animate-spin" style={{ animationDuration: '4s' }} />
                    </div>
                  </div>
-                 <h3 className={`font-extrabold text-2xl mb-2 flex items-center justify-center gap-2 ${isPatientFaceTimeMode ? 'text-white' : 'text-slate-900'}`}>
+                 <h3 className={`font-extrabold text-2xl mb-2 flex items-center justify-center gap-2 ${isVideoMode ? 'text-white' : 'text-slate-900'}`}>
                    Awaiting Consultant Connection
                    <span className="flex gap-1"><span className="animate-bounce delay-75 text-emerald-600">.</span><span className="animate-bounce delay-150 text-emerald-600">.</span><span className="animate-bounce delay-300 text-emerald-600">.</span></span>
                  </h3>
-                 <p className={`text-sm font-medium max-w-md mb-8 leading-relaxed ${isPatientFaceTimeMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                 <p className={`text-sm font-medium max-w-md mb-8 leading-relaxed ${isVideoMode ? 'text-slate-400' : 'text-slate-500'}`}>
                    Your request has been dispatched. The video conference room and timer will start automatically as soon as the consultant accepts your booking.
                  </p>
                  {role === 'patient' && (
@@ -3126,8 +3076,7 @@ export default function ConsultationRoom() {
                   <div className="w-full h-full relative">
                       <SafeRoomComponent>
                         <ConnectionMonitor sessionId={activeConsultation?.sessionId || urlRoomName} tickets={tickets} revokeTicket={revokeTicket} activeConsultation={activeConsultation} showToast={showToast} navigate={navigate} />
-                        {!isPatientFaceTimeMode && <ElapsedTimeOverlay />}
-                        {!isPatientFaceTimeMode && (
+                        {!isVideoMode && (
                           <WaitingOverlay 
                             isAccepted={isAcceptedSession} 
                             showCancelButton={role === 'patient'} 

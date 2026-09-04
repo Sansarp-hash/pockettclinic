@@ -108,10 +108,10 @@ export default function ConsultantOnboarding() {
   const [verifiedPharmacists, setVerifiedPharmacists] = useState<{ uid: string; fullName: string; prefix: string; pin: string }[]>([]);
 
   // SECTION D — Compliance & Insurance State
-  const [ghanaCardNo, setGhanaCardNo] = useState('GHA-');
-  const [indemnityPolicyNo, setIndemnityPolicyNo] = useState('IND-2026-');
-  const [insuranceProvider, setInsuranceProvider] = useState('Star Assurance Ghana');
-  const [expiryDate, setExpiryDate] = useState('2027-12-31');
+  const [ghanaCardNo, setGhanaCardNo] = useState('');
+  const [indemnityPolicyNo, setIndemnityPolicyNo] = useState('');
+  const [insuranceProvider, setInsuranceProvider] = useState('');
+  const [expiryDate, setExpiryDate] = useState('');
   const [indemnityDocData, setIndemnityDocData] = useState<string | null>(null);
   const [indemnityDocName, setIndemnityDocName] = useState('');
   const indemnityInputRef = useRef<HTMLInputElement>(null);
@@ -128,8 +128,8 @@ export default function ConsultantOnboarding() {
   const [typedLegalSignature, setTypedLegalSignature] = useState('');
 
   // SECTION F — Availability & Account Setup State
-  const [availabilityDays, setAvailabilityDays] = useState('Monday - Friday');
-  const [availabilityHours, setAvailabilityHours] = useState('9:00 AM - 5:00 PM');
+  const [availabilityDays, setAvailabilityDays] = useState('');
+  const [availabilityHours, setAvailabilityHours] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 1. Check if already completed onboarding

@@ -32,8 +32,8 @@ export default function AdminPartnerPharmacyManager() {
   const [supervisingPharmacist, setSupervisingPharmacist] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [region, setRegion] = useState('Greater Accra');
-  const [city, setCity] = useState('Accra');
+  const [region, setRegion] = useState('');
+  const [city, setCity] = useState('');
 
   useEffect(() => {
     const q = query(collection(db, 'partner_pharmacies'));

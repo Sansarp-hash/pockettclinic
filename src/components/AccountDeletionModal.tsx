@@ -28,7 +28,7 @@ const DELETION_REASONS = [
 ];
 
 export default function AccountDeletionModal({ isOpen, onClose }: AccountDeletionModalProps) {
-  const { user, requestAccountDeletion } = useAppContext();
+  const { user, requestAccountDeletion, logout } = useAppContext();
   
   const [reason, setReason] = useState(DELETION_REASONS[0]);
   const [customFeedback, setCustomFeedback] = useState('');

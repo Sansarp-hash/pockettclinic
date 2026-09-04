@@ -51,7 +51,7 @@ export default function Booking() {
   const [date, setDate] = useState(getTodayStr());
   const [time, setTime] = useState(getDefaultTimeStr());
   const [sessionType, setSessionType] = useState<'VIDEO' | 'CHAT_ONLY' | 'AUDIO_ONLY'>('VIDEO');
-  const [chiefComplaints, setChiefComplaints] = useState('General consultation request: Mild fever, sore throat and fatigue for 2 days.');
+  const [chiefComplaints, setChiefComplaints] = useState('');
   const [consultation, setConsultation] = useState<ConsultationSession | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [patientInformedConsent, setPatientInformedConsent] = useState(true);
@@ -424,7 +424,7 @@ export default function Booking() {
   const consultant = consultants.find(p => p.uid === consultantId) || null;
 
   const effectiveCadre = normalizeCadre(consultant ? consultant.cadre : targetCadreParam);
-  const pricing = getSessionTierPricing(effectiveCadre, sessionType, systemConfig);
+  const pricing = getSessionTierPricing(effectiveCadre, sessionType, systemConfig, mode === 'instant');
 
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault();
@@ -486,7 +486,7 @@ export default function Booking() {
       amountPaidGHS: grossFee,
       platformCutGHS: platformCutGHS,
       payoutAmountGHS: payoutAmountGHS,
-      priorityMatching: userIsCarePlus
+      priorityMatching: mode === 'instant' ? true : userIsCarePlus
     };
     
     setConsultation(newConsultation);
@@ -1033,10 +1033,9 @@ export default function Booking() {
             <div className="pt-2 flex justify-end">
               <button 
                 type="submit"
-                disabled={!user?.hasAcceptedCareTerms}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-8 py-4 rounded-xl font-bold transition-all flex justify-center items-center gap-2 shadow-lg shadow-indigo-500/20 cursor-pointer uppercase tracking-wider text-xs"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white px-8 py-4 rounded-xl font-bold transition-all flex justify-center items-center gap-2 shadow-lg shadow-indigo-500/20 cursor-pointer uppercase tracking-wider text-xs"
               >
-                {!user?.hasAcceptedCareTerms ? 'Terms Acceptance Required' : 'Proceed Direct to Payment'}
+                Proceed Direct to Payment
                 <ChevronRight size={18} />
               </button>
             </div>
@@ -1051,7 +1050,7 @@ export default function Booking() {
             <p className="text-slate-500 text-sm mt-1">{pricing.tier.title} ({pricing.durationMins} Mins)</p>
           </div>
           <div className="p-6 md:p-8">
-            {activePatientTickets.length > 0 && (
+            {activePatientTickets.length > 0 && mode !== 'instant' && (
               <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl animate-in fade-in">
                 <h4 className="text-xs font-black uppercase tracking-wider text-emerald-900 mb-2 flex items-center gap-1.5">
                   <Award size={16} className="text-emerald-600" />
@@ -1164,7 +1163,7 @@ export default function Booking() {
               </div>
             )}
 
-            {user?.videoChatTickets && user.videoChatTickets > 0 && (
+            {user?.videoChatTickets && user.videoChatTickets > 0 && mode !== 'instant' && (
               <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-2xl animate-in fade-in">
                 <h4 className="text-xs font-black uppercase tracking-wider text-indigo-900 mb-2 flex items-center gap-1.5">
                   <Video size={16} className="text-indigo-600" />

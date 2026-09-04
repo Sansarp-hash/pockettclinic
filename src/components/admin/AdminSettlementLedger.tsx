@@ -44,7 +44,7 @@ export default function AdminSettlementLedger({
     const query = searchQuery.toLowerCase().trim();
 
     const matchesQuery = !query || pName.includes(query) || cName.includes(query) || sId.includes(query);
-    const isProcessed = c.ledgerProcessed || c.status === 'COMPLETED';
+    const isProcessed = c.ledgerProcessed || c.status === 'COMPLETED' || c.status === 'CLINICAL_ESCALATION';
 
     if (filterType === 'PROCESSED') return matchesQuery && isProcessed;
     if (filterType === 'PENDING') return matchesQuery && !isProcessed;
@@ -260,7 +260,7 @@ export default function AdminSettlementLedger({
               {filtered.map((c) => {
                 const gross = Number(c.amountPaidGHS || c.amountGHS || 80);
                 const payout = Number(c.payoutAmountGHS || gross * 0.8);
-                const isProcessed = c.ledgerProcessed || c.status === 'COMPLETED';
+                const isProcessed = c.ledgerProcessed || c.status === 'COMPLETED' || c.status === 'CLINICAL_ESCALATION';
 
                 return (
                   <tr key={c.id || c.sessionId} className="hover:bg-white/80 transition-colors">

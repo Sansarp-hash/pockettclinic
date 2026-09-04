@@ -114,7 +114,7 @@ export default function ConsultationHistory({ patientId }: ConsultationHistoryPr
 
                   <span
                     className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                      session.status === 'COMPLETED'
+                      session.status === 'COMPLETED' || session.status === 'CLINICAL_ESCALATION'
                         ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                         : session.status === 'IN_PROGRESS'
                         ? 'bg-slate-50 text-slate-600 border border-slate-300'
@@ -192,7 +192,7 @@ export default function ConsultationHistory({ patientId }: ConsultationHistoryPr
               )}
 
               {/* 24-HOUR FOLLOW-UP WINDOW TRIGGER */}
-              {session.status === 'COMPLETED' && session.followUpWindowClosesAt && (
+              {session.status === 'COMPLETED' || session.status === 'CLINICAL_ESCALATION' && session.followUpWindowClosesAt && (
                 (() => {
                   const isWindowOpen = new Date(session.followUpWindowClosesAt).getTime() > Date.now();
                   const remaining = session.followUpMessagesRemaining || 0;
@@ -228,7 +228,7 @@ export default function ConsultationHistory({ patientId }: ConsultationHistoryPr
               <ReferralGuidanceBanner consultation={session} />
 
               {/* Patient Rating Prompt if not yet rated */}
-              {session.status === 'COMPLETED' && !session.patientRating && (
+              {session.status === 'COMPLETED' || session.status === 'CLINICAL_ESCALATION' && !session.patientRating && (
                 <div className="mb-4 bg-amber-50 border border-amber-200 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">

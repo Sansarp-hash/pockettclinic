@@ -32,9 +32,9 @@ export default function ConsultantReviewSignatureModal({
   
   // Section states
   const [chiefComplaint, setChiefComplaint] = useState(consultation.chiefComplaints || 'Mild fever and sore throat.');
-  const [discussionHistory, setDiscussionHistory] = useState('Patient presented with acute mild symptoms. Evaluated during 15-minute live virtual consultation session.');
-  const [suggestedInterventions, setSuggestedInterventions] = useState('Hydration, supportive care, and symptomatic OTC medication.');
-  const [nextSteps, setNextSteps] = useState('Monitor temperature for 24-48 hours. Consult a doctor if symptoms escalate.');
+  const [discussionHistory, setDiscussionHistory] = useState('');
+  const [suggestedInterventions, setSuggestedInterventions] = useState('');
+  const [nextSteps, setNextSteps] = useState('');
   const [consultantFinalNotes, setConsultantFinalNotes] = useState('');
   const [fullSummaryMarkdown, setFullSummaryMarkdown] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

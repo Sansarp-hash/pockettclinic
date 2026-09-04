@@ -16,7 +16,7 @@ export default function AdminQualityAssurance({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAuditSession, setSelectedAuditSession] = useState<any | null>(null);
 
-  const completedSessions = consultations.filter((c) => c.status === 'COMPLETED' || c.soapNotes || c.chiefComplaints);
+  const completedSessions = consultations.filter((c) => c.status === 'COMPLETED' || c.status === 'CLINICAL_ESCALATION' || c.soapNotes || c.chiefComplaints);
 
   return (
     <div className="space-y-6">

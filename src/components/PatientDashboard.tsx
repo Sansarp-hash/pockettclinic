@@ -163,7 +163,7 @@ export default function PatientDashboard({
   onBackToList
 }: PatientDashboardProps = {}) {
   const navigate = useNavigate();
-  const { user, setUser, consultations, prescriptions, updateConsultation, cancelConsultation, isLoading, showToast, tickets, allUsers, globalLogoUrl, logout } = useAppContext();
+  const { user, setUser, consultations, prescriptions, updateConsultation, cancelConsultation, isLoading, showToast, tickets, allUsers, globalLogoUrl, logout, systemConfig } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const [consultantSearch, setConsultantSearch] = useState('');
   const [messageIndex, setMessageIndex] = useState(0);
@@ -204,14 +204,14 @@ export default function PatientDashboard({
   // Direct Consultation Payment State
   const [selectedConsultantForPay, setSelectedConsultantForPay] = useState<AvailableConsultant | null>(null);
   const [selectedTicketId, setSelectedTicketId] = useState<string>('');
-  const [payComplaint, setPayComplaint] = useState('Mild fever and general symptoms for 2 days.');
+  const [payComplaint, setPayComplaint] = useState('');
   const [payChannel, setPayChannel] = useState<'mobile_money' | 'card'>('mobile_money');
-  const [momoNumber, setMomoNumber] = useState('0244123456');
+  const [momoNumber, setMomoNumber] = useState('');
   const [isProcessingConsultPay, setIsProcessingConsultPay] = useState(false);
   const [agreedToSessionTerms, setAgreedToSessionTerms] = useState(false);
   const [agreeOnceAndForAll, setAgreeOnceAndForAll] = useState(false);
   
-  const activeTabParam = searchParams.get('tab') as 'overview' | 'appointments' | 'history' | 'medications' | 'vault' | 'family' | 'portfolio' | 'tickets' | null;
+  const activeTabParam = searchParams.get('tab') as 'overview' | 'appointments' | 'history' | 'medications' | 'vault' | 'family' | 'portfolio' | 'tickets' | 'subscription' | null;
   const activeTab = activeTabParam || 'overview';
   const setActiveTab = (tab: 'overview' | 'appointments' | 'history' | 'medications' | 'vault' | 'family' | 'portfolio' | 'tickets') => {
     const newParams = new URLSearchParams(searchParams);
@@ -360,6 +360,7 @@ export default function PatientDashboard({
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [ratingSessionId, setRatingSessionId] = useState<string | null>(null);
+  const [escalationViewSessionId, setEscalationViewSessionId] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
@@ -498,6 +499,7 @@ export default function PatientDashboard({
     { id: 'vault', name: 'Vitals & Vault', icon: HeartPulse },
     { id: 'family', name: 'Family Profiles', icon: Users },
     { id: 'tickets', name: 'My Tickets', icon: Ticket },
+    { id: 'subscription', name: 'Subscription', icon: Crown },
   ] as const;
 
   useEffect(() => {
@@ -627,6 +629,7 @@ export default function PatientDashboard({
     c.status === 'COMPLETED' || 
     c.status === 'CANCELLED' || 
     c.status === 'INCONCLUSIVE' || 
+    c.status === 'CLINICAL_ESCALATION' || 
     c.status === 'TICKET_ISSUED' || 
     c.status === 'TERMINATED_SYSTEM_FAILURE' || 
     c.status === 'FAILED' ||
@@ -748,7 +751,7 @@ export default function PatientDashboard({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
             <button 
               onClick={() => navigate('/booking/instant?cadre=DOCTOR')}
-              className="bg-emerald-50 hover:bg-emerald-100/80 p-4 rounded-[20px] flex flex-col justify-between shadow-sm active:scale-95 hover:shadow-md transition-all text-left group border border-emerald-200/60 cursor-pointer"
+              className="bg-white hover:bg-slate-50 p-4 rounded-[20px] flex flex-col justify-between shadow-[0_4px_20px_rgba(0,0,0,0.04)] active:scale-95 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all text-left group border border-slate-200 cursor-pointer"
             >
               <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center mb-3 shadow-sm">
                 <Stethoscope size={22} strokeWidth={2} />
@@ -757,7 +760,7 @@ export default function PatientDashboard({
                 <h4 className="text-[14px] font-black text-slate-900 leading-tight">Doctor</h4>
                 <p className="text-[11px] text-slate-500 font-medium mt-0.5">Medical Diagnosis & Advice</p>
                 <div className="mt-2.5 flex items-center justify-between">
-                  <span className="text-[12px] font-black text-emerald-800">GHS 80</span>
+                  <span className="text-[12px] font-black text-emerald-800">GHS {getSessionTierPricing('DOCTOR', 'VIDEO', systemConfig).grossFee}</span>
                   <span className="text-[10px] font-extrabold uppercase bg-emerald-200/60 text-emerald-800 px-2 py-0.5 rounded-full">Instant</span>
                 </div>
               </div>
@@ -765,7 +768,7 @@ export default function PatientDashboard({
 
             <button 
               onClick={() => navigate('/booking/instant?cadre=PHARMACIST')}
-              className="bg-purple-50 hover:bg-purple-100/80 p-4 rounded-[20px] flex flex-col justify-between shadow-sm active:scale-95 hover:shadow-md transition-all text-left group border border-purple-200/60 cursor-pointer"
+              className="bg-white hover:bg-slate-50 p-4 rounded-[20px] flex flex-col justify-between shadow-[0_4px_20px_rgba(0,0,0,0.04)] active:scale-95 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all text-left group border border-slate-200 cursor-pointer"
             >
               <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center mb-3 shadow-sm">
                 <Pill size={22} strokeWidth={2} />
@@ -774,7 +777,7 @@ export default function PatientDashboard({
                 <h4 className="text-[14px] font-black text-slate-900 leading-tight">Pharmacist</h4>
                 <p className="text-[11px] text-slate-500 font-medium mt-0.5">Medication & Rx Guidance</p>
                 <div className="mt-2.5 flex items-center justify-between">
-                  <span className="text-[12px] font-black text-purple-800">GHS 50</span>
+                  <span className="text-[12px] font-black text-purple-800">GHS {getSessionTierPricing('PHARMACIST', 'VIDEO', systemConfig).grossFee}</span>
                   <span className="text-[10px] font-extrabold uppercase bg-purple-200/60 text-purple-800 px-2 py-0.5 rounded-full">Instant</span>
                 </div>
               </div>
@@ -782,7 +785,7 @@ export default function PatientDashboard({
 
             <button 
               onClick={() => navigate('/booking/instant?cadre=PHARM_TECH')}
-              className="bg-blue-50 hover:bg-blue-100/80 p-4 rounded-[20px] flex flex-col justify-between shadow-sm active:scale-95 hover:shadow-md transition-all text-left group border border-blue-200/60 cursor-pointer"
+              className="bg-white hover:bg-slate-50 p-4 rounded-[20px] flex flex-col justify-between shadow-[0_4px_20px_rgba(0,0,0,0.04)] active:scale-95 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all text-left group border border-slate-200 cursor-pointer"
             >
               <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-3 shadow-sm">
                 <ShieldCheck size={22} strokeWidth={2} />
@@ -791,7 +794,7 @@ export default function PatientDashboard({
                 <h4 className="text-[14px] font-black text-slate-900 leading-tight">Pharmacy Technician</h4>
                 <p className="text-[11px] text-slate-500 font-medium mt-0.5">Refills & Stock Support</p>
                 <div className="mt-2.5 flex items-center justify-between">
-                  <span className="text-[12px] font-black text-blue-800">GHS 40</span>
+                  <span className="text-[12px] font-black text-blue-800">GHS {getSessionTierPricing('PHARM_TECH', 'VIDEO', systemConfig).grossFee}</span>
                   <span className="text-[10px] font-extrabold uppercase bg-blue-200/60 text-blue-800 px-2 py-0.5 rounded-full">Instant</span>
                 </div>
               </div>
@@ -799,7 +802,7 @@ export default function PatientDashboard({
 
             <button 
               onClick={() => navigate('/booking/instant?cadre=PHYSICIAN_ASSISTANT')}
-              className="bg-amber-50 hover:bg-amber-100/80 p-4 rounded-[20px] flex flex-col justify-between shadow-sm active:scale-95 hover:shadow-md transition-all text-left group border border-amber-200/60 cursor-pointer"
+              className="bg-white hover:bg-slate-50 p-4 rounded-[20px] flex flex-col justify-between shadow-[0_4px_20px_rgba(0,0,0,0.04)] active:scale-95 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all text-left group border border-slate-200 cursor-pointer"
             >
               <div className="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center mb-3 shadow-sm">
                 <UserCheck size={22} strokeWidth={2} />
@@ -808,7 +811,7 @@ export default function PatientDashboard({
                 <h4 className="text-[14px] font-black text-slate-900 leading-tight">Physician Assistant (PA)</h4>
                 <p className="text-[11px] text-slate-500 font-medium mt-0.5">Primary Care Assessments</p>
                 <div className="mt-2.5 flex items-center justify-between">
-                  <span className="text-[12px] font-black text-amber-800">GHS 60</span>
+                  <span className="text-[12px] font-black text-amber-800">GHS {getSessionTierPricing('PHYSICIAN_ASSISTANT', 'VIDEO', systemConfig).grossFee}</span>
                   <span className="text-[10px] font-extrabold uppercase bg-amber-200/60 text-amber-800 px-2 py-0.5 rounded-full">Instant</span>
                 </div>
               </div>
@@ -822,9 +825,9 @@ export default function PatientDashboard({
             <div>
               <h3 className="text-[16px] font-black text-slate-800 tracking-tight flex items-center gap-1.5">
                 <Sparkles size={18} className="text-emerald-600" />
-                Find Specialized Care
+                Find Specialized Consultants Online
               </h3>
-              <p className="text-[11px] text-slate-500 font-medium">Search for sub-specialists like Gynecologist, Cardiologist, Dermatologist, etc.</p>
+              <p className="text-[11px] text-slate-500 font-medium">Search the directory to connect with specialized professionals.</p>
             </div>
           </div>
 
@@ -835,7 +838,7 @@ export default function PatientDashboard({
                 type="text"
                 value={specialistSearchQuery}
                 onChange={(e) => setSpecialistSearchQuery(e.target.value)}
-                placeholder="Search specialty e.g. Gynecologist, Cardiologist, Dermatologist..."
+                placeholder="Search by name, role, or area of expertise..."
                 className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50"
               />
               {specialistSearchQuery && (
@@ -846,31 +849,6 @@ export default function PatientDashboard({
                   <X size={14} />
                 </button>
               )}
-            </div>
-
-            {/* Quick Specialty Chips */}
-            <div className="flex flex-wrap gap-2 pt-1">
-              {[
-                { name: 'Gynecologist', label: '🩺 Gynecologist' },
-                { name: 'Cardiologist', label: '🫀 Cardiologist' },
-                { name: 'Dermatologist', label: '🧴 Dermatologist' },
-                { name: 'Pediatrician', label: '👶 Pediatrician' },
-                { name: 'Neurologist', label: '🧠 Neurologist' },
-                { name: 'Psychiatrist', label: '🧘 Psychiatrist' },
-                { name: 'Orthopedist', label: '🦴 Orthopedist' },
-                { name: 'Ophthalmologist', label: '👁️ Ophthalmologist' }
-              ]
-              .filter(chip => !specialistSearchQuery || chip.name.toLowerCase().includes(specialistSearchQuery.toLowerCase()))
-              .map(chip => (
-                <button
-                  key={chip.name}
-                  onClick={() => navigate(`/booking/instant?cadre=SPECIALIST&specialty=${chip.name}`)}
-                  className="bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200/80 px-3 py-1.5 rounded-full text-[11px] font-extrabold flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-xs"
-                >
-                  <span>{chip.label}</span>
-                  <ChevronRight size={12} className="text-emerald-600" />
-                </button>
-              ))}
             </div>
 
             {specialistSearchQuery && (
@@ -1251,6 +1229,11 @@ export default function PatientDashboard({
                     </div>
                     
                     <div className="flex flex-wrap gap-2 mt-1">
+                      {c.status === 'CLINICAL_ESCALATION' && (
+                        <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                          <AlertTriangle size={12} /> INCONCLUSIVE / ESCALATED
+                        </span>
+                      )}
                       {c.prescriptionId && (
                         <Link 
                           to={`/prescriptions/${c.prescriptionId}`}
@@ -1259,6 +1242,15 @@ export default function PatientDashboard({
                           <FileText size={14} />
                           PRESCRIPTION
                         </Link>
+                      )}
+                      {c.status === 'CLINICAL_ESCALATION' && c.escalationNotes && (
+                        <button 
+                          onClick={() => setEscalationViewSessionId(c.sessionId)}
+                          className="bg-slate-50 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 border border-indigo-100 uppercase tracking-wide cursor-pointer"
+                        >
+                          <FileText size={14} />
+                          VIEW ADD-UP SHEET
+                        </button>
                       )}
                       {!c.rating && c.status === 'COMPLETED' && (
                         <button 
@@ -1647,9 +1639,17 @@ export default function PatientDashboard({
           {/* Patient Header Card */}
           <div className="bg-white rounded-2xl p-4 border border-slate-100 space-y-3 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-slate-300/30 shrink-0">
-                {effectiveUser?.fullName ? effectiveUser.fullName.charAt(0) : 'P'}
-              </div>
+              {effectiveUser?.avatarUrl || effectiveUser?.profilePhotoUrl ? (
+                <img 
+                  src={effectiveUser.avatarUrl || effectiveUser.profilePhotoUrl} 
+                  alt={effectiveUser.fullName || 'Patient'} 
+                  className="w-14 h-14 rounded-2xl object-cover border border-slate-200 shrink-0 shadow-sm" 
+                />
+              ) : (
+                <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-slate-300/30 shrink-0">
+                  {effectiveUser?.fullName ? effectiveUser.fullName.charAt(0).toUpperCase() : 'P'}
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-black text-slate-800 truncate">{effectiveUser?.fullName || 'Patient'}</h2>
@@ -1708,10 +1708,6 @@ export default function PatientDashboard({
               );
             })}
           </nav>
-
-          <div className="px-3 py-2">
-            <SubscriptionCard compact={true} />
-          </div>
 
           {/* Quick Actions Card */}
           <div className="bg-gradient-to-br from-emerald-900 to-emerald-950 p-4 rounded-2xl border border-emerald-800 space-y-3">
@@ -1826,6 +1822,7 @@ export default function PatientDashboard({
             {activeTab === 'vault' && 'Vitals Tracking & Medical Locker'}
             {activeTab === 'family' && 'Family Health Profiles'}
             {activeTab === 'tickets' && 'My Tickets & Support Credits'}
+            {activeTab === 'subscription' && 'My Subscription Plan'}
             {activeTab === 'portfolio' && 'My Patient Profile'}
           </h1>
           {activeTab === 'overview' && (
@@ -1850,9 +1847,58 @@ export default function PatientDashboard({
           {activeTab === 'vault' && renderVaultTab()}
           {activeTab === 'family' && renderFamilyTab()}
           {activeTab === 'tickets' && renderTicketsTab()}
+          {activeTab === 'subscription' && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <SubscriptionCard />
+            </div>
+          )}
           {activeTab === 'portfolio' && renderPortfolioTab()}
         </div>
       </main>
+
+      {escalationViewSessionId && (
+        <div className="fixed inset-0 bg-white/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-[32px] shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col p-8 relative max-h-[90vh] overflow-y-auto">
+            <button 
+              onClick={() => setEscalationViewSessionId(null)}
+              className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
+            >
+              <X size={20} />
+            </button>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center">
+                <AlertTriangle size={24} className="text-amber-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-slate-800">Inconclusive Assessment</h3>
+                <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">Clinical Escalation Add-Up Sheet</p>
+              </div>
+            </div>
+            
+            {(() => {
+              const session = pastConsultations.find(c => c.sessionId === escalationViewSessionId);
+              if (!session) return null;
+              return (
+                <div className="space-y-6 text-left">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                    <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider mb-2">Escalation Reason</h4>
+                    <p className="text-sm font-semibold text-slate-800">{session.escalationReason}</p>
+                  </div>
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 whitespace-pre-wrap font-mono text-xs text-slate-700 leading-relaxed">
+                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3 font-sans">Preliminary Findings (Add-Up)</h4>
+                    {session.escalationNotes}
+                  </div>
+                  <div className="text-center pt-4">
+                     <p className="text-xs text-slate-500 font-medium max-w-md mx-auto">
+                       You can show this Add-Up Sheet to a Doctor in a future consultation so you do not have to repeat your symptoms and vitals.
+                     </p>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
 
       {/* Rating Feedback Modal */}
       {ratingSessionId && (

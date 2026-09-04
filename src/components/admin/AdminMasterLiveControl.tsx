@@ -1104,21 +1104,63 @@ export default function AdminMasterLiveControl() {
                 { cadre: 'SPECIALIST', title: 'Specialist', subtitle: 'Cardiology, Pediatrics, GYN, Dermatology, etc.' },
                 { cadre: 'PHARMACIST', title: 'Pharmacist', subtitle: 'Comprehensive medication reviews & interactions' },
                 { cadre: 'PHARM_TECH', title: 'Pharmacy Technician', subtitle: 'OTC triage, OTC medication inquiries & refills' },
+                { cadre: 'PHYSICIAN_ASSISTANT', title: 'Physician Assistant (PA)', subtitle: 'Primary healthcare assessment & triage' }
               ].map((item) => {
-                const tier = localConfig.pricing?.tiers?.[item.cadre] || { chatFeeGHS: 40, voiceVideoFeeGHS: 60, durationMins: 15, extensionFeeGHS: 20 };
+                const tier = localConfig.pricing?.tiers?.[item.cadre] || { chatFeeGHS: 40, voiceVideoFeeGHS: 60, durationMins: 15, extensionFeeGHS: 20, instantChatFeeGHS: 45, instantVoiceVideoFeeGHS: 65, title: item.title, focus: item.subtitle };
+                
+                const displayTitle = tier.title || item.title;
+                const displaySubtitle = tier.focus || item.subtitle;
+                
                 return (
                   <div key={item.cadre} className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-bold text-slate-600 text-base">{item.title}</h3>
-                        <p className="text-xs text-slate-500">{item.subtitle}</p>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 space-y-2">
+                        <input
+                          type="text"
+                          value={displayTitle}
+                          onChange={(e) => {
+                            setLocalConfig({
+                              ...localConfig,
+                              pricing: {
+                                ...localConfig.pricing,
+                                tiers: {
+                                  ...(localConfig.pricing?.tiers || {}),
+                                  [item.cadre]: { ...tier, title: e.target.value }
+                                }
+                              }
+                            });
+                          }}
+                          className="font-bold text-slate-800 text-base bg-white border border-slate-200 rounded-md px-2 py-1 w-full"
+                          placeholder="Cadre Title"
+                        />
+                        <textarea
+                          rows={2}
+                          value={displaySubtitle}
+                          onChange={(e) => {
+                            setLocalConfig({
+                              ...localConfig,
+                              pricing: {
+                                ...localConfig.pricing,
+                                tiers: {
+                                  ...(localConfig.pricing?.tiers || {}),
+                                  [item.cadre]: { ...tier, focus: e.target.value }
+                                }
+                              }
+                            });
+                          }}
+                          className="text-xs text-slate-500 bg-white border border-slate-200 rounded-md px-2 py-1 w-full resize-none"
+                          placeholder="Cadre Description"
+                        />
                       </div>
-                      <span className="px-2.5 py-1 bg-emerald-600/20 text-emerald-800 border border-slate-300/30 rounded text-xs font-mono font-bold">
+                      <span className="px-2.5 py-1 bg-emerald-600/20 text-emerald-800 border border-slate-300/30 rounded text-xs font-mono font-bold shrink-0">
                         {item.cadre}
                       </span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 pt-2">
+                      <div className="col-span-2 pt-2 border-t border-slate-200">
+                        <h4 className="text-[10px] font-black uppercase text-indigo-600 tracking-wider">Scheduled Consultation Fees</h4>
+                      </div>
                       <div>
                         <label className="text-[11px] font-bold text-slate-500 uppercase">Chat Fee (GHS)</label>
                         <input
@@ -1140,7 +1182,6 @@ export default function AdminMasterLiveControl() {
                           className="w-full mt-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-600 font-bold text-sm"
                         />
                       </div>
-
                       <div>
                         <label className="text-[11px] font-bold text-slate-500 uppercase">Video / Call Fee (GHS)</label>
                         <input
@@ -1163,11 +1204,14 @@ export default function AdminMasterLiveControl() {
                         />
                       </div>
 
+                      <div className="col-span-2 pt-2 border-t border-slate-200">
+                        <h4 className="text-[10px] font-black uppercase text-rose-600 tracking-wider">Instant Consultation Fees</h4>
+                      </div>
                       <div>
-                        <label className="text-[11px] font-bold text-slate-500 uppercase">Duration (Mins)</label>
+                        <label className="text-[11px] font-bold text-slate-500 uppercase">Instant Chat Fee (GHS)</label>
                         <input
                           type="number"
-                          value={tier.durationMins}
+                          value={tier.instantChatFeeGHS ?? (tier.chatFeeGHS + 5)}
                           onChange={(e) => {
                             const val = Number(e.target.value);
                             setLocalConfig({
@@ -1176,7 +1220,28 @@ export default function AdminMasterLiveControl() {
                                 ...localConfig.pricing,
                                 tiers: {
                                   ...(localConfig.pricing?.tiers || {}),
-                                  [item.cadre]: { ...tier, durationMins: val }
+                                  [item.cadre]: { ...tier, instantChatFeeGHS: val }
+                                }
+                              }
+                            });
+                          }}
+                          className="w-full mt-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-600 font-bold text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-500 uppercase">Instant Video/Call Fee (GHS)</label>
+                        <input
+                          type="number"
+                          value={tier.instantVoiceVideoFeeGHS ?? (tier.voiceVideoFeeGHS + 5)}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            setLocalConfig({
+                              ...localConfig,
+                              pricing: {
+                                ...localConfig.pricing,
+                                tiers: {
+                                  ...(localConfig.pricing?.tiers || {}),
+                                  [item.cadre]: { ...tier, instantVoiceVideoFeeGHS: val }
                                 }
                               }
                             });
@@ -1185,26 +1250,49 @@ export default function AdminMasterLiveControl() {
                         />
                       </div>
 
-                      <div>
-                        <label className="text-[11px] font-bold text-slate-500 uppercase">10m Extension Fee (GHS)</label>
-                        <input
-                          type="number"
-                          value={tier.extensionFeeGHS}
-                          onChange={(e) => {
-                            const val = Number(e.target.value);
-                            setLocalConfig({
-                              ...localConfig,
-                              pricing: {
-                                ...localConfig.pricing,
-                                tiers: {
-                                  ...(localConfig.pricing?.tiers || {}),
-                                  [item.cadre]: { ...tier, extensionFeeGHS: val }
+                      <div className="col-span-2 pt-2 border-t border-slate-200 flex gap-3">
+                        <div className="flex-1">
+                          <label className="text-[11px] font-bold text-slate-500 uppercase">Duration (Mins)</label>
+                          <input
+                            type="number"
+                            value={tier.durationMins}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              setLocalConfig({
+                                ...localConfig,
+                                pricing: {
+                                  ...localConfig.pricing,
+                                  tiers: {
+                                    ...(localConfig.pricing?.tiers || {}),
+                                    [item.cadre]: { ...tier, durationMins: val }
+                                  }
                                 }
-                              }
-                            });
-                          }}
-                          className="w-full mt-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-600 font-bold text-sm"
-                        />
+                              });
+                            }}
+                            className="w-full mt-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-600 font-bold text-sm"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="text-[11px] font-bold text-slate-500 uppercase">10m Ext. Fee (GHS)</label>
+                          <input
+                            type="number"
+                            value={tier.extensionFeeGHS}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              setLocalConfig({
+                                ...localConfig,
+                                pricing: {
+                                  ...localConfig.pricing,
+                                  tiers: {
+                                    ...(localConfig.pricing?.tiers || {}),
+                                    [item.cadre]: { ...tier, extensionFeeGHS: val }
+                                  }
+                                }
+                              });
+                            }}
+                            className="w-full mt-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-600 font-bold text-sm"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

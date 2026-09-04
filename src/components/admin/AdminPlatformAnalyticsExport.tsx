@@ -5,7 +5,7 @@ import { useAppContext } from '../../AppContext';
 export default function AdminPlatformAnalyticsExport() {
   const { showToast } = useAppContext();
   const [isExporting, setIsExporting] = useState(false);
-  const [exportMonth, setExportMonth] = useState('2026-08');
+  const [exportMonth, setExportMonth] = useState('');
 
   const handleExportCSV = () => {
     setIsExporting(true);

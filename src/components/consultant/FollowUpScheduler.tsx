@@ -32,13 +32,13 @@ export default function FollowUpScheduler({
 
   // Form State
   const [targetPatientName, setTargetPatientName] = useState(patientName);
-  const [targetPhone, setTargetPhone] = useState('+233 24 000 0000');
+  const [targetPhone, setTargetPhone] = useState('');
   const [scheduledDate, setScheduledDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() + 7);
     return d.toISOString().split('T')[0];
   });
-  const [reason, setReason] = useState('Review therapeutic response to prescribed medication');
+  const [reason, setReason] = useState('');
   const [intervalDays, setIntervalDays] = useState(7);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);

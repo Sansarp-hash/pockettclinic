@@ -35,6 +35,7 @@ import AdminPlatformAnalyticsExport from './admin/AdminPlatformAnalyticsExport';
 import AdminSidebar from './admin/AdminSidebar';
 import ConsultantDashboard from './ConsultantDashboard';
 import PatientDashboard from './PatientDashboard';
+import DualFaceBiometrics from './DualFaceBiometrics';
 
 const SUPER_ADMINS = ['pockettclinic@gmail.com', 'missty2k@gmail.com', 'pharmabridgeghana@gmail.com'];
 const DEFAULT_ADMIN_EMAIL = 'pockettclinic@gmail.com';
@@ -1052,6 +1053,14 @@ export default function AdminDashboard() {
         {activeTab === 'system-logs' && (
           <div className="animate-in fade-in duration-300">
             <AdminSystemLogsAudit />
+          </div>
+        )}
+        {activeTab === 'identity-verification' && (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <h2 className="text-2xl font-black text-slate-800">Patient Identity Verification (Biometrics)</h2>
+            <div className="bg-slate-900 rounded-[32px] p-6 sm:p-8 shadow-xl max-w-2xl mx-auto">
+               <DualFaceBiometrics />
+            </div>
           </div>
         )}
 

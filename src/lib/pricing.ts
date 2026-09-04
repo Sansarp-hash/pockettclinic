@@ -90,7 +90,8 @@ export function calculateRevenueSplit(grossFeeGHS: number, config?: SystemAppCon
 export function getSessionTierPricing(
   cadre: string = 'UNASSIGNED',
   sessionType: 'CHAT_ONLY' | 'AUDIO_ONLY' | 'VIDEO' | string = 'VIDEO',
-  config?: SystemAppConfig
+  config?: SystemAppConfig,
+  isInstant: boolean = false
 ) {
   let rawCadre = (cadre || 'UNASSIGNED').toUpperCase().trim().replace(/[\s-]+/g, '_');
   if (rawCadre === 'DOCTOR_GENERAL') {
@@ -108,9 +109,15 @@ export function getSessionTierPricing(
   const normCadre = rawCadre;
   const baseTier = CONSULTANT_TIERS[normCadre] || CONSULTANT_TIERS.DOCTOR;
   const configuredTier = config?.pricing?.tiers?.[normCadre];
+  
+  let chatFeeGHS = configuredTier?.chatFeeGHS ?? baseTier.chatFeeGHS;
+  let voiceVideoFeeGHS = configuredTier?.voiceVideoFeeGHS ?? baseTier.voiceVideoFeeGHS;
+  
+  if (isInstant) {
+    chatFeeGHS = configuredTier?.instantChatFeeGHS ?? (chatFeeGHS + 5);
+    voiceVideoFeeGHS = configuredTier?.instantVoiceVideoFeeGHS ?? (voiceVideoFeeGHS + 5);
+  }
 
-  const chatFeeGHS = configuredTier?.chatFeeGHS ?? baseTier.chatFeeGHS;
-  const voiceVideoFeeGHS = configuredTier?.voiceVideoFeeGHS ?? baseTier.voiceVideoFeeGHS;
   const durationMins = configuredTier?.durationMins ?? baseTier.chatDurationMins;
   const extensionFeeGHS = configuredTier?.extensionFeeGHS ?? baseTier.extensionFeeGHS;
 

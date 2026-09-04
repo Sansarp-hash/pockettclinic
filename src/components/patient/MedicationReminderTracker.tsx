@@ -29,7 +29,7 @@ export default function MedicationReminderTracker({
   const [dosage, setDosage] = useState('');
   const [frequency, setFrequency] = useState<MedicationReminder['frequency']>('TWICE_DAILY');
   const [timeSlots, setTimeSlots] = useState<string[]>(['08:00', '20:00']);
-  const [instructions, setInstructions] = useState('Take with food');
+  const [instructions, setInstructions] = useState('');
   const [totalPills, setTotalPills] = useState(30);
   const [remainingPills, setRemainingPills] = useState(30);
   const [refillThreshold, setRefillThreshold] = useState(6);

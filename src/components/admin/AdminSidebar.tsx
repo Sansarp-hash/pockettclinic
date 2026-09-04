@@ -30,6 +30,7 @@ export default function AdminSidebar({
     { id: 'master-control', label: 'Live Master Control', icon: Sliders },
     { id: 'call-dispatch', label: 'Call Dispatch', icon: Radio },
     { id: 'compliance', label: 'Compliance and Audit', icon: ShieldCheck },
+    { id: 'identity-verification', label: 'Identity Verification', icon: ShieldCheck },
     { id: 'prescription-vault', label: 'RX Vault', icon: FileCheck },
     { id: 'pin-verification', label: 'Cancel PIN Verification', icon: Award },
     { id: 'consultations', label: 'Consultation Ledger', icon: Video },
