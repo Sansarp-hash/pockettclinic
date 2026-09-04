@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* Light Lemon clinic theme background and typography styling */
+@layer base {
+  body {
+    @apply bg-white text-lime-600 antialiased font-sans;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+  }
+
+  /* Prevent awkward character-level line breaks on critical labels and text components */
+  p, h1, h2, h3, h4, h5, h6, span, button, a {
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+}
+
+/* Enable smooth scrolling inside custom scroll overlays */
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+}

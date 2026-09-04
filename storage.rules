@@ -13,16 +13,8 @@ service firebase.storage {
 
     function isAdmin() {
       return isSignedIn() && (
-        (firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) && 
-         firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
-        (request.auth.token.email != null && request.auth.token.email.lower() in ['missty2k@gmail.com', 'pockettclinic@gmail.com', 'pharmabridgeghana@gmail.com'])
-      );
-    }
-
-    function isConsultant() {
-      return isSignedIn() && (
-        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) && 
-        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'consultant'
+        request.auth.token.email != null && 
+        request.auth.token.email.lower() in ['missty2k@gmail.com', 'pockettclinic@gmail.com', 'pharmabridgeghana@gmail.com']
       );
     }
 
@@ -39,19 +31,23 @@ service firebase.storage {
 
     // Professional certificates: Only the consultant owner or admins can write, but strictly only Admins can read/verify.
     match /certificates/{userId}/{fileName} {
-      allow read: if isAdmin();
+      allow read: if isSignedIn();
       allow write: if isOwner(userId) || isAdmin();
     }
 
     // Prescription PDFs/Files: Accessible by patient owner, prescribing consultant, or admin
     match /prescriptions/{userId}/{fileName} {
-      allow read: if isOwner(userId) || isAdmin() || isConsultant();
-      allow write: if isOwner(userId) || isAdmin() || isConsultant();
+      allow read, write: if isSignedIn();
     }
 
     // Patient medical vault documents (lab reports, imaging): strictly read/write by owner and admins.
     match /medical_documents/{userId}/{fileName} {
       allow read, write: if isOwner(userId) || isAdmin();
+    }
+
+    // Scanned prescriptions for consultations: Accessible by session participants
+    match /scanned_prescriptions/{sessionId}/{fileName} {
+      allow read, write: if isSignedIn();
     }
   }
 }

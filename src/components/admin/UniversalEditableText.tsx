@@ -1,0 +1,1 @@
+export { UniversalEditableText } from '../UniversalEditableText';

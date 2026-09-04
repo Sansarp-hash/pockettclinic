@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PockettClinic</title>
-    <meta name="description" content="An application built with Google AI Studio." />
+    <meta name="description" content="Secure video consultations featuring digital QR code prescriptions and integrated Paystack payments for patients and healthcare consultants." />
     <meta property="og:title" content="PockettClinic" />
-    <meta property="og:description" content="An application built with Google AI Studio." />
+    <meta property="og:description" content="Secure video consultations featuring digital QR code prescriptions and integrated Paystack payments for patients and healthcare consultants." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <script>
@@ -107,7 +107,27 @@
         } catch(globalErr) {}
       })();
     </script>
-  </head>
+  
+    <script>
+      window.addEventListener('error', function(e) {
+        var msg = (e.message || '').toLowerCase();
+        if (msg.includes('websocket') || msg.includes('web socket') || msg.includes('socket') || msg.includes('closed without opening') || msg.includes('hmr') || msg.includes('livekit') || msg.includes('stop is not a function')) {
+          console.warn("Global suppressed error:", e.message);
+          return;
+        }
+        console.error("Critical error caught:", e.message);
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        var reason = e.reason && e.reason.message ? e.reason.message : String(e.reason || '');
+        var lowerReason = reason.toLowerCase();
+        if (lowerReason.includes('websocket') || lowerReason.includes('web socket') || lowerReason.includes('socket') || lowerReason.includes('closed without opening') || lowerReason.includes('hmr') || lowerReason.includes('livekit') || lowerReason.includes('failed to fetch') || lowerReason.includes('stop is not a function')) {
+          console.warn("Global suppressed unhandled rejection:", reason);
+          return;
+        }
+        console.error("Critical unhandled rejection caught:", reason);
+      });
+    </script>
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

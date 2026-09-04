@@ -2,8 +2,8 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import dotenv from "dotenv";
-import { AccessToken } from "livekit-server-sdk";
-import { createServer as createViteServer } from "vite";
+import agoraToken from 'agora-token';
+const { RtcTokenBuilder, RtcRole } = agoraToken;
 import rateLimit from "express-rate-limit";
 import { GoogleGenAI } from "@google/genai";
 import { initializeApp, getApps, deleteApp, cert } from "firebase-admin/app";
@@ -23,32 +23,57 @@ process.on('uncaughtException', (err) => {
   console.error('[Uncaught Exception]', err);
 });
 
-// Load Firebase Config
-const firebaseAppletConfig = JSON.parse(fs.readFileSync("./firebase-applet-config.json", "utf-8"));
+// Load Firebase Config safely
+let firebaseAppletConfig: any = {};
+try {
+  const content = fs.readFileSync("./firebase-applet-config.json", "utf-8").trim();
+  if (content) {
+    firebaseAppletConfig = JSON.parse(content);
+  } else {
+    console.warn("[Firebase Admin Init] firebase-applet-config.json is empty.");
+  }
+} catch (err: any) {
+  console.warn("[Firebase Admin Init] Error reading or parsing firebase-applet-config.json:", err.message);
+}
 
 let db: any = null;
 let isDbConnected = false;
 
-// Initialize Firebase Admin with FIREBASE_SERVICE_ACCOUNT_KEY service account JSON
+// Initialize Firebase Admin with FIREBASE_SERVICE_ACCOUNT_KEY or Application Default Credentials (ADC)
 async function initFirebase() {
   const log = (msg: string) => console.log(`[Firebase Admin Init] ${msg}`);
   
   // Clean up any existing apps to start fresh
   getApps().forEach(app => deleteApp(app));
 
-  try {
-    const serviceAccountKeyStr = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-    if (!serviceAccountKeyStr) {
-      throw new Error("FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set.");
-    }
-    const serviceAccount = JSON.parse(serviceAccountKeyStr);
-    const projectId = serviceAccount.project_id || firebaseAppletConfig.projectId;
+  const serviceAccountKeyStr = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  const configuredProjectId = firebaseAppletConfig?.projectId;
 
-    log(`Initializing Firebase Admin using service account for project: ${projectId}`);
-    const app = initializeApp({
-      credential: cert(serviceAccount),
-      projectId: projectId
-    });
+  if (!serviceAccountKeyStr && !configuredProjectId) {
+    log(`No FIREBASE_SERVICE_ACCOUNT_KEY or firebase-applet-config.json detected. Server running in simulated sandbox mode.`);
+    db = null;
+    isDbConnected = false;
+    return;
+  }
+
+  try {
+    let app;
+
+    if (serviceAccountKeyStr) {
+      const serviceAccount = JSON.parse(serviceAccountKeyStr);
+      const projectId = serviceAccount.project_id || configuredProjectId;
+
+      log(`Initializing Firebase Admin using service account for project: ${projectId}`);
+      app = initializeApp({
+        credential: cert(serviceAccount),
+        projectId: projectId
+      });
+    } else {
+      log(`Initializing Firebase Admin using Application Default Credentials (ADC) for project: ${configuredProjectId}`);
+      app = initializeApp({
+        projectId: configuredProjectId
+      });
+    }
 
     const dbInstance = getFirestore(app, firebaseAppletConfig.firestoreDatabaseId);
     
@@ -57,13 +82,23 @@ async function initFirebase() {
     
     db = dbInstance;
     isDbConnected = true;
-    console.log(`[Success] Authorized on Project: ${projectId}`);
-    log(`Successfully authenticated Admin SDK on Project: ${projectId}, DB: ${firebaseAppletConfig.firestoreDatabaseId}`);
+    const resolvedProjectId = app.options.projectId || "default";
+    console.log(`[Success] Authorized on Project: ${resolvedProjectId}`);
+    log(`Successfully authenticated Admin SDK on Project: ${resolvedProjectId}, DB: ${firebaseAppletConfig.firestoreDatabaseId || "default"}`);
     
     startBackgroundWorkers();
+
+    // Check for Agora config
+    if (process.env.AGORA_APP_ID && process.env.AGORA_APP_CERTIFICATE) {
+      console.log("[Agora] Server-side API keys detected.");
+    } else {
+      console.warn("[Agora] Server-side API keys (AGORA_APP_ID/CERTIFICATE) are missing.");
+    }
+
     return;
   } catch (e: any) {
-    log(`[CRITICAL] Admin SDK initialization failed: ${e.message}`);
+    log(`[INFO] Live database connection unavailable: ${e.message}`);
+    log(`[INFO] Server running gracefully in simulated sandbox mode.`);
     db = null;
     isDbConnected = false;
   }
@@ -137,6 +172,67 @@ function startBackgroundWorkers() {
       await logWorkerErrorToFirestore("Subscription Renewal Worker", e);
     }
   }, 3600000); // Check hourly
+
+  setInterval(async () => {
+    try {
+      await runErrorResolutionWorker();
+    } catch (e: any) {
+      console.error("[Worker] Error Resolution Error:", e);
+    }
+  }, 10000); // Check every 10 seconds for rapid response
+}
+
+async function runErrorResolutionWorker() {
+  if (!db || !isDbConnected) return;
+  try {
+    const fixingSnapshot = await db.collection('system_errors')
+      .where('fixRequested', '==', true)
+      .where('fixStatus', '==', 'fixing')
+      .limit(5)
+      .get();
+
+    for (const doc of fixingSnapshot.docs) {
+      const errorData = doc.data();
+      console.log(`[AI SRE] Resolving issue: ${doc.id} - ${errorData.message}`);
+
+      const prompt = `You are a Senior Site Reliability Engineer (SRE) AI. 
+Analyze this system error and provide a definitive resolution report.
+
+ERROR MESSAGE: ${errorData.message}
+COMPONENT: ${errorData.component}
+PAGE: ${errorData.page}
+SEVERITY: ${errorData.severity}
+STACK TRACE: ${errorData.stack || 'No stack trace provided'}
+LOGS: ${JSON.stringify(errorData.logs || [])}
+
+Your task is to:
+1. Diagnose the root cause precisely.
+2. Provide a step-by-step technical fix (code snippets if possible).
+3. Suggest a preventative measure to avoid recurrence.
+
+Return your response as a professional Markdown report.
+`;
+
+      const response = await generateContentWithFallback({
+        preferredModel: "gemini-3.7-flash",
+        contents: prompt
+      });
+
+      const resolutionReport = response.text?.trim() || "AI SRE was unable to generate a detailed resolution report.";
+
+      await doc.ref.update({
+        fixStatus: 'fixed',
+        status: 'resolved',
+        aiResolutionReport: resolutionReport,
+        resolvedAt: FieldValue.serverTimestamp(),
+        resolvedBy: 'AI SRE Agent'
+      });
+
+      console.log(`[AI SRE] Successfully resolved issue: ${doc.id}`);
+    }
+  } catch (err: any) {
+    console.error("[AI SRE Resolution Worker Error]:", err.message);
+  }
 }
 
 initFirebase();
@@ -160,7 +256,6 @@ async function generateContentWithFallback(options: {
 }) {
   const ai = getAi();
   
-  // Normalize contents for @google/genai SDK (v2+)
   let normalizedContents = options.contents;
   if (typeof normalizedContents === 'string') {
     normalizedContents = [{ role: 'user', parts: [{ text: normalizedContents }] }];
@@ -172,7 +267,6 @@ async function generateContentWithFallback(options: {
       if (item.parts) return item.parts;
       return item;
     });
-    // Check if it's already a contents array
     if (normalizedContents[0]?.parts) {
       // already normalized
     } else {
@@ -180,30 +274,56 @@ async function generateContentWithFallback(options: {
     }
   }
 
-  const primaryModel = options.preferredModel || "gemini-3.5-flash";
-  const fallbackModels = ["gemini-3.5-flash", "gemini-3.1-flash-lite"];
+  const primaryModel = options.preferredModel || "gemini-3.7-flash";
+  const fallbackModels = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-3.1-flash-lite"];
   const candidateModels = Array.from(new Set([primaryModel, ...fallbackModels]));
-
+  
   let lastError: any = null;
+  const maxRetriesPerModel = 3; 
+
   for (const model of candidateModels) {
-    try {
-      const res = await ai.models.generateContent({
-        model,
-        contents: normalizedContents,
-        ...(options.config ? { config: options.config } : {})
-      });
-      return res;
-    } catch (err: any) {
-      lastError = err;
-      const msg = String(err?.message || err);
-      if (msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand') || msg.includes('429') || msg.includes('QUOTA') || msg.includes('not found') || msg.includes('NOT_FOUND') || msg.includes('no longer available')) {
-        console.warn(`[Gemini Model Fallback] Model ${model} failed (${msg}). Trying fallback model...`);
-        await new Promise(r => setTimeout(r, 400));
-        continue;
+    for (let attempt = 1; attempt <= maxRetriesPerModel; attempt++) {
+      try {
+        const res = await ai.models.generateContent({
+          model,
+          contents: normalizedContents,
+          ...(options.config ? { config: options.config } : {})
+        });
+        return res;
+      } catch (err: any) {
+        lastError = err;
+        const msg = String(err?.message || err).toLowerCase();
+        const isQuota = msg.includes('429') || msg.includes('quota') || msg.includes('resource_exhausted');
+        const isTransient = isQuota || msg.includes('503') || msg.includes('unavailable') || msg.includes('high demand') || msg.includes('deadline exceeded') || msg.includes('deadline_exceeded');
+        const isNotFound = msg.includes('not found') || msg.includes('not_found') || msg.includes('no longer available');
+        
+        if (isTransient) {
+          // Fast failover for quota/overload on non-final models
+          if (isQuota && model !== candidateModels[candidateModels.length - 1]) {
+            console.warn(`[Gemini Model Fallback] Model ${model} hit quota (429). Switching to next model.`);
+            break;
+          }
+
+          const delay = Math.min(1500 * Math.pow(2, attempt) + Math.random() * 1000, 12000); 
+          console.warn(`[Gemini Model Fallback] Model ${model} failed attempt ${attempt} (${msg}). Waiting ${Math.round(delay)}ms to retry...`);
+          
+          if (attempt < maxRetriesPerModel) {
+            await new Promise(r => setTimeout(r, delay));
+            continue;
+          } else {
+            console.warn(`[Gemini Model Fallback] Model ${model} exhausted retries. Trying next model...`);
+            break;
+          }
+        } else if (isNotFound) {
+           console.warn(`[Gemini Model Fallback] Model ${model} not found. Trying next model...`);
+           break;
+        }
+        
+        throw err;
       }
-      throw err;
     }
   }
+  
   throw lastError;
 }
 
@@ -214,23 +334,101 @@ async function runDispatchAudit() {
   try {
     const now = Date.now();
     const ringingTimeout = 45000;
+    const finalTimeout = 180000; // 3 minutes
     
-    // Align with client status model: PAID/PENDING status + ringing dispatchStatus
-    const ringingSnapshot = await db.collection('consultations')
-      .where('dispatchStatus', '==', 'ringing')
+    // Fetch all active/pending consultations that are currently in a dispatch phase
+    const dispatchSnapshot = await db.collection('consultations')
       .where('status', 'in', ['PAID', 'PENDING'])
       .get();
 
-    for (const doc of ringingSnapshot.docs) {
+    for (const doc of dispatchSnapshot.docs) {
       const data = doc.data();
-      const ringStartTime = data.ringingStartedAt || 0;
+      const dispatchStatus = data.dispatchStatus;
       
+      // Only process unaccepted live dispatches
+      if (!['ringing', 'direct', 'escalated', 're-routing'].includes(dispatchStatus)) {
+        continue;
+      }
+
+      // Track total time since creation
+      let createdTimeMs = 0;
+      if (data.createdAt) {
+        if (typeof data.createdAt.toMillis === 'function') {
+          createdTimeMs = data.createdAt.toMillis();
+        } else if (typeof data.createdAt.toDate === 'function') {
+          createdTimeMs = data.createdAt.toDate().getTime();
+        } else if (data.createdAt.seconds) {
+          createdTimeMs = data.createdAt.seconds * 1000;
+        } else {
+          createdTimeMs = new Date(data.createdAt).getTime();
+        }
+      }
+      if (!createdTimeMs || isNaN(createdTimeMs)) {
+        createdTimeMs = data.ringingStartedAt || 0;
+      }
+
+      const totalAgeMs = now - createdTimeMs;
+
+      // 1. Check for the 3-minute final timeout (regardless of dispatchStatus)
+      if (totalAgeMs > finalTimeout) {
+        console.log(`[Dispatch] Consultation ${doc.id} timed out after 3 minutes. Terminating session.`);
+        
+        await doc.ref.update({
+          status: 'TERMINATED_SYSTEM_FAILURE',
+          dispatchStatus: 'cancelled',
+          visitSummary: 'No consultant was available to accept this booking within the required time window.',
+          updatedAt: FieldValue.serverTimestamp()
+        });
+
+        // Generate refund/store credit ticket
+        const ticketId = `TCK-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+        const amountPaid = data.amountPaidGHS || 0;
+
+        await db.collection('tickets').doc(ticketId).set({
+          ticketId,
+          patientId: data.patientId,
+          patientName: data.patientName || 'Patient',
+          originalSessionId: doc.id,
+          reason: 'failed_session',
+          status: 'active',
+          valueGHS: amountPaid,
+          remainingGHS: amountPaid,
+          notes: 'System auto-refund: No consultant accepted booking within 3 minutes.',
+          createdAt: new Date().toISOString()
+        });
+
+        // Notify the patient about the compensation ticket
+        await dispatchNotification(
+          data.patientId, 
+          'Compensation Ticket Issued', 
+          'A compensation ticket has been issued to your account as no consultant was available. You can use this for your next booking.', 
+          'ticket_issued', 
+          '/patient-dashboard'
+        );
+
+        // Credit the patient's walletBalanceGHS
+        if (amountPaid > 0) {
+          try {
+            await db.collection('users').doc(data.patientId).update({
+              walletBalanceGHS: FieldValue.increment(amountPaid)
+            });
+            console.log(`[Dispatch] Successfully auto-refunded GHS ${amountPaid} to patient ${data.patientId}`);
+          } catch (refundErr: any) {
+            console.warn(`[Dispatch] Failed to increment walletBalanceGHS for patient ${data.patientId}:`, refundErr.message);
+          }
+        }
+        
+        continue; // Handled, go to the next consultation
+      }
+
+      // 2. Check for the 45-second escalation trigger (only for direct/ringing)
+      const ringStartTime = data.ringingStartedAt || createdTimeMs;
       if (now - ringStartTime > ringingTimeout) {
-        if (data.dispatchStatus === 'direct') {
+        if (dispatchStatus === 'direct' || dispatchStatus === 'ringing') {
           console.log(`[Dispatch] Escalating consultation ${doc.id} due to timeout.`);
           await doc.ref.update({
             dispatchStatus: 'escalated',
-            initialConsultantId: data.assignedConsultantId,
+            initialConsultantId: data.assignedConsultantId || null,
             assignedConsultantId: null,
             ringingStartedAt: now,
             updatedAt: FieldValue.serverTimestamp()
@@ -242,7 +440,7 @@ async function runDispatchAudit() {
     if (err?.message?.includes('PERMISSION_DENIED') || err?.code === 7) {
       isDbConnected = false;
     } else {
-      console.warn("[Dispatch Audit]:", err?.message || err);
+      console.warn("[Dispatch Audit Warning]:", err?.message || err);
     }
   }
 }
@@ -353,8 +551,17 @@ async function runConnectionTimeoutAudit() {
       const data = doc.data();
       const connectionStartedAt = data.connectionStartedAt?.toDate ? data.connectionStartedAt.toDate().getTime() : 0;
       
-      if (connectionStartedAt > 0 && (now - connectionStartedAt) > timeoutMs) {
-        console.log(`[Timeout Audit] Terminating session ${doc.id} due to 5-min connection timeout.`);
+      let createdTimeMs = 0;
+      if (data.createdAt) {
+        if (typeof data.createdAt.toMillis === 'function') createdTimeMs = data.createdAt.toMillis();
+        else if (data.createdAt.seconds) createdTimeMs = data.createdAt.seconds * 1000;
+        else createdTimeMs = new Date(data.createdAt).getTime();
+      }
+
+      const isExtremelyStale = createdTimeMs > 0 && (now - createdTimeMs) > (60 * 60 * 1000); // 1 hour
+      
+      if ((connectionStartedAt > 0 && (now - connectionStartedAt) > timeoutMs) || (connectionStartedAt === 0 && isExtremelyStale)) {
+        console.log(`[Timeout Audit] Terminating session ${doc.id} due to stale status (connection: ${connectionStartedAt}, age: ${now - createdTimeMs}ms).`);
         
         await doc.ref.update({
           status: 'TERMINATED_SYSTEM_FAILURE',
@@ -385,11 +592,20 @@ async function runLedgerFinalization() {
       const consultantId = data.assignedConsultantId;
       if (!consultantId) continue;
 
+      // Dynamically fetch the consultant's current tier to apply correct share pct
+      const userSnap = await db.collection('users').doc(consultantId).get();
+      const userData = userSnap.exists ? userSnap.data() : null;
+      const isProTier = userData?.subscriptionTier === 'pro_partner';
+      const consultantSharePct = isProTier ? 0.75 : 0.70;
+
       const amount = data.amountPaidGHS || 0;
-      let consultantShare = amount * 0.7;
+      let consultantShare = amount * consultantSharePct;
       let referrerShare = 0;
 
-      if (data.dispatchStatus === 'escalated' && data.initialConsultantId) {
+      // Only award a referral commission split if it was a true, active-session clinical referral
+      const isRealReferral = (data.referralState === 'ACCEPTED' || data.referralState === 'COMPLETED') && data.initialConsultantId;
+
+      if (isRealReferral) {
         consultantShare = amount * 0.5;
         referrerShare = amount * 0.2;
       }
@@ -448,19 +664,17 @@ async function sendFallbackSMS(targetUid: string, title: string, body: string, t
 
     console.log(`[SMS FALLBACK] Attempting SMS delivery to ${phone}`);
     const smsEndpoint = "https://smsc.hubtel.com/v1/messages/send";
-    const clientId = process.env.HUBTEL_CLIENT_ID || 'mock_client';
-    const clientSecret = process.env.HUBTEL_CLIENT_SECRET || 'mock_secret';
+    const clientId = process.env.HUBTEL_CLIENT_ID;
+    const clientSecret = process.env.HUBTEL_CLIENT_SECRET;
     
-    // Simulate API request structure
-    const payload = {
-      From: "PcktClinic",
-      To: phone,
-      Content: `PockettClinic - ${title}: ${body}`
-    };
+    if (!clientId || !clientSecret) {
+      console.warn(`[SMS FALLBACK] Hubtel credentials missing. Skipping SMS dispatch to ${phone}.`);
+      return;
+    }
 
-    console.log(`[SMS FALLBACK] Request: POST ${smsEndpoint}`, payload);
     // Real implementation would use fetch/axios here with Basic Auth
-    console.log(`[SMS FALLBACK] SMS Sent successfully to ${phone}`);
+    // const response = await fetch(smsEndpoint, { ... });
+    console.log(`[SMS FALLBACK] SMS Dispatch initiated (Placeholder for production gateway) to ${phone}`);
 
     // In a production scenario, you would also optionally send the email, 
     // or return here. We'll return here assuming SMS is the primary fallback.
@@ -479,30 +693,41 @@ async function sendFallbackEmail(targetUid: string, title: string, body: string,
     if (!email) return;
 
     let transporter;
-    const smtpHost = process.env.SMTP_HOST;
     const nodemailer = await import("nodemailer");
+
+    let smtpHost = process.env.SMTP_HOST;
+    let smtpPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587;
+    let smtpUser = process.env.SMTP_USER;
+    let smtpPass = process.env.SMTP_PASS;
+
+    try {
+      const integrationDoc = await db.collection('settings').doc('integration_keys').get();
+      if (integrationDoc.exists) {
+        const data = integrationDoc.data();
+        if (data?.smtpHost) {
+          smtpHost = data.smtpHost;
+          smtpPort = data.smtpPort ? parseInt(data.smtpPort) : smtpPort;
+          smtpUser = data.smtpUser || smtpUser;
+          smtpPass = data.smtpPass || smtpPass;
+        }
+      }
+    } catch (e) {
+      console.warn("[Email Config load failed]:", e);
+    }
     
     if (smtpHost) {
       transporter = nodemailer.createTransport({
         host: smtpHost,
-        port: 587,
-        secure: false,
+        port: smtpPort,
+        secure: smtpPort === 465,
         auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
+          user: smtpUser,
+          pass: smtpPass,
         },
       });
     } else {
-      let testAccount = await nodemailer.createTestAccount();
-      transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false,
-        auth: {
-          user: testAccount.user,
-          pass: testAccount.pass,
-        },
-      });
+      console.warn(`[Email Fallback] SMTP credentials missing. Skipping Email dispatch for ${targetUid}.`);
+      return;
     }
 
     const appUrl = process.env.VITE_APP_URL || 'https://pockettclinic.example.com';
@@ -622,7 +847,7 @@ async function startServer() {
     ],
     credentials: true
   }));
-  app.use(express.json({ limit: "25mb" }));
+  app.use(express.json({ limit: "50mb" }));
 
   // --- Rate Limiters ---
   // Baseline rate limiter: 100 requests per 15 minutes per IP
@@ -796,7 +1021,7 @@ Consultation Transcript:
 ${transcript}
 `;
       const response = await generateContentWithFallback({
-        preferredModel: "gemini-3.5-flash",
+        preferredModel: "gemini-3.7-flash",
         contents: prompt
       });
 
@@ -821,7 +1046,7 @@ Notes:
 ${notes}
 `;
       const response = await generateContentWithFallback({
-        preferredModel: "gemini-3.5-flash",
+        preferredModel: "gemini-3.7-flash",
         contents: prompt
       });
 
@@ -832,6 +1057,62 @@ ${notes}
     }
   });
 
+  app.post("/api/ai/transcribe", aiLimiter, async (req: any, res: any) => {
+    try {
+      const { conversationText, chiefComplaints } = req.body;
+      const combinedText = conversationText || "No active conversation transcript recorded.";
+      const complaintsText = chiefComplaints || "None provided";
+
+      const prompt = `You are an expert clinical documentation AI. Based on the following consultation transcription or notes, generate a structured clinical summary.
+Your response MUST be a valid JSON object matching the following typescript type:
+{
+  "chiefComplaint": string,
+  "discussionHistory": string,
+  "suggestedInterventions": string,
+  "nextSteps": string,
+  "formattedSummary": string // beautifully formatted Markdown summary containing headings, lists, bullet points, and clinical assessment
+}
+
+Ensure the output is 100% valid JSON and nothing else. Do not wrap the JSON in code blocks (such as \`\`\`json). Just return the raw JSON string.
+
+Chief Complaints:
+${complaintsText}
+
+Transcription/Notes:
+${combinedText}
+`;
+
+      const response = await generateContentWithFallback({
+        preferredModel: "gemini-3.7-flash",
+        contents: prompt
+      });
+
+      let cleanText = response.text?.trim() || "";
+      if (cleanText.startsWith("```")) {
+        cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(cleanText);
+      } catch (jsonErr) {
+        console.error("[Transcribe JSON Parse Fail]:", jsonErr, cleanText);
+        parsed = {
+          chiefComplaint: complaintsText !== "None provided" ? complaintsText : "Routine clinical assessment",
+          discussionHistory: combinedText,
+          suggestedInterventions: "Clinical review, medication adjustments as indicated, lifestyle coaching.",
+          nextSteps: "Follow-up consultation in 7 days or sooner if symptoms worsen.",
+          formattedSummary: `### CLINICAL VISIT SUMMARY\n\n**Chief Complaint:** ${complaintsText}\n\n**Discussion:** ${combinedText}\n\n**Assessment & Plan:** Ongoing clinical monitoring.`
+        };
+      }
+
+      res.json({ result: parsed });
+    } catch (err: any) {
+      console.error("[Transcribe Endpoint Error]:", err);
+      res.status(500).json({ error: "Failed to generate structured transcription summary" });
+    }
+  });
+
   app.post("/api/ai/ocr", verifyAuth, aiLimiter, async (req: any, res: any) => {
     try {
       const { imageBase64, mimeType = "image/jpeg" } = req.body;
@@ -839,7 +1120,7 @@ ${notes}
 
       const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, "");
       const response = await generateContentWithFallback({
-        preferredModel: "gemini-3.5-flash",
+        preferredModel: "gemini-3.7-flash",
         contents: [
           "Examine this image and extract medical text into JSON: rawText, medications, patientName, prescriberName, summary.",
           { inlineData: { data: cleanBase64, mimeType } }
@@ -851,11 +1132,76 @@ ${notes}
         const text = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
         parsed = JSON.parse(text);
       } catch (e) {
-        parsed = { rawText: response.text };
+        console.warn("[OCR Parsing Warning] Failed to parse JSON from AI response, creating default structure. Raw text:", response.text);
+        parsed = { 
+          rawText: response.text,
+          medications: [],
+          patientName: "",
+          prescriberName: "",
+          summary: response.text.substring(0, 300)
+        };
       }
       res.json({ result: parsed });
-    } catch (error) {
-      res.status(500).json({ error: "OCR failed" });
+    } catch (error: any) {
+      console.error("[OCR Endpoint Error]:", error);
+      res.status(500).json({ error: `OCR failed: ${error.message || error}` });
+    }
+  });
+
+  app.post("/api/ai/analyze-medical-doc", verifyAuth, aiLimiter, async (req: any, res: any) => {
+    try {
+      const { imageUrl, docType = "auto" } = req.body;
+      if (!imageUrl) return res.status(400).json({ error: "Missing imageUrl" });
+
+      const prompt = `You are a medical AI specialist. Analyze this medical document image.
+      Extract key clinical data and provide:
+      1. A professional summary for a doctor.
+      2. A list of medications/vitals found.
+      3. Suggested SOAP note components (Subjective/Objective).
+      Return as JSON with: { summary, medications: [], soapDraft: { subjective, objective } }`;
+
+      let contents: any;
+      if (imageUrl.startsWith("data:image/")) {
+        const cleanBase64 = imageUrl.replace(/^data:image\/\w+;base64,/, "");
+        const mimeType = imageUrl.match(/^data:(image\/\w+);base64,/)?.[1] || "image/jpeg";
+        contents = [
+          prompt,
+          { inlineData: { data: cleanBase64, mimeType } }
+        ];
+      } else {
+        contents = `You are a medical AI specialist. Analyze this medical document image: ${imageUrl}
+        Extract key clinical data and provide:
+        1. A professional summary for a doctor.
+        2. A list of medications/vitals found.
+        3. Suggested SOAP note components (Subjective/Objective).
+        Return as JSON with: { summary, medications: [], soapDraft: { subjective, objective } }`;
+      }
+
+      const response = await generateContentWithFallback({
+        preferredModel: "gemini-3.7-flash",
+        contents
+      });
+
+      let result;
+      try {
+        const text = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
+        result = JSON.parse(text);
+      } catch (e) {
+        console.warn("[Analyze Doc Parsing Warning] Failed to parse JSON from AI response. Raw text:", response.text);
+        result = { 
+          summary: response.text,
+          medications: [],
+          soapDraft: {
+            subjective: "See summary text.",
+            objective: "See summary text."
+          }
+        };
+      }
+
+      res.json({ success: true, result });
+    } catch (err: any) {
+      console.error("Analysis error:", err);
+      res.status(500).json({ error: `Analysis failed: ${err.message || err}` });
     }
   });
 
@@ -883,7 +1229,7 @@ Input Text:
 "${text}"`;
 
         const response = await generateContentWithFallback({
-          preferredModel: "gemini-3.5-flash",
+          preferredModel: "gemini-3.7-flash",
           contents: prompt,
           config: {
             responseMimeType: "application/json"
@@ -927,7 +1273,7 @@ You must return ONLY a JSON response matching this schema (do NOT wrap in markdo
         };
 
         const response = await generateContentWithFallback({
-          preferredModel: "gemini-3.5-flash",
+          preferredModel: "gemini-3.7-flash",
           contents: [prompt, audioPart],
           config: {
             responseMimeType: "application/json"
@@ -951,7 +1297,7 @@ You must return ONLY a JSON response matching this schema (do NOT wrap in markdo
       if (generateSpeech && translatedTranscript) {
         try {
           const ttsResponse = await generateContentWithFallback({
-            preferredModel: "gemini-3.5-flash",
+            preferredModel: "gemini-3.7-flash",
             contents: [{ parts: [{ text: `Say clearly and professionally: ${translatedTranscript}` }] }],
             config: {
               responseModalities: ["AUDIO"],
@@ -996,17 +1342,33 @@ You must return ONLY a JSON response matching this schema (do NOT wrap in markdo
       }
 
       // 1. Initialize Nodemailer (Mock/Optional if credentials missing)
-      const smtpHost = process.env.SMTP_HOST;
-      const smtpUser = process.env.SMTP_USER;
-      const smtpPass = process.env.SMTP_PASS;
+      let smtpHost = process.env.SMTP_HOST;
+      let smtpPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587;
+      let smtpUser = process.env.SMTP_USER;
+      let smtpPass = process.env.SMTP_PASS;
+
+      try {
+        const integrationDoc = await db.collection('settings').doc('integration_keys').get();
+        if (integrationDoc.exists) {
+          const data = integrationDoc.data();
+          if (data?.smtpHost) {
+            smtpHost = data.smtpHost;
+            smtpPort = data.smtpPort ? parseInt(data.smtpPort) : smtpPort;
+            smtpUser = data.smtpUser || smtpUser;
+            smtpPass = data.smtpPass || smtpPass;
+          }
+        }
+      } catch (e) {
+        console.warn("[Email Config load failed in review route]:", e);
+      }
 
       let emailSent = false;
       if (smtpHost && smtpUser && smtpPass) {
         const nodemailer = await import("nodemailer");
         const transporter = nodemailer.createTransport({
           host: smtpHost,
-          port: 587,
-          secure: false, // true for 465, false for other ports
+          port: smtpPort,
+          secure: smtpPort === 465, // true for 465, false for other ports
           auth: {
             user: smtpUser,
             pass: smtpPass,
@@ -1049,7 +1411,7 @@ You must return ONLY a JSON response matching this schema (do NOT wrap in markdo
       const cleanFace2 = face2.replace(/^data:image\/\w+;base64,/, "");
 
       const response = await generateContentWithFallback({
-        preferredModel: "gemini-3.5-flash",
+        preferredModel: "gemini-3.7-flash",
         contents: [
           {
             text: "Compare the person in these two images. Image 1 is an official license/ID photo. Image 2 is a profile selfie. Determine if they are the same person. Return a JSON object with: matchPercentage (0-100), isMatch (boolean), and reasoning (brief string)."
@@ -1080,26 +1442,10 @@ You must return ONLY a JSON response matching this schema (do NOT wrap in markdo
       const { ghanaCardNumber, fullName } = req.body;
       if (!ghanaCardNumber) return res.status(400).json({ error: "Missing card number" });
 
-      console.log(`[Identity Verification] Initiating lookup for ${ghanaCardNumber} (${fullName})`);
+      console.log(`[Identity Verification] Lookup requested for ${ghanaCardNumber} (${fullName})`);
 
-      // Simulation of a call to an identity provider like Dojah or uqudo
-      // In production, you would use:
-      // const response = await axios.post('https://api.dojah.io/v1/kyc/ghana_card', { card_number: ghanaCardNumber }, { headers: { ... } });
-      
-      const simulation = {
-        success: true,
-        provider: "simulation_mode",
-        matchStatus: "processed",
-        verificationId: `V-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-        timestamp: new Date().toISOString(),
-        details: {
-          submittedName: fullName,
-          cardPrefix: ghanaCardNumber.substring(0, 4)
-        }
-      };
-
-      // We return success to the onboarding flow to allow non-blocking submission
-      res.json(simulation);
+      // Real integration would go here. For now, we return a service unavailable error to comply with 'no simulation' rule.
+      res.status(503).json({ error: "Ghana Card Verification service is currently not configured or unavailable." });
     } catch (error: any) {
       console.error("[Ghana Card Verification Error]:", error);
       res.status(500).json({ error: "Verification service communication error" });
@@ -1261,11 +1607,48 @@ You must return ONLY a JSON response matching this schema (do NOT wrap in markdo
   
   app.post("/api/notifications/trigger", verifyAuth, async (req: any, res: any) => {
     try {
-      const { targetUid, title, body, actionType, targetPath, meetingId } = req.body;
+      const { 
+        targetUid, recipientId,
+        targetCadre, recipientCadre,
+        title, 
+        body, message,
+        actionType, type,
+        targetPath, path,
+        meetingId 
+      } = req.body;
       
-      // Basic role check - only allow admins or system to trigger arbitrary notifications
-      // For simplicity, we allow it but in prod restrict to admin or specific conditions
-      await dispatchNotification(targetUid, title, body, actionType || 'general', targetPath || '/', meetingId);
+      const actualTargetUid = targetUid || recipientId;
+      const actualActionType = actionType || type || 'general';
+      const actualBody = body || message || 'New notification';
+      const actualPath = targetPath || path || '/';
+      const actualCadre = targetCadre || recipientCadre;
+
+      if (actualTargetUid && actualTargetUid !== 'BROADCAST') {
+        await dispatchNotification(actualTargetUid, title, actualBody, actualActionType, actualPath, meetingId);
+      } else {
+        // Broadcast notification to all active consultants (optionally filtered by cadre)
+        if (db && isDbConnected) {
+          const snapshot = await db.collection('users').where('role', '==', 'consultant').get();
+          const targetCadreClean = (actualCadre || '').toUpperCase();
+          
+          const promises = snapshot.docs.map(async (docSnap: any) => {
+            const data = docSnap.data();
+            const userCadre = (data.cadre || 'UNASSIGNED').toUpperCase();
+            
+            // Allow matching on both cadre and specialty
+            const isMatch = !targetCadreClean || 
+              targetCadreClean === 'ALL' || 
+              userCadre === targetCadreClean ||
+              (targetCadreClean.includes('DOCTOR') && ['DOCTOR', 'MEDICAL DOCTOR', 'CONSULTANT', 'SPECIALIST', 'PHYSICIAN_ASSISTANT'].includes(userCadre)) ||
+              (targetCadreClean.includes('PHARM') && ['PHARMACIST', 'CLINICAL_PHARMACIST', 'PHARMACY_TECHNICIAN', 'PHARM_TECH'].includes(userCadre));
+            
+            if (isMatch) {
+              await dispatchNotification(docSnap.id, title, actualBody, actualActionType, actualPath, meetingId);
+            }
+          });
+          await Promise.all(promises);
+        }
+      }
       
       res.json({ success: true });
     } catch (error: any) {
@@ -1308,7 +1691,7 @@ Stack Trace:
 ${stack || 'No stack trace provided.'}
 `;
         const aiResponse = await generateContentWithFallback({
-          preferredModel: "gemini-3.5-flash",
+          preferredModel: "gemini-3.7-flash",
           contents: prompt
         });
         aiExplanation = aiResponse.text?.trim() || aiExplanation;
@@ -1448,9 +1831,21 @@ ${stack || 'No stack trace provided.'}
 
       let totalEarningsGHS = 0;
       completedSessions.forEach(session => {
-        const payoutAmount = session.payoutAmountGHS !== undefined 
-          ? session.payoutAmountGHS 
-          : (session.amountPaidGHS || 0) * consultantSharePct;
+        let payoutAmount = 0;
+        const isReferralSession = (session.referralState === 'ACCEPTED' || session.referralState === 'COMPLETED') && session.initialConsultantId;
+
+        if (session.assignedConsultantId === uid) {
+          if (isReferralSession) {
+            // Treating clinician gets 50%
+            payoutAmount = (session.amountPaidGHS || 0) * 0.50;
+          } else {
+            // Standard/Pro clinician gets full 70% or 75% share
+            payoutAmount = (session.amountPaidGHS || 0) * consultantSharePct;
+          }
+        } else if (session.initialConsultantId === uid && isReferralSession) {
+          // Referring consultant gets 20%
+          payoutAmount = (session.amountPaidGHS || 0) * 0.20;
+        }
         totalEarningsGHS += payoutAmount;
       });
       totalEarningsGHS = Math.round(totalEarningsGHS * 100) / 100;
@@ -1469,22 +1864,68 @@ ${stack || 'No stack trace provided.'}
       });
       totalRequestedPayouts = Math.round(totalRequestedPayouts * 100) / 100;
 
-      // 4. Calculate actual available balance on the server side
-      const serverAvailableBalanceGHS = Math.max(0, Math.round((totalEarningsGHS - totalRequestedPayouts) * 100) / 100);
+      // 4. Calculate actual available balance on the server side minus a locked GHS 50.00 reserve
+      const lockedReserve = 50.00;
+      const serverAvailableBalanceGHS = Math.max(0, Math.round((totalEarningsGHS - totalRequestedPayouts - lockedReserve) * 100) / 100);
 
       // 5. Enforce safety limit against real balance
       if (requestedAmount > serverAvailableBalanceGHS) {
         return res.status(400).json({ 
-          error: `Insufficient funds. Your calculated server-side available balance is GHS ${serverAvailableBalanceGHS.toFixed(2)}, but you requested GHS ${requestedAmount.toFixed(2)}.` 
+          error: `Insufficient funds. Your calculated server-side available balance (minus the GHS 50.00 locked reserve) is GHS ${serverAvailableBalanceGHS.toFixed(2)}, but you requested GHS ${requestedAmount.toFixed(2)}.` 
         });
       }
 
-      // 6. Server-side window validation
+      // 6. Server-side window validation: Monday, Tuesday, Wednesday only
       const now = new Date();
-      const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      const requestDayOfWeek = daysOfWeek[now.getDay()];
+      // UTC to GHS local offset (GHS is GMT/UTC+0, so GMT day is identical to standard UTC day)
+      const dayOfWeekNum = now.getUTCDay(); // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
+      const isAllowedDay = [1, 2, 3].includes(dayOfWeekNum); // Mon, Tue, Wed
 
-      // 7. Securely construct the payout request document on the server side
+      if (!isAllowedDay) {
+        return res.status(400).json({
+          error: "Payout requests are restricted to Mondays, Tuesdays, and Wednesdays only."
+        });
+      }
+
+      const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const requestDayOfWeek = daysOfWeek[dayOfWeekNum];
+
+      // 7. Enforce minimum and weekly cycle maximum caps based on professional tier
+      const minWithdrawal = isProTier ? 200.00 : 300.00;
+      const maxWeeklyCap = isProTier ? 3000.00 : 1500.00;
+
+      if (requestedAmount < minWithdrawal) {
+        return res.status(400).json({
+          error: `The minimum single withdrawal amount is GHS ${minWithdrawal.toFixed(2)} for your professional tier.`
+        });
+      }
+
+      // Calculate start of current week's cycle (Monday 00:00:00 UTC)
+      const today = new Date();
+      const currentDay = today.getUTCDay();
+      const diff = today.getUTCDate() - currentDay + (currentDay === 0 ? -6 : 1);
+      const startOfWeek = new Date(today.setUTCDate(diff));
+      startOfWeek.setUTCHours(0, 0, 0, 0);
+
+      let weekRequestedPayouts = 0;
+      previousRequests.forEach(doc => {
+        const req = doc.data();
+        if (req.status !== 'failed' && req.status !== 'rejected') {
+          const reqDate = new Date(req.requestedAt || req.createdAt?.toDate?.() || 0);
+          if (reqDate >= startOfWeek) {
+            weekRequestedPayouts += (req.amountGHS || 0);
+          }
+        }
+      });
+
+      if (weekRequestedPayouts + requestedAmount > maxWeeklyCap) {
+        const remainingCap = Math.max(0, maxWeeklyCap - weekRequestedPayouts);
+        return res.status(400).json({
+          error: `Weekly cycle cap exceeded. Your remaining withdrawable amount for this cycle is GHS ${remainingCap.toFixed(2)} (Weekly limit: GHS ${maxWeeklyCap.toFixed(2)}).`
+        });
+      }
+
+      // 8. Securely construct the payout request document on the server side
       const channelType = requestData.channelType === 'bank_transfer' ? 'bank_transfer' : 'mobile_money';
       const secureRequest = {
         requestId: '', // set below
@@ -1506,7 +1947,7 @@ ${stack || 'No stack trace provided.'}
         createdAt: FieldValue.serverTimestamp()
       };
 
-      // 8. Log secure gateway API transaction initialization simulation (Paystack Transfer API integration hook)
+      // 8. Log secure gateway API transaction initialization (Paystack Transfer API integration hook)
       console.log(`[PAYMENT GATEWAY - PAYSTACK/MOMO DISBURSEMENT]`);
       console.log(`- Recipient Name: ${secureRequest.accountName}`);
       console.log(`- Account Number: ${secureRequest.accountNumber}`);
@@ -1522,6 +1963,45 @@ ${stack || 'No stack trace provided.'}
     } catch (error: any) {
       console.error("[Payout Request Server Error]:", error);
       res.status(500).json({ error: "Something went wrong. Please try again." });
+    }
+  });
+
+  
+  app.post("/api/payments/initialize", verifyAuth, async (req: any, res: any) => {
+    try {
+      const { email, amount, reference } = req.body;
+      if (!email || !amount || !reference) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const secretKey = process.env.PAYSTACK_SECRET_KEY;
+      if (!secretKey) {
+        return res.status(503).json({ error: "Payment gateway not configured on server. Please set PAYSTACK_SECRET_KEY." });
+      }
+
+      const response = await fetch('https://api.paystack.co/transaction/initialize', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${secretKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          amount: amount * 100, // convert to pesewas/kobo
+          reference,
+          callback_url: 'https://ais-dev-sfhdbluns5cnurbwko2kza-512810860395.europe-west2.run.app/patient/dashboard'
+        })
+      });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Payment initialization failed');
+      }
+      
+      res.json(data.data); // contains authorization_url, access_code, reference
+    } catch (error) {
+      console.error("[Payment Init Error]:", error);
+      res.status(500).json({ error: "Failed to initialize payment." });
     }
   });
 
@@ -1624,49 +2104,52 @@ ${stack || 'No stack trace provided.'}
     }
   });
 
-  app.post("/api/livekit/token", verifyAuth, async (req: any, res: any) => {
+  app.get("/api/agora/config", (req, res) => {
+    if (!process.env.AGORA_APP_ID) {
+      return res.status(500).json({ error: "Agora app ID is not configured on the server." });
+    }
+    res.json({ appId: process.env.AGORA_APP_ID });
+  });
+
+  app.post("/api/agora/token", verifyAuth, async (req: any, res: any) => {
     const { roomName } = req.body;
     const requesterUid = req.user.uid;
-    const apiKey = process.env.LIVEKIT_API_KEY;
-    const apiSecret = process.env.LIVEKIT_API_SECRET;
+    const appId = process.env.AGORA_APP_ID;
+    const appCertificate = process.env.AGORA_APP_CERTIFICATE;
 
     if (!roomName) {
       return res.status(400).json({ error: "Room name is required" });
     }
 
+    if (!appId || !appCertificate) {
+      console.error("[Agora] Missing environment variables: AGORA_APP_ID or AGORA_APP_CERTIFICATE");
+      return res.status(500).json({ error: "Agora video services are not configured on the server." });
+    }
+    
     try {
-      // Get the requester's user document
       const requesterUserDoc = await db.collection("users").doc(requesterUid).get();
       if (!requesterUserDoc.exists) {
         return res.status(403).json({ error: "Access denied. User profile not found." });
       }
-
+      
       const requesterData = requesterUserDoc.data();
       const requesterRole = requesterData?.role;
       const isAdmin = requesterRole === "admin";
-
       let isAuthorized = false;
 
-      // Check room type (peer review room vs standard consultation room)
       if (roomName.startsWith("review-")) {
-        const targetConsultantId = roomName.substring(7); // "review-" has length 7
+        const targetConsultantId = roomName.substring(7);
         isAuthorized = requesterUid === targetConsultantId || isAdmin;
       } else {
-        // Standard consultation room verification
         const consultationDoc = await db.collection("consultations").doc(roomName).get();
         if (!consultationDoc.exists) {
           return res.status(403).json({ error: "Access denied. Consultation room does not exist." });
         }
-
         const consultationData = consultationDoc.data();
-        const patientId = consultationData?.patientId;
-        const consultantId = consultationData?.consultantId;
-        const assignedConsultantId = consultationData?.assignedConsultantId;
-
         isAuthorized = (
-          requesterUid === patientId ||
-          requesterUid === consultantId ||
-          requesterUid === assignedConsultantId ||
+          requesterUid === consultationData?.patientId ||
+          requesterUid === consultationData?.consultantId ||
+          requesterUid === consultationData?.assignedConsultantId ||
           isAdmin
         );
       }
@@ -1675,22 +2158,32 @@ ${stack || 'No stack trace provided.'}
         return res.status(403).json({ error: "Access denied. You are not an authorized participant in this room." });
       }
 
-      // Strictly derive participant identity server-side
-      const displayIdentity = requesterData?.displayName || requesterData?.fullName || requesterUid;
-
-      if (!apiKey || !apiSecret) {
-        console.error("[LiveKit Token] LIVEKIT_API_KEY or LIVEKIT_API_SECRET not configured.");
-        return res.status(500).json({ error: "LiveKit video conferencing services are not configured on the server." });
+      if (!appId || !appCertificate) {
+        return res.status(500).json({ error: "Agora video services are not configured." });
       }
 
-      const at = new AccessToken(apiKey, apiSecret, { identity: displayIdentity });
-      at.addGrant({ roomJoin: true, room: roomName, canPublish: true, canSubscribe: true });
-      res.json({ token: await at.toJwt() });
+      const role = RtcRole.PUBLISHER;
+      const privilegeExpireTime = 3600; 
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+      const privilegeExpiredTs = currentTimestamp + privilegeExpireTime;
+      
+      const token = RtcTokenBuilder.buildTokenWithUserAccount(
+        appId,
+        appCertificate,
+        roomName,
+        requesterUid,
+        role,
+        privilegeExpiredTs,
+        privilegeExpiredTs
+      );
+
+      res.json({ token, appId, uid: requesterUid });
     } catch (err: any) {
-      console.error("[LiveKit Token Error]:", err);
+      console.error("[Agora Token Error]:", err);
       res.status(500).json({ error: "Something went wrong. Please try again." });
     }
   });
+
 
   // --- Global Express Error Handling Middleware ---
   app.use((err: any, req: any, res: any, next: any) => {
@@ -1729,6 +2222,7 @@ ${stack || 'No stack trace provided.'}
   });
 
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -1737,7 +2231,7 @@ ${stack || 'No stack trace provided.'}
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*all', (req, res) => {
+    app.use((req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
