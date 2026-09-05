@@ -1,10 +1,12 @@
-export enum OperationType {
-  GET = 'GET',
-  LIST = 'LIST',
-  WRITE = 'WRITE',
-  UPDATE = 'UPDATE',
-  DELETE = 'DELETE',
-}
+export const OperationType = {
+  GET: 'GET',
+  LIST: 'LIST',
+  WRITE: 'WRITE',
+  UPDATE: 'UPDATE',
+  DELETE: 'DELETE',
+} as const;
+
+export type OperationType = typeof OperationType[keyof typeof OperationType];
 
 export function handleFirestoreError(
   error: any,

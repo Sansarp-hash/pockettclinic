@@ -548,8 +548,8 @@ export default function ConsultantDashboard({
                 )}
             
             {/* Native Mobile Bottom Navigation Bar */}
-            <div className="md:hidden fixed bottom-6 left-4 right-4 z-50">
-              <div className="bg-slate-950/90 backdrop-blur-2xl border border-white/10 rounded-[28px] p-2 shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center justify-around">
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+              <div className="flex items-center justify-around h-12">
                 {[
                   { id: 'appointments', label: 'Home', icon: LayoutDashboard },
                   { id: 'queue', label: 'Queue', icon: Users },
@@ -573,25 +573,16 @@ export default function ConsultantDashboard({
                           setIsMoreMenuOpen(false);
                         }
                       }}
-                      className={`relative flex flex-col items-center gap-1 py-2 px-3 rounded-2xl transition-all active:scale-90 ${
-                        isActive ? 'text-emerald-400' : 'text-slate-400 hover:text-slate-200'
+                      className={`relative flex flex-col items-center justify-center gap-0.5 h-full px-2 transition-all active:scale-95 ${
+                        isActive ? 'text-[#0A3B24]' : 'text-slate-400'
                       }`}
                     >
-                      <Icon size={20} className={isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'} />
-                      <span className={`text-[10px] font-black uppercase tracking-tighter ${isActive ? 'opacity-100' : 'opacity-60'}`}>
+                      <Icon size={18} className={isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'} />
+                      <span className={`text-[8px] font-black uppercase tracking-tight ${isActive ? 'opacity-100' : 'opacity-60'}`}>
                         {tab.label}
                       </span>
-                      {isActive && !isMoreMenuOpen && (
-                        <motion.div 
-                          layoutId="nav-active"
-                          className="absolute -bottom-1 w-1 h-1 bg-emerald-400 rounded-full"
-                        />
-                      )}
-                      {tab.id === 'more' && isMoreMenuOpen && (
-                        <motion.div 
-                          layoutId="nav-active"
-                          className="absolute -bottom-1 w-1 h-1 bg-emerald-400 rounded-full"
-                        />
+                      {isActive && (
+                        <div className="absolute top-0 w-8 h-0.5 bg-[#0A3B24] rounded-full" />
                       )}
                     </button>
                   );
@@ -601,46 +592,38 @@ export default function ConsultantDashboard({
 
             {/* Pending Review Banner */}
             {isPendingReview && (
-              <div className="bg-amber-500 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-xl shadow-amber-500/20 relative overflow-hidden">
+              <div className="bg-amber-600 text-white rounded-xl p-3 mb-5 shadow-sm relative overflow-hidden">
                 <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-4">
-                    <ShieldCheck size={32} className="text-amber-200" />
-                    <h3 className="text-xl font-black uppercase tracking-tight">Your Account Is Under Review</h3>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <ShieldCheck size={16} className="text-amber-200" />
+                    <h3 className="text-[10px] font-black uppercase tracking-tight">Review In Progress</h3>
                   </div>
-                  <p className="text-amber-50 text-sm leading-relaxed max-w-2xl">
-                    Your account is under review by our medical directorate. Once your face-to-face review and credential verification are completed by the administrator, instant consultations and patient queue access will unlock.
+                  <p className="text-amber-50 text-[9px] leading-relaxed max-w-2xl font-bold uppercase tracking-tight">
+                    Your account is under medical directorate review. Consultation access will unlock after credential verification.
                   </p>
-                  <div className="mt-6 flex flex-wrap gap-4">
-                    <div className="bg-amber-600 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm">
-                      <CheckCircle2 size={16} />
-                      View-Only Mode Active
-                    </div>
-                  </div>
                 </div>
-                <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
               </div>
             )}
 
             {/* Face-to-Face Compliance Review Banner */}
             {user?.reviewScheduledAt && (
-              <div className="bg-sky-50 border border-sky-200 rounded-3xl p-6 md:p-8 mb-8 shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                  <Video size={32} className="text-sky-600" />
-                  <h3 className="text-xl font-black text-sky-900 uppercase tracking-tight">Mandatory Face-to-Face Compliance Review</h3>
+              <div className="bg-sky-50 border border-sky-100 rounded-2xl p-4 md:p-6 mb-6 shadow-sm">
+                <div className="flex items-center gap-2.5 mb-3">
+                  <Video size={24} className="text-sky-600" />
+                  <h3 className="text-sm font-black text-sky-900 uppercase tracking-tight">Compliance Review</h3>
                 </div>
-                <p className="text-sky-800 text-sm leading-relaxed mb-6">
-                  Our clinical administration team has scheduled a mandatory live video review with you on <span className="font-bold">{new Date(user.reviewScheduledAt).toLocaleString()}</span>. 
-                  Before joining, you must review and agree to the compliance terms below.
+                <p className="text-sky-800 text-[11px] leading-relaxed mb-4 font-bold uppercase tracking-tight">
+                  Scheduled for <span className="underline">{new Date(user.reviewScheduledAt).toLocaleString()}</span>.
                 </p>
 
                 {!user.reviewTermsAcceptedAt ? (
-                  <div className="bg-white p-6 rounded-2xl border border-sky-100 shadow-sm">
-                    <h4 className="font-bold text-slate-950 mb-3 text-sm">Pre-Review Compliance & Terms Agreement</h4>
-                    <ul className="text-xs text-slate-800 space-y-2 mb-6 list-disc list-inside">
-                      <li>I confirm that my submitted professional indemnity insurance and medical licensing documents are authentic and currently active.</li>
-                      <li>I understand that I am operating as an independent contractor and assume full personal and professional liability for clinical advice provided on this platform.</li>
-                      <li>I agree to adhere strictly to the PockettClinic Code of Conduct during all patient interactions.</li>
-                      <li>I consent to this Face-to-Face review being recorded for auditing and compliance verification purposes.</li>
+                  <div className="bg-white p-4 rounded-xl border border-sky-100 shadow-sm">
+                    <h4 className="font-black text-slate-950 mb-2.5 text-[10px] uppercase tracking-widest">Agreement</h4>
+                    <ul className="text-[9px] text-slate-800 space-y-1.5 mb-5 list-disc list-inside font-bold uppercase tracking-tight">
+                      <li>I confirm documents are authentic.</li>
+                      <li>I assume clinical liability.</li>
+                      <li>I agree to the Code of Conduct.</li>
+                      <li>I consent to recording.</li>
                     </ul>
                     
                     <label className="flex items-start gap-3 mb-6 cursor-pointer">

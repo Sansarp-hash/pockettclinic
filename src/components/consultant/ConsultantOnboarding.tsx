@@ -14,6 +14,7 @@ import {
   SPECIALTY_OPTIONS, 
   ALL_LANGUAGES 
 } from '../../config/consultantCadreConfig';
+import { getSessionTierPricing } from '../../lib/pricing';
 
 const processFileUpload = (file: File, showToast?: (m: string, t: any) => void): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -61,7 +62,7 @@ const processFileUpload = (file: File, showToast?: (m: string, t: any) => void):
 
 export default function ConsultantOnboarding() {
   const navigate = useNavigate();
-  const { user: currentUser, updateUserProfile, signUpWithEmail, showToast } = useAppContext();
+  const { user: currentUser, updateUserProfile, signUpWithEmail, showToast, systemConfig } = useAppContext();
   
   // Navigation & Modal State
   const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
@@ -690,10 +691,13 @@ export default function ConsultantOnboarding() {
                       <div className="space-y-1">
                         <div className="flex items-center justify-between">
                           <span className={`text-xs font-black uppercase tracking-wider ${isSelected ? 'text-emerald-400' : 'text-slate-200'}`}>
-                            {cfg.label}
+                            {getSessionTierPricing(cKey, 'VIDEO', systemConfig).tier.title}
                           </span>
                           {isSelected && <CheckCircle2 size={16} className="text-emerald-400" />}
                         </div>
+                        <p className="text-[10px] text-slate-400 font-medium leading-tight">
+                          {getSessionTierPricing(cKey, 'VIDEO', systemConfig).tier.focus}
+                        </p>
                         <p className="text-[10px] text-slate-400 font-medium">
                           Council: {cfg.governingCouncil}
                         </p>

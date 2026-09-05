@@ -11,6 +11,7 @@ import {
   PharmacistDegreeTrack 
 } from '../../config/consultantCadreConfig';
 import { formatConsultantName } from '../../lib/formatters';
+import { getSessionTierPricing } from '../../lib/pricing';
 import { 
   UserCircle, ShieldCheck, Loader2, Award, BookOpen, Calendar, 
   FileCheck, Stethoscope, CheckCircle2, 
@@ -75,7 +76,7 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
   setIsEditingPortfolio,
   onSave
 }) => {
-  const { showToast, updateUserProfile } = useAppContext();
+  const { showToast, updateUserProfile, systemConfig } = useAppContext();
 
   // State initialization from user
   const initialCadre = normalizeCadre(user?.cadre);
@@ -482,27 +483,27 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
   };
 
   return (
-    <div className={`bg-white md:rounded-[2.5rem] border border-slate-100 md:shadow-2xl md:shadow-slate-200/40 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 ${isEditingPortfolio ? 'fixed inset-0 z-[100] md:relative md:inset-auto md:z-auto overflow-y-auto' : 'relative'}`}>
+    <div className={`bg-white md:rounded-[1.25rem] border border-slate-100 md:shadow-lg md:shadow-slate-200/20 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-500 ${isEditingPortfolio ? 'fixed inset-0 z-[100] md:relative md:inset-auto md:z-auto overflow-y-auto' : 'relative'}`}>
       
       {/* Dashboard Section Header */}
-      <div className="sticky top-0 z-30 p-6 md:p-10 border-b border-slate-50 bg-white/95 backdrop-blur-xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-sm">
-        <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-[24px] bg-slate-900 text-white flex items-center justify-center shadow-2xl shadow-slate-900/20 shrink-0">
-            <UserCircle size={32} />
+      <div className="sticky top-0 z-30 p-4 md:p-5 border-b border-slate-50 bg-white/95 backdrop-blur-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/10 shrink-0">
+            <UserCircle size={20} />
           </div>
           <div>
-            <h3 className="text-2xl font-black text-slate-950 uppercase tracking-tight">Professional Portfolio</h3>
-            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">
+            <h3 className="text-sm font-black text-slate-950 uppercase tracking-tight">Professional Portfolio</h3>
+            <p className="text-[8px] text-slate-400 font-black uppercase tracking-[0.2em] mt-0.5">
               Credentialing & Specialty Scope
             </p>
           </div>
         </div>
         <button
           onClick={() => setIsEditingPortfolio(!isEditingPortfolio)}
-          className={`w-full sm:w-auto px-8 py-4 rounded-[1.25rem] text-[10px] font-black uppercase tracking-[0.15em] transition-all active:scale-95 shadow-xl ${
+          className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-md ${
             isEditingPortfolio 
-              ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100 shadow-rose-600/10' 
-              : 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/20'
+              ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100 shadow-rose-600/5' 
+              : 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/10'
           }`}
         >
           {isEditingPortfolio ? 'Exit Editor' : 'Edit Portfolio'}
@@ -511,19 +512,19 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
 
       {/* Missing Documents Alert Box */}
       {hasMissingDocs && !isEditingPortfolio && (
-        <div className="m-6 md:m-10 p-8 rounded-[2rem] bg-amber-50 border border-amber-100 text-amber-900 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-sm">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm shrink-0 mt-0.5">
-              <AlertTriangle className="text-amber-600" size={24} />
+        <div className="m-4 md:m-5 p-4 rounded-xl bg-amber-50 border border-amber-100 text-amber-900 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shadow-sm shrink-0 mt-0.5">
+              <AlertTriangle className="text-amber-600" size={16} />
             </div>
             <div>
-              <h4 className="text-xs font-black uppercase tracking-[0.15em] text-amber-950">Pending Credentials</h4>
-              <p className="text-[11px] md:text-xs text-amber-800/80 mt-1.5 leading-relaxed font-bold uppercase tracking-tight">
-                Missing compliance files:
+              <h4 className="text-[10px] font-black uppercase tracking-[0.1em] text-amber-950">Pending Credentials</h4>
+              <p className="text-[9px] text-amber-800/80 mt-1 leading-relaxed font-bold uppercase tracking-tight">
+                Missing:
                 <span className="text-amber-600 ml-1">
-                  {isDegreeMissing ? '[Degree Certificate] ' : ''}
-                  {isIndemnityMissing ? '[Indemnity Proof] ' : ''}
-                  {isPinMissing ? '[Council PIN] ' : ''}
+                  {isDegreeMissing ? '[Degree] ' : ''}
+                  {isIndemnityMissing ? '[Indemnity] ' : ''}
+                  {isPinMissing ? '[PIN] ' : ''}
                   {isGhanaCardMissing ? '[Ghana Card] ' : ''}
                 </span> 
               </p>
@@ -531,83 +532,83 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
           </div>
           <button
             onClick={() => setIsEditingPortfolio(true)}
-            className="w-full md:w-auto px-6 py-3 bg-amber-600 text-white font-black text-[10px] rounded-xl hover:bg-amber-700 transition-all shrink-0 cursor-pointer shadow-lg shadow-amber-600/20 uppercase tracking-widest"
+            className="w-full md:w-auto px-4 py-2 bg-amber-600 text-white font-black text-[9px] rounded-lg hover:bg-amber-700 transition-all shrink-0 cursor-pointer shadow-md shadow-amber-600/10 uppercase tracking-widest"
           >
-            Update Now
+            Update
           </button>
         </div>
       )}
 
-      <div className={`p-6 md:p-12 ${isEditingPortfolio ? 'pb-24 md:pb-12' : ''}`}>
+      <div className={`p-4 md:p-6 ${isEditingPortfolio ? 'pb-20 md:pb-6' : ''}`}>
         {!isEditingPortfolio ? (
           /* ================= VIEW PORTFOLIO MODE ================= */
-          <div className="space-y-10 md:space-y-12">
+          <div className="space-y-6">
             {/* Master Cadre Header Card */}
-            <div className="bg-slate-50 p-8 md:p-12 rounded-[3rem] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-8">
-              <div className="flex items-center gap-6">
+            <div className="bg-slate-50 p-5 md:p-6 rounded-[1.25rem] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-5">
+              <div className="flex items-center gap-4">
                 {profilePhoto ? (
                   <img 
                     src={profilePhoto} 
                     alt={fullName} 
                     onError={() => setProfilePhoto(null)} 
-                    className="w-24 h-24 rounded-[32px] object-cover border-4 border-white shadow-2xl" 
+                    className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-xl" 
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-[32px] bg-slate-900 text-white flex items-center justify-center font-black text-3xl shadow-2xl">
+                  <div className="w-16 h-16 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-xl shadow-xl">
                     {prefix.replace('.', '')}
                   </div>
                 )}
                 <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-2xl font-black text-slate-950 uppercase tracking-tight">{formatConsultantName(fullName, prefix)}</h3>
-                    <div className="bg-emerald-50 text-emerald-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-[0.15em] border border-emerald-100 flex items-center gap-1.5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-base font-black text-slate-950 uppercase tracking-tight">{formatConsultantName(fullName, prefix)}</h3>
+                    <div className="bg-emerald-50 text-emerald-700 text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-[0.1em] border border-emerald-100 flex items-center gap-1">
                       <div className="w-1 h-1 rounded-full bg-emerald-500" />
-                      {cadreConfig.label}
+                      {getSessionTierPricing(cadre, 'VIDEO', systemConfig).tier.title}
                     </div>
                   </div>
-                  <p className="text-[11px] text-slate-500 font-black uppercase tracking-[0.1em] flex items-center gap-2">
-                    <Building2 size={14} className="text-slate-400" />
+                  <p className="text-[9px] text-slate-500 font-black uppercase tracking-[0.1em] flex items-center gap-1.5">
+                    <Building2 size={12} className="text-slate-400" />
                     {institution || 'Facility Not Documented'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-col items-start md:items-end gap-2">
-                <span className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">{cadreConfig.governingCouncil}</span>
-                <div className="flex items-center gap-3 bg-white px-5 py-2.5 rounded-2xl border border-slate-100 shadow-sm">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">PIN</span>
-                  <span className="text-xs font-black text-slate-950 uppercase tracking-widest">{pin || 'UNVERIFIED'}</span>
+              <div className="flex flex-col items-start md:items-end gap-1">
+                <span className="text-[8px] text-slate-400 font-black uppercase tracking-[0.15em]">{cadreConfig.governingCouncil}</span>
+                <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-100 shadow-sm">
+                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">PIN</span>
+                  <span className="text-[10px] font-black text-slate-950 uppercase tracking-widest">{pin || 'UNVERIFIED'}</span>
                 </div>
               </div>
             </div>
 
             {/* Section I: Bio & Qualifications */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              <div className="md:col-span-2 space-y-4">
-                <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                  <BookOpen size={16} className="text-slate-900" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2 space-y-2.5">
+                <div className="flex items-center gap-1.5 text-[8px] font-black text-slate-400 uppercase tracking-[0.15em]">
+                  <BookOpen size={12} className="text-slate-900" />
                   Professional Summary
                 </div>
-                <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm leading-relaxed text-slate-600 text-[13px] font-bold italic">
+                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm leading-relaxed text-slate-600 text-[11px] font-bold italic">
                   "{bio || 'Clinical profile summary pending update.'}"
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                  <Award size={16} className="text-slate-900" />
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-1.5 text-[8px] font-black text-slate-400 uppercase tracking-[0.15em]">
+                  <Award size={12} className="text-slate-900" />
                   Credentials
                 </div>
-                <div className="bg-slate-900 p-8 rounded-[2rem] shadow-xl shadow-slate-900/10 border border-slate-950 space-y-4">
+                <div className="bg-slate-900 p-5 rounded-2xl shadow-lg shadow-slate-900/5 border border-slate-950 space-y-3">
                   <div>
-                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Academic Rank</span>
-                    <p className="text-xs font-black text-white uppercase tracking-wider">{qualification || 'Generalist'}</p>
+                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest block mb-0.5">Academic Rank</span>
+                    <p className="text-[10px] font-black text-white uppercase tracking-wider">{qualification || 'Generalist'}</p>
                   </div>
                   {cadre === 'PHARMACIST' && (
-                    <div className="pt-4 border-t border-slate-800">
-                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">PharmD Track</span>
-                      <span className="text-[10px] text-emerald-400 font-black uppercase tracking-widest">
-                        {pharmacistDegreeTrack || 'B_PHARM'} {degreeVerified ? '• Registry Match' : ''}
+                    <div className="pt-3 border-t border-slate-800">
+                      <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest block mb-0.5">PharmD Track</span>
+                      <span className="text-[9px] text-emerald-400 font-black uppercase tracking-widest">
+                        {pharmacistDegreeTrack || 'B_PHARM'} {degreeVerified ? '• Match' : ''}
                       </span>
                     </div>
                   )}
@@ -616,114 +617,107 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
             </div>
 
             {/* Section II: Compliance & Insurance */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-10 border-t border-slate-50">
-              <div className="group p-6 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2">Ghana Card</span>
-                <p className="text-[11px] font-black text-slate-950 uppercase tracking-widest">{ghanaCardNo || 'PENDING'}</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-6 border-t border-slate-50">
+              <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.15em] block mb-1">Ghana Card</span>
+                <p className="text-[10px] font-black text-slate-950 uppercase tracking-widest">{ghanaCardNo || 'PENDING'}</p>
               </div>
 
-              <div className="group p-6 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2">Indemnity Policy</span>
-                <p className="text-[11px] font-black text-slate-950 uppercase tracking-widest mb-1">{indemnityPolicyNo || 'NONE'}</p>
-                <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest block">{insuranceProvider}</span>
+              <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.15em] block mb-1">Indemnity Policy</span>
+                <p className="text-[10px] font-black text-slate-950 uppercase tracking-widest truncate">{indemnityPolicyNo || 'NONE'}</p>
               </div>
 
-              <div className="group p-6 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2">Insurance Expiry</span>
-                <p className="text-[11px] font-black text-slate-950 uppercase tracking-widest">{expiryDate || 'N/A'}</p>
-                {provideLater && (
-                  <span className="mt-2 text-[8px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-amber-100 inline-block">
-                    Liability Waiver Active
-                  </span>
-                )}
+              <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.15em] block mb-1">Expiry</span>
+                <p className="text-[10px] font-black text-slate-950 uppercase tracking-widest">{expiryDate || 'N/A'}</p>
               </div>
 
-              <div className="group p-6 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2">Availability</span>
-                <p className="text-[11px] font-black text-slate-950 uppercase tracking-widest mb-1">{availabilityDays}</p>
-                <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest block">{availabilityHours}</span>
+              <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.15em] block mb-1">Availability</span>
+                <p className="text-[10px] font-black text-slate-950 uppercase tracking-widest truncate">{availabilityDays}</p>
               </div>
             </div>
 
             {/* Section III: Document Certificates */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-50">
-              <div className="p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100 flex items-center justify-between group hover:bg-white hover:shadow-2xl hover:shadow-slate-200/40 transition-all duration-500">
-                <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-sm group-hover:bg-slate-950 group-hover:text-white transition-all">
-                    <FileCheck size={24} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4">
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm group-hover:bg-slate-950 group-hover:text-white transition-all shrink-0">
+                    <FileCheck size={18} />
                   </div>
                   <div>
-                    <h5 className="text-[11px] font-black text-slate-950 uppercase tracking-widest">Degree Certificate</h5>
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{degreeCertificateFile ? 'Verified on File' : 'Missing File'}</p>
+                    <h5 className="text-[10px] font-black text-slate-950 uppercase tracking-widest">Degree Cert</h5>
+                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{degreeCertificateFile ? 'Verified' : 'Missing'}</p>
                   </div>
                 </div>
                 {degreeCertificateFile && (
-                  <a href={degreeCertificateFile} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-950 hover:text-white hover:border-slate-950 transition-all">
-                    <Search size={16} />
+                  <a href={degreeCertificateFile} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-950 hover:text-white hover:border-slate-950 transition-all">
+                    <Search size={14} />
                   </a>
                 )}
               </div>
 
-              <div className="p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100 flex items-center justify-between group hover:bg-white hover:shadow-2xl hover:shadow-slate-200/40 transition-all duration-500">
-                <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-sm group-hover:bg-slate-950 group-hover:text-white transition-all">
-                    <ShieldCheck size={24} />
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm group-hover:bg-slate-950 group-hover:text-white transition-all shrink-0">
+                    <ShieldCheck size={18} />
                   </div>
                   <div>
-                    <h5 className="text-[11px] font-black text-slate-950 uppercase tracking-widest">Indemnity Insurance</h5>
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{indemnityDocData ? 'Policy Verified' : provideLater ? 'Waiver Documented' : 'Action Required'}</p>
+                    <h5 className="text-[10px] font-black text-slate-950 uppercase tracking-widest">Indemnity Ins.</h5>
+                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{indemnityDocData ? 'Verified' : provideLater ? 'Waiver' : 'Required'}</p>
                   </div>
                 </div>
                 {indemnityDocData && (
-                  <a href={indemnityDocData} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-950 hover:text-white hover:border-slate-950 transition-all">
-                    <Search size={16} />
+                  <a href={indemnityDocData} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-950 hover:text-white hover:border-slate-950 transition-all">
+                    <Search size={14} />
                   </a>
                 )}
               </div>
             </div>
 
             {/* Section IV: Languages & Scope */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-10 border-t border-slate-50">
-              <div className="space-y-6">
-                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Spoken Languages</h5>
-                <div className="flex flex-wrap gap-2.5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-slate-50">
+              <div className="space-y-3">
+                <h5 className="text-[8px] font-black text-slate-400 uppercase tracking-[0.15em]">Languages</h5>
+                <div className="flex flex-wrap gap-1.5">
                   {languages.map((l, i) => (
-                    <span key={i} className="px-5 py-2 rounded-xl bg-slate-50 text-slate-950 text-[10px] font-black uppercase tracking-widest border border-slate-100">
+                    <span key={i} className="px-3 py-1.5 rounded-lg bg-slate-50 text-slate-950 text-[9px] font-black uppercase tracking-widest border border-slate-100">
                       {l}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-6">
-                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Clinical Scope</h5>
-                <div className="flex flex-wrap gap-2.5">
+              <div className="space-y-3">
+                <h5 className="text-[8px] font-black text-slate-400 uppercase tracking-[0.15em]">Clinical Scope</h5>
+                <div className="flex flex-wrap gap-1.5">
                   {scopeOfServices.length > 0 ? (
                     scopeOfServices.map((s, i) => (
-                      <span key={i} className="px-5 py-2 rounded-xl bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest border border-emerald-100">
+                      <span key={i} className="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-[9px] font-black uppercase tracking-widest border border-emerald-100">
                         {s}
                       </span>
                     ))
                   ) : (
-                    <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest italic">Full Medical Capacity</span>
+                    <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest italic">General Practice</span>
                   )}
                 </div>
               </div>
             </div>
 
             {/* Section V: Legal Affirmations */}
-            <div className="p-8 rounded-[2.5rem] bg-slate-950 text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl shadow-slate-900/40">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10">
-                  <CheckCircle2 className="text-emerald-400" size={24} />
+            <div className="p-5 rounded-2xl bg-slate-900 text-white flex flex-col md:flex-row items-center justify-between gap-5 shadow-lg shadow-slate-900/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/10">
+                  <CheckCircle2 className="text-emerald-400" size={20} />
                 </div>
                 <div>
-                  <h5 className="text-xs font-black uppercase tracking-widest">Affirmed Contractor Status</h5>
-                  <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1">Legal Liability & Indemnity Agreement Signed</p>
+                  <h5 className="text-[10px] font-black uppercase tracking-widest">Affirmed Contractor Status</h5>
+                  <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest mt-0.5">Agreement Signed Digitally</p>
                 </div>
               </div>
-              <div className="px-6 py-3 bg-white/5 rounded-2xl border border-white/10 text-[10px] font-black uppercase tracking-[0.2em]">
-                Digital Signature: <span className="text-emerald-400 ml-2">{typedLegalSignature || fullName}</span>
+              <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/10 text-[9px] font-black uppercase tracking-[0.15em]">
+                Signature: <span className="text-emerald-400 ml-1.5">{typedLegalSignature || fullName}</span>
               </div>
             </div>
           </div>

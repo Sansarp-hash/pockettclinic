@@ -3,12 +3,16 @@ import { Download, Printer, Award, ShieldCheck, Heart, User, Calendar } from "lu
 import { QRCodeSVG } from "qrcode.react";
 import { jsPDF } from "jspdf";
 import { DigitalPrescription } from "../types";
+import { normalizeCadre } from "../config/consultantCadreConfig";
+import { getSessionTierPricing } from "../lib/pricing";
+import { useAppContext } from "../AppContext";
 
 interface DigitalPrescriptionPDFProps {
   prescription: DigitalPrescription;
 }
 
 export default function DigitalPrescriptionPDF({ prescription }: DigitalPrescriptionPDFProps) {
+  const { systemConfig } = useAppContext();
   const printRef = useRef<HTMLDivElement>(null);
 
   const downloadPDF = () => {
@@ -187,7 +191,7 @@ export default function DigitalPrescriptionPDF({ prescription }: DigitalPrescrip
             </div>
             <div className="space-y-1 text-xs text-slate-600">
               <p>Consultant: <span className="font-semibold text-slate-800">{prescription.consultantName}</span></p>
-              <p>Cadre: <span className="font-semibold text-slate-800">{prescription.consultantCadre || "Doctor"}</span></p>
+              <p>Cadre: <span className="font-semibold text-slate-800">{getSessionTierPricing(normalizeCadre(prescription.consultantCadre || ""), "VIDEO", systemConfig).tier.title}</span></p>
               <p>GMC Council PIN: <span className="font-mono font-semibold text-slate-800">{prescription.consultantPin || "GMC-87293-A"}</span></p>
             </div>
           </div>

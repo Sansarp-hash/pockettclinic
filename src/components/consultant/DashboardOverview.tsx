@@ -48,27 +48,27 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       />
 
       {/* Next Consultations Widget */}
-      <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden group">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 relative z-10">
+      <div className="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-lg shadow-slate-200/10 relative overflow-hidden group">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative z-10">
           <div>
-            <h3 className="text-xl font-black text-slate-950 uppercase tracking-tight">Active Room Monitor</h3>
-            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Real-time scheduling & virtual consultation access</p>
+            <h3 className="text-sm font-black text-slate-950 uppercase tracking-tight">Active Room Monitor</h3>
+            <p className="text-[8px] text-slate-400 font-black uppercase tracking-[0.2em] mt-0.5">Real-time scheduling access</p>
           </div>
-          <div className="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Live Synchronization</span>
+          <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+            <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Live Sync</span>
           </div>
         </div>
 
         {upcoming.length === 0 ? (
-          <div className="text-center py-24 bg-slate-50/50 rounded-[2rem] border border-dashed border-slate-200 relative z-10">
-            <div className="w-16 h-16 rounded-[24px] bg-white flex items-center justify-center text-slate-300 mx-auto mb-6 shadow-sm">
-              <Calendar size={32} />
+          <div className="text-center py-16 bg-slate-50/50 rounded-xl border border-dashed border-slate-200 relative z-10">
+            <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-slate-300 mx-auto mb-4 shadow-sm">
+              <Calendar size={24} />
             </div>
-            <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-xs italic">Schedule is currently clear</p>
+            <p className="text-slate-400 font-black uppercase tracking-[0.15em] text-[10px] italic">Schedule is clear</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 relative z-10">
             {upcoming.map((session) => {
               const sessionTime = session.scheduledAt ? new Date(session.scheduledAt) : null;
               const formattedTime = sessionTime 
@@ -80,21 +80,21 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
               return (
                 <div 
-                  key={session.sessionId}
-                  className="bg-white hover:bg-slate-50 p-6 md:p-8 rounded-[2rem] border border-slate-100 transition-all duration-300 flex flex-col justify-between gap-6 group/card shadow-sm hover:shadow-xl hover:shadow-slate-200/40 animate-in fade-in slide-in-from-bottom-4"
+                   key={session.sessionId}
+                  className="bg-white hover:bg-slate-50 p-4 md:p-5 rounded-xl border border-slate-100 transition-all duration-300 flex flex-col justify-between gap-4 group/card shadow-sm hover:shadow-md animate-in fade-in slide-in-from-bottom-2"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div className={`p-3 rounded-2xl ${
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={`p-2 rounded-lg ${
                         session.sessionType === 'VIDEO'
                           ? 'bg-sky-50 text-sky-600'
                           : session.sessionType === 'AUDIO_ONLY'
                             ? 'bg-emerald-50 text-emerald-600'
                             : 'bg-indigo-50 text-indigo-600'
                       }`}>
-                        {session.sessionType === 'VIDEO' && <Video size={20} />}
-                        {session.sessionType === 'AUDIO_ONLY' && <PhoneCall size={20} />}
-                        {session.sessionType === 'CHAT_ONLY' && <MessageSquare size={20} />}
+                        {session.sessionType === 'VIDEO' && <Video size={16} />}
+                        {session.sessionType === 'AUDIO_ONLY' && <PhoneCall size={16} />}
+                        {session.sessionType === 'CHAT_ONLY' && <MessageSquare size={16} />}
                       </div>
 
                       <div className="flex flex-col items-end gap-1">

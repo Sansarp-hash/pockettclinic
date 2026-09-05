@@ -163,27 +163,27 @@ export default function MainLayout() {
 
       {/* Patient & Consultant Care & Emergency Triage Disclaimer Banner (Replaces scheduled maintenance with essential safety disclaimers) */}
       {!location.pathname.startsWith('/admin') && !dismissedEmergencyBanner && (
-        <div className="bg-rose-50 text-rose-950 px-4 py-3 text-xs font-bold flex flex-col md:flex-row items-center justify-between gap-3 z-50 shadow-md shadow-lime-900/5 border-b border-rose-200/40">
-          <div className="flex items-center gap-2 mx-auto text-left leading-relaxed">
-            <HeartPulse size={16} className="text-rose-600 flex-shrink-0 animate-pulse" />
-            <span>
+        <div className="bg-rose-50 text-rose-950 px-4 py-1.5 text-[10px] font-bold flex flex-col md:flex-row items-center justify-between gap-2 z-50 shadow-sm border-b border-rose-200/40">
+          <div className="flex items-center gap-2 mx-auto text-left leading-tight">
+            <HeartPulse size={14} className="text-rose-600 flex-shrink-0 animate-pulse" />
+            <span className="line-clamp-2 md:line-clamp-none">
               <strong className="text-rose-700 uppercase tracking-wider mr-1">Emergency Notice:</strong> 
-              PockettClinic is designed strictly for virtual medical consultations and triage. If you are experiencing a life-threatening crisis, cardiac symptoms, respiratory distress, or severe trauma, please dial <strong className="text-rose-700 font-extrabold underline">112 / 193</strong> or visit the nearest physical emergency facility immediately.
+              PockettClinic is for triage. If in crisis, dial <strong className="text-rose-700 font-extrabold underline">112 / 193</strong> or visit emergency immediately.
             </span>
           </div>
-          <div className="flex items-center gap-3 flex-shrink-0 self-end md:self-auto">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => setIsNearestFacilitiesOpen(true)}
-              className="bg-rose-600 hover:bg-rose-700 text-white px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-md shadow-lime-900/5 hover:shadow-lg active:scale-95 whitespace-nowrap"
+              className="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap"
             >
-              Nearest Hospital Wards
+              Hospitals
             </button>
             <button 
               onClick={() => setDismissedEmergencyBanner(true)} 
               className="opacity-60 hover:opacity-100 p-1 cursor-pointer text-rose-900 hover:bg-rose-200/30 rounded-full transition-all flex-shrink-0"
               title="Dismiss Disclaimer"
             >
-              <X size={14} />
+              <X size={12} />
             </button>
           </div>
         </div>
@@ -249,12 +249,12 @@ export default function MainLayout() {
         </div>
       )}
 
-      <header className="bg-white border-b border-lime-200 px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between sticky top-0 z-50 shadow-md shadow-lime-900/5">
-        <BrandingLogo />
+      <header className="bg-white border-b border-slate-100 px-4 sm:px-6 lg:px-8 py-1.5 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+        <BrandingLogo logoSize="w-6 h-6" titleSize="text-[13px]" showSlogan={false} />
         <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
           <nav className="hidden lg:flex items-center gap-6">
-            <Link to="/find-care" className="text-sm font-bold text-emerald-600 hover:text-emerald-600 transition-colors flex items-center gap-2">
-              <Search size={18} /> Find Care
+            <Link to="/find-care" className="text-[11px] font-black text-emerald-800 hover:text-emerald-900 transition-colors flex items-center gap-1.5 uppercase tracking-wider">
+              <Search size={14} strokeWidth={2.5} /> Find Care
             </Link>
           </nav>
           
@@ -271,9 +271,9 @@ export default function MainLayout() {
                   console.info("MainLayout sign-in error handled:", err?.message || err);
                 }
               }}
-              className="px-4 sm:px-6 py-2 sm:py-2.5 bg-emerald-500 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-lg shadow-indigo-500/20 flex items-center gap-2"
+              className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-black text-[10px] transition-all shadow-sm flex items-center gap-1.5 uppercase tracking-widest"
             >
-              <User size={18} />
+              <User size={14} strokeWidth={2.5} />
               Sign In
             </button>
           ) : (

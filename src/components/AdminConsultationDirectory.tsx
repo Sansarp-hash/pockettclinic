@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Video, MessageSquare, Phone, Search, Calendar, User, Stethoscope, CheckCircle2, Eye, CreditCard, FileText, Trash2, Clock, ShieldAlert, UserCheck, Sliders, Loader2 } from 'lucide-react';
+import { normalizeCadre } from '../config/consultantCadreConfig';
+import { getSessionTierPricing } from '../lib/pricing';
 import { TableSkeleton } from './Skeleton';
 import { useAppContext } from '../AppContext';
 import { doc, updateDoc, collection, getDocs, query, where } from 'firebase/firestore';
@@ -18,7 +20,7 @@ export default function AdminConsultationDirectory({
   onInspectSession
 }: AdminConsultationDirectoryProps) {
   const navigate = useNavigate();
-  const { showToast } = useAppContext();
+  const { showToast, systemConfig } = useAppContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'IN_PROGRESS' | 'COMPLETED' | 'PAID' | 'RINGING' | 'CANCELLED'>('ALL');
   const [selectedSession, setSelectedSession] = useState<any | null>(null);
@@ -259,7 +261,9 @@ export default function AdminConsultationDirectory({
                         </div>
                         <div>
                           <p className="font-bold text-slate-800 text-xs">{c.consultantName || 'Assigned Consultant'}</p>
-                          <p className="text-[10px] text-slate-600 font-medium uppercase">{c.consultantCadre || 'Doctor'}</p>
+                          <p className="text-[10px] text-slate-600 font-medium uppercase">
+                            {getSessionTierPricing(normalizeCadre(c.consultantCadre || c.cadreNeeded || ""), 'VIDEO', systemConfig).tier.title}
+                          </p>
                         </div>
                       </div>
                     </td>

@@ -128,6 +128,8 @@ export function getSessionTierPricing(
   return {
     tier: {
       ...baseTier,
+      title: configuredTier?.title || baseTier.title,
+      focus: configuredTier?.focus || baseTier.focus,
       chatFeeGHS,
       voiceVideoFeeGHS,
       chatDurationMins: durationMins,

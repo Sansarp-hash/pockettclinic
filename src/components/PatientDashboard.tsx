@@ -163,7 +163,7 @@ export default function PatientDashboard({
   onBackToList
 }: PatientDashboardProps = {}) {
   const navigate = useNavigate();
-  const { user, setUser, consultations, prescriptions, updateConsultation, cancelConsultation, isLoading, showToast, tickets, allUsers, globalLogoUrl, logout, systemConfig } = useAppContext();
+  const { user, setUser, consultations, prescriptions, updateConsultation, cancelConsultation, isLoading, showToast, tickets, allUsers, globalLogoUrl, globalTitle, globalSlogan, logout, systemConfig } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const [consultantSearch, setConsultantSearch] = useState('');
   const [messageIndex, setMessageIndex] = useState(0);
@@ -681,24 +681,24 @@ export default function PatientDashboard({
         
         {/* ACTIVE SESSION RE-ENTRY BANNER */}
         {reenterableSession && (
-          <div className="mx-4 lg:mx-0 mt-6 relative z-30">
-            <div className="bg-emerald-50 border-2 border-emerald-400 rounded-[20px] p-5 shadow-lg shadow-emerald-950/5 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-pulse">
-              <div className="flex gap-3.5 items-start">
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800 shrink-0 border border-emerald-200 shadow-sm">
-                  <Video size={24} className="animate-bounce" />
+          <div className="mx-4 lg:mx-0 mt-4 relative z-30">
+            <div className="bg-emerald-50 border-2 border-emerald-300 rounded-xl p-3.5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 animate-pulse">
+              <div className="flex gap-2.5 items-start">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800 shrink-0 border border-emerald-200">
+                  <Video size={18} className="animate-bounce" />
                 </div>
                 <div>
-                  <h4 className="text-[15px] font-black text-emerald-900 leading-tight uppercase tracking-wider">Active Consultation In Progress</h4>
-                  <p className="text-[12px] text-emerald-700 mt-1.5 font-medium leading-relaxed">
-                    You have an ongoing session with <span className="font-extrabold">{formatConsultantName(reenterableSession.consultantName, reenterableSession.consultantPrefix)}</span>. Reconnect now to resume your video consultation before your remaining time expires.
+                  <h4 className="text-[12px] font-black text-emerald-900 leading-tight uppercase tracking-tight">Session In Progress</h4>
+                  <p className="text-[10px] text-emerald-700 mt-1 font-bold leading-relaxed uppercase tracking-tight">
+                    Ongoing with <span className="font-black underline">{formatConsultantName(reenterableSession.consultantName, reenterableSession.consultantPrefix)}</span>. Reconnect now.
                   </p>
                 </div>
               </div>
               <button 
                 onClick={() => navigate(`/consultation/${reenterableSession.sessionId}`)}
-                className="w-full md:w-auto bg-[#0A3B24] hover:bg-emerald-950 text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-md shrink-0 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                className="w-full md:w-auto bg-[#0A3B24] hover:bg-emerald-900 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all"
               >
-                <Video size={16} />
+                <Video size={14} />
                 <span>Join Room</span>
               </button>
             </div>
@@ -708,74 +708,70 @@ export default function PatientDashboard({
         
         
         {/* QUICK CARE SECTION */}
-        <div className="mt-8 px-4 lg:px-0 space-y-4">
+        <div className="mt-4 px-4 lg:px-0 space-y-2">
           <div className="flex items-center justify-between">
-            <h3 className="text-[16px] font-black text-slate-800 tracking-tight">Quick Care Actions</h3>
+            <h3 className="text-[13px] font-black text-slate-800 tracking-tight uppercase">Quick Actions</h3>
             <button 
               onClick={() => { const el = document.getElementById('consultants-section'); if(el) el.scrollIntoView({ behavior: 'smooth' }); }} 
-              className="text-[11px] font-extrabold text-slate-600 hover:text-slate-800 flex items-center gap-0.5 transition-colors uppercase tracking-wider"
+              className="text-[9px] font-extrabold text-slate-500 hover:text-slate-700 flex items-center gap-0.5 transition-colors uppercase tracking-wider"
             >
-              <span>View Directory</span> <ChevronRight size={14} strokeWidth={2.5} />
+              <span>Directory</span> <ChevronRight size={10} strokeWidth={2.5} />
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-3.5">
+          <div className="grid grid-cols-2 gap-2">
              <button 
               onClick={() => { const el = document.getElementById('consultants-section'); if(el) el.scrollIntoView({ behavior: 'smooth' }); }}
-              className="bg-[#F0FDF4] p-4 rounded-[20px] flex items-center justify-between shadow-sm active:scale-95 hover:shadow-md transition-all text-left group border border-emerald-100 cursor-pointer"
+              className="bg-white p-2.5 rounded-xl flex items-center justify-between shadow-sm active:scale-95 hover:shadow-md transition-all text-left group border border-slate-100 cursor-pointer min-w-0"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 flex items-center justify-center text-emerald-700 shrink-0 group-hover:scale-105 transition-transform">
-                  <Stethoscope size={28} strokeWidth={1.5} />
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-105 transition-transform">
+                  <Stethoscope size={18} strokeWidth={2} />
                 </div>
-                <div>
-                  <h4 className="text-[14px] font-black text-slate-800 leading-tight">Online Consultants</h4>
-                  <p className="text-[10px] text-emerald-700 font-extrabold mt-1 tracking-wide uppercase">Consult now</p>
+                <div className="min-w-0">
+                  <h4 className="text-[11px] font-black text-slate-800 leading-tight truncate uppercase">Consultants</h4>
                 </div>
               </div>
-              <ChevronRight size={16} className="text-slate-400 shrink-0" strokeWidth={2.5} />
+              <ChevronRight size={12} className="text-slate-300 shrink-0" strokeWidth={2.5} />
             </button>
             <button 
               onClick={() => setShowVitalsModal(true)}
-              className="bg-[#FAF5FF] p-4 rounded-[20px] flex items-center justify-between shadow-sm active:scale-95 hover:shadow-md transition-all text-left group border border-purple-100 cursor-pointer"
+              className="bg-white p-2.5 rounded-xl flex items-center justify-between shadow-sm active:scale-95 hover:shadow-md transition-all text-left group border border-slate-100 cursor-pointer min-w-0"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 flex items-center justify-center text-purple-700 shrink-0 group-hover:scale-105 transition-transform">
-                  <Activity size={28} strokeWidth={1.5} />
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 flex items-center justify-center text-purple-600 shrink-0 group-hover:scale-105 transition-transform">
+                  <Activity size={18} strokeWidth={2} />
                 </div>
-                <div>
-                  <h4 className="text-[14px] font-black text-slate-800 leading-tight">Log Vitals</h4>
-                  <p className="text-[10px] text-purple-700 font-extrabold mt-1 tracking-wide uppercase">Track health</p>
+                <div className="min-w-0">
+                  <h4 className="text-[11px] font-black text-slate-800 leading-tight truncate uppercase">Log Vitals</h4>
                 </div>
               </div>
-              <ChevronRight size={16} className="text-slate-400 shrink-0" strokeWidth={2.5} />
+              <ChevronRight size={12} className="text-slate-300 shrink-0" strokeWidth={2.5} />
             </button>
           </div>
         </div>
 
         {/* GENERAL CADRES SECTION */}
-        <div className="mt-8 px-4 lg:px-0 space-y-4">
+        <div className="mt-5 px-4 lg:px-0 space-y-2.5">
           <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-[16px] font-black text-slate-800 tracking-tight">Instant Consultation by Cadre</h3>
-              <p className="text-[11px] text-slate-500 font-medium">Select a general cadre to instantly connect with available consultants</p>
-            </div>
+            <h3 className="text-[13px] font-black text-slate-800 tracking-tight uppercase">Instant Care</h3>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
             <button 
               onClick={() => navigate('/booking/instant?cadre=DOCTOR')}
-              className="bg-white hover:bg-slate-50 p-4 rounded-[20px] flex flex-col justify-between shadow-[0_4px_20px_rgba(0,0,0,0.04)] active:scale-95 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all text-left group border border-slate-200 cursor-pointer"
+              className="bg-white p-2.5 rounded-xl flex flex-col justify-between shadow-sm active:scale-95 transition-all text-left group border border-slate-100 cursor-pointer min-w-0"
             >
-              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center mb-3 shadow-sm">
-                <Stethoscope size={22} strokeWidth={2} />
+              <div className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center mb-1.5 shadow-sm shrink-0">
+                <Stethoscope size={14} strokeWidth={2.5} />
               </div>
-              <div>
-                <h4 className="text-[14px] font-black text-slate-900 leading-tight">Doctor</h4>
-                <p className="text-[11px] text-slate-500 font-medium mt-0.5">Medical Diagnosis & Advice</p>
-                <div className="mt-2.5 flex items-center justify-between">
-                  <span className="text-[12px] font-black text-emerald-800">GHS {getSessionTierPricing('DOCTOR', 'VIDEO', systemConfig).grossFee}</span>
-                  <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${isCadreOnline('DOCTOR') ? 'bg-emerald-200/60 text-emerald-800' : 'bg-slate-200 text-slate-500 opacity-60'}`}>
-                    {isCadreOnline('DOCTOR') ? 'Instant' : 'Offline'}
+              <div className="min-w-0">
+                <h4 className="text-[11px] font-black text-slate-900 leading-tight truncate uppercase">
+                  {getSessionTierPricing('DOCTOR', 'VIDEO', systemConfig).tier.title}
+                </h4>
+                <div className="mt-1 flex items-center justify-between gap-1">
+                  <span className="text-[10px] font-black text-emerald-800">GHS {getSessionTierPricing('DOCTOR', 'VIDEO', systemConfig).grossFee}</span>
+                  <span className={`text-[7px] font-black uppercase px-1 py-0.5 rounded-full shrink-0 ${isCadreOnline('DOCTOR') ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}`}>
+                    {isCadreOnline('DOCTOR') ? 'Live' : 'Off'}
                   </span>
                 </div>
               </div>
@@ -783,18 +779,19 @@ export default function PatientDashboard({
 
             <button 
               onClick={() => navigate('/booking/instant?cadre=PHARMACIST')}
-              className="bg-white hover:bg-slate-50 p-4 rounded-[20px] flex flex-col justify-between shadow-[0_4px_20px_rgba(0,0,0,0.04)] active:scale-95 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all text-left group border border-slate-200 cursor-pointer"
+              className="bg-white p-2.5 rounded-xl flex flex-col justify-between shadow-sm active:scale-95 transition-all text-left group border border-slate-100 cursor-pointer min-w-0"
             >
-              <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center mb-3 shadow-sm">
-                <Pill size={22} strokeWidth={2} />
+              <div className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center mb-1.5 shadow-sm shrink-0">
+                <Pill size={14} strokeWidth={2.5} />
               </div>
-              <div>
-                <h4 className="text-[14px] font-black text-slate-900 leading-tight">Pharmacist</h4>
-                <p className="text-[11px] text-slate-500 font-medium mt-0.5">Medication & Rx Guidance</p>
-                <div className="mt-2.5 flex items-center justify-between">
-                  <span className="text-[12px] font-black text-purple-800">GHS {getSessionTierPricing('PHARMACIST', 'VIDEO', systemConfig).grossFee}</span>
-                  <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${isCadreOnline('PHARMACIST') ? 'bg-purple-200/60 text-purple-800' : 'bg-slate-200 text-slate-500 opacity-60'}`}>
-                    {isCadreOnline('PHARMACIST') ? 'Instant' : 'Offline'}
+              <div className="min-w-0">
+                <h4 className="text-[11px] font-black text-slate-900 leading-tight truncate uppercase">
+                  {getSessionTierPricing('PHARMACIST', 'VIDEO', systemConfig).tier.title}
+                </h4>
+                <div className="mt-1 flex items-center justify-between gap-1">
+                  <span className="text-[10px] font-black text-purple-800">GHS {getSessionTierPricing('PHARMACIST', 'VIDEO', systemConfig).grossFee}</span>
+                  <span className={`text-[7px] font-black uppercase px-1 py-0.5 rounded-full shrink-0 ${isCadreOnline('PHARMACIST') ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-400'}`}>
+                    {isCadreOnline('PHARMACIST') ? 'Live' : 'Off'}
                   </span>
                 </div>
               </div>
@@ -802,18 +799,19 @@ export default function PatientDashboard({
 
             <button 
               onClick={() => navigate('/booking/instant?cadre=PHARM_TECH')}
-              className="bg-white hover:bg-slate-50 p-4 rounded-[20px] flex flex-col justify-between shadow-[0_4px_20px_rgba(0,0,0,0.04)] active:scale-95 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all text-left group border border-slate-200 cursor-pointer"
+              className="bg-white p-2.5 rounded-xl flex flex-col justify-between shadow-sm active:scale-95 transition-all text-left group border border-slate-100 cursor-pointer min-w-0"
             >
-              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-3 shadow-sm">
-                <ShieldCheck size={22} strokeWidth={2} />
+              <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center mb-1.5 shadow-sm shrink-0">
+                <ShieldCheck size={14} strokeWidth={2.5} />
               </div>
-              <div>
-                <h4 className="text-[14px] font-black text-slate-900 leading-tight">Pharmacy Technician</h4>
-                <p className="text-[11px] text-slate-500 font-medium mt-0.5">Refills & Stock Support</p>
-                <div className="mt-2.5 flex items-center justify-between">
-                  <span className="text-[12px] font-black text-blue-800">GHS {getSessionTierPricing('PHARM_TECH', 'VIDEO', systemConfig).grossFee}</span>
-                  <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${isCadreOnline('PHARM_TECH') ? 'bg-blue-200/60 text-blue-800' : 'bg-slate-200 text-slate-500 opacity-60'}`}>
-                    {isCadreOnline('PHARM_TECH') ? 'Instant' : 'Offline'}
+              <div className="min-w-0">
+                <h4 className="text-[11px] font-black text-slate-900 leading-tight truncate uppercase">
+                  {getSessionTierPricing('PHARM_TECH', 'VIDEO', systemConfig).tier.title}
+                </h4>
+                <div className="mt-1 flex items-center justify-between gap-1">
+                  <span className="text-[10px] font-black text-blue-800">GHS {getSessionTierPricing('PHARM_TECH', 'VIDEO', systemConfig).grossFee}</span>
+                  <span className={`text-[7px] font-black uppercase px-1 py-0.5 rounded-full shrink-0 ${isCadreOnline('PHARM_TECH') ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'}`}>
+                    {isCadreOnline('PHARM_TECH') ? 'Live' : 'Off'}
                   </span>
                 </div>
               </div>
@@ -821,18 +819,19 @@ export default function PatientDashboard({
 
             <button 
               onClick={() => navigate('/booking/instant?cadre=PHYSICIAN_ASSISTANT')}
-              className="bg-white hover:bg-slate-50 p-4 rounded-[20px] flex flex-col justify-between shadow-[0_4px_20px_rgba(0,0,0,0.04)] active:scale-95 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all text-left group border border-slate-200 cursor-pointer"
+              className="bg-white p-2.5 rounded-xl flex flex-col justify-between shadow-sm active:scale-95 transition-all text-left group border border-slate-100 cursor-pointer min-w-0"
             >
-              <div className="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center mb-3 shadow-sm">
-                <UserCheck size={22} strokeWidth={2} />
+              <div className="w-6 h-6 rounded-lg bg-amber-600 text-white flex items-center justify-center mb-1.5 shadow-sm shrink-0">
+                <UserCheck size={14} strokeWidth={2.5} />
               </div>
-              <div>
-                <h4 className="text-[14px] font-black text-slate-900 leading-tight">Physician Assistant (PA)</h4>
-                <p className="text-[11px] text-slate-500 font-medium mt-0.5">Primary Care Assessments</p>
-                <div className="mt-2.5 flex items-center justify-between">
-                  <span className="text-[12px] font-black text-amber-800">GHS {getSessionTierPricing('PHYSICIAN_ASSISTANT', 'VIDEO', systemConfig).grossFee}</span>
-                  <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${isCadreOnline('PHYSICIAN_ASSISTANT') ? 'bg-amber-200/60 text-amber-800' : 'bg-slate-200 text-slate-500 opacity-60'}`}>
-                    {isCadreOnline('PHYSICIAN_ASSISTANT') ? 'Instant' : 'Offline'}
+              <div className="min-w-0">
+                <h4 className="text-[11px] font-black text-slate-900 leading-tight truncate uppercase">
+                  {getSessionTierPricing('PHYSICIAN_ASSISTANT', 'VIDEO', systemConfig).tier.title}
+                </h4>
+                <div className="mt-1 flex items-center justify-between gap-1">
+                  <span className="text-[10px] font-black text-amber-800">GHS {getSessionTierPricing('PHYSICIAN_ASSISTANT', 'VIDEO', systemConfig).grossFee}</span>
+                  <span className={`text-[7px] font-black uppercase px-1 py-0.5 rounded-full shrink-0 ${isCadreOnline('PHYSICIAN_ASSISTANT') ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-400'}`}>
+                    {isCadreOnline('PHYSICIAN_ASSISTANT') ? 'Live' : 'Off'}
                   </span>
                 </div>
               </div>
@@ -889,56 +888,56 @@ export default function PatientDashboard({
           </div>
         </div>
 
-        {/* TOP CONSULTANTS ONLINE */}
-        <div id="consultants-section" className="mt-8 space-y-4">
+        {/* TOP CONSULTANTS ONLINE - Slimmed */}
+        <div id="consultants-section" className="mt-6 space-y-3">
           <div className="flex items-center justify-between px-4 lg:px-0">
-            <h3 className="text-[16px] font-black text-slate-800 tracking-tight">Top Consultants Online</h3>
+            <h3 className="text-[15px] font-black text-slate-800 tracking-tight">Top Consultants Online</h3>
             <button 
               onClick={() => { const el = document.getElementById('consultants-section'); if(el) el.scrollIntoView({ behavior: 'smooth' }); }}
-              className="text-[11px] font-extrabold text-slate-600 hover:text-slate-800 flex items-center gap-0.5 transition-colors uppercase tracking-wider"
+              className="text-[10px] font-extrabold text-slate-600 hover:text-slate-800 flex items-center gap-0.5 transition-colors uppercase tracking-wider"
             >
-              <span>View All</span> <ChevronRight size={14} strokeWidth={2.5} />
+              <span>View All</span> <ChevronRight size={12} strokeWidth={2.5} />
             </button>
           </div>
           
-          <div className="flex overflow-x-auto pb-4 -mx-4 px-4 lg:mx-0 lg:px-0 gap-4 snap-x snap-mandatory hide-scrollbar">
+          <div className="flex overflow-x-auto pb-4 -mx-4 px-4 lg:mx-0 lg:px-0 gap-3 snap-x snap-mandatory hide-scrollbar">
             {availableConsultants.length === 0 ? (
-              <div className="text-center py-6 text-slate-600 w-full text-xs font-medium">No consultants currently online</div>
+              <div className="text-center py-4 text-slate-600 w-full text-[10px] font-medium uppercase tracking-wider">No consultants online</div>
             ) : (
               availableConsultants.map((c: any) => (
-                <div key={c.uid || c.id} className="min-w-[175px] w-[175px] snap-start bg-white rounded-[22px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-100 shrink-0 flex flex-col relative group pb-4">
-                  <div className="h-[120px] bg-slate-100 relative m-1.5 rounded-[18px] overflow-hidden">
+                <div key={c.uid || c.id} className="min-w-[150px] w-[150px] snap-start bg-white rounded-[16px] overflow-hidden shadow-sm border border-slate-100 shrink-0 flex flex-col relative group pb-3">
+                  <div className="h-[100px] bg-slate-100 relative m-1 rounded-[14px] overflow-hidden">
                     <img 
                       src={c.avatarUrl || c.profilePhotoUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${c.uid || c.id}&backgroundColor=e2e8f0`} 
                       alt={c.fullName || c.displayName} 
                       className="w-full h-full object-cover" 
                     />
-                    <div className="absolute top-2.5 right-2.5 bg-white px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm border border-slate-100">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                      <span className="text-[8px] font-extrabold text-[#15803D] tracking-wider uppercase">Online</span>
+                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm border border-slate-100">
+                      <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
+                      <span className="text-[7px] font-black text-[#15803D] tracking-wider uppercase">Online</span>
                     </div>
                   </div>
-                  <div className="px-3.5 pt-2 flex flex-col flex-1 justify-between">
+                  <div className="px-3 pt-1.5 flex flex-col flex-1 justify-between">
                     <div>
-                      <h4 className="font-extrabold text-slate-800 text-[13.5px] leading-tight line-clamp-2">
+                      <h4 className="font-black text-slate-800 text-[12px] leading-tight line-clamp-1 truncate">
                         {formatConsultantName(c.fullName || c.displayName, c.prefix)}
                       </h4>
-                      <p className="text-[11px] text-slate-400 font-bold mt-1 line-clamp-1">
-                        {c.specialty || (c.cadre ? (CADRE_CONFIGS[normalizeCadre(c.cadre)]?.label || c.cadre) : 'General Practice')}
+                      <p className="text-[9px] text-slate-400 font-bold mt-0.5 line-clamp-1 uppercase tracking-tight">
+                        {c.specialty || getSessionTierPricing(normalizeCadre(c.cadre || 'UNASSIGNED'), 'VIDEO', systemConfig).tier.title}
                       </p>
                     </div>
-                    <div className="mt-3.5 space-y-1">
-                      <p className="text-[14px] font-black text-emerald-800">
+                    <div className="mt-2.5 space-y-1">
+                      <p className="text-[12px] font-black text-emerald-800">
                         GHS {getSessionTierPricing(normalizeCadre(c.cadre || 'UNASSIGNED'), 'VIDEO', systemConfig).grossFee}
                       </p>
-                      <div className="flex items-center gap-1 text-[11px] text-slate-600 font-bold">
-                        <Star size={12} className="fill-amber-400 text-amber-400 stroke-none" />
+                      <div className="flex items-center gap-1 text-[9px] text-slate-600 font-bold">
+                        <Star size={10} className="fill-amber-400 text-amber-400 stroke-none" />
                         <span className="text-slate-800">{c.rating || '4.9'}</span>
-                        <span className="text-slate-600 font-medium">({c.reviewsCount || 0})</span>
+                        <span className="text-slate-600 font-medium opacity-60">({c.reviewsCount || 0})</span>
                       </div>
                     </div>
                   </div>
-                  <div className="px-3 pb-1 mt-3 text-center">
+                  <div className="px-2.5 mt-2.5 text-center">
                     <button 
                       onClick={() => handleStartConsultPay({ 
                         ...c, 
@@ -947,9 +946,9 @@ export default function PatientDashboard({
                         fee: getSessionTierPricing(normalizeCadre(c.cadre || 'UNASSIGNED'), 'VIDEO', systemConfig).grossFee, 
                         avatar: c.avatarUrl || c.profilePhotoUrl 
                       })}
-                      className="w-full bg-[#0A3B24] hover:bg-emerald-900 text-white py-2 px-3 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all duration-250 shadow-sm hover:shadow flex items-center justify-center gap-1 cursor-pointer"
+                      className="w-full bg-[#0A3B24] hover:bg-emerald-900 text-white py-1.5 px-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-250 shadow-sm flex items-center justify-center gap-1 cursor-pointer"
                     >
-                      <Video size={12} strokeWidth={2.5} />
+                      <Video size={10} strokeWidth={2.5} />
                       <span>Consult</span>
                     </button>
                   </div>
@@ -960,100 +959,103 @@ export default function PatientDashboard({
         </div>
 
         {/* HEALTH SUMMARY */}
-        <div className="mt-8 px-4 lg:px-0 space-y-4">
+        <div className="mt-6 px-4 lg:px-0 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-[16px] font-black text-slate-800 tracking-tight">Health Summary</h3>
+            <h3 className="text-[15px] font-black text-slate-800 tracking-tight">Health Summary</h3>
             <button 
               onClick={() => setActiveTab('vault')}
-              className="text-[11px] font-extrabold text-slate-600 hover:text-slate-800 flex items-center gap-0.5 transition-colors uppercase tracking-wider"
+              className="text-[10px] font-extrabold text-slate-600 hover:text-slate-800 flex items-center gap-0.5 transition-colors uppercase tracking-wider"
             >
-              <span>View Details</span> <ChevronRight size={14} strokeWidth={2.5} />
+              <span>Details</span> <ChevronRight size={12} strokeWidth={2.5} />
             </button>
           </div>
-          <div className="grid grid-cols-4 gap-2.5">
-            <button onClick={() => setActiveTab('appointments')} className="bg-[#E8F5E9] py-4 px-1 rounded-[18px] flex flex-col items-center justify-center gap-1.5 active:scale-95 transition-transform hover:opacity-90 border border-emerald-100">
-              <Calendar size={24} className="text-emerald-700" strokeWidth={1.5} />
-              <span className="text-[20px] font-black text-slate-900 leading-none">{upcomingConsultations.length}</span>
-              <span className="text-[10px] text-slate-600 font-bold mt-1 text-center whitespace-nowrap uppercase tracking-wide">Consultations</span>
+          <div className="grid grid-cols-4 gap-2">
+            <button onClick={() => setActiveTab('appointments')} className="bg-[#E8F5E9] py-3 px-1 rounded-[14px] flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform hover:opacity-90 border border-emerald-100 min-w-0">
+              <Calendar size={20} className="text-emerald-700" strokeWidth={1.5} />
+              <span className="text-[16px] font-black text-slate-900 leading-none">{upcomingConsultations.length}</span>
+              <span className="text-[8px] text-slate-600 font-bold mt-0.5 text-center truncate w-full uppercase tracking-tight">Consults</span>
             </button>
-            <button onClick={() => setActiveTab('medications')} className="bg-[#F3E5F5] py-4 px-1 rounded-[18px] flex flex-col items-center justify-center gap-1.5 active:scale-95 transition-transform hover:opacity-90 border border-purple-100">
-              <Pill size={24} className="text-purple-700" strokeWidth={1.5} />
-              <span className="text-[20px] font-black text-slate-900 leading-none">{totalMedsCount}</span>
-              <span className="text-[10px] text-slate-600 font-bold mt-1 text-center whitespace-nowrap uppercase tracking-wide">Active Meds</span>
+            <button onClick={() => setActiveTab('medications')} className="bg-[#F3E5F5] py-3 px-1 rounded-[14px] flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform hover:opacity-90 border border-purple-100 min-w-0">
+              <Pill size={20} className="text-purple-700" strokeWidth={1.5} />
+              <span className="text-[16px] font-black text-slate-900 leading-none">{totalMedsCount}</span>
+              <span className="text-[8px] text-slate-600 font-bold mt-0.5 text-center truncate w-full uppercase tracking-tight">Meds</span>
             </button>
-            <button onClick={() => setActiveTab('vault')} className="bg-[#FFEBEE] py-4 px-1 rounded-[18px] flex flex-col items-center justify-center gap-1.5 active:scale-95 transition-transform hover:opacity-90 border border-rose-100">
-              <HeartPulse size={24} className="text-rose-600" strokeWidth={1.5} />
-              <span className="text-[20px] font-black text-slate-900 leading-none">{vitals.length}</span>
-              <span className="text-[10px] text-slate-600 font-bold mt-1 text-center whitespace-nowrap uppercase tracking-wide">Logged Vitals</span>
+            <button onClick={() => setActiveTab('vault')} className="bg-[#FFEBEE] py-3 px-1 rounded-[14px] flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform hover:opacity-90 border border-rose-100 min-w-0">
+              <HeartPulse size={20} className="text-rose-600" strokeWidth={1.5} />
+              <span className="text-[16px] font-black text-slate-900 leading-none">{vitals.length}</span>
+              <span className="text-[8px] text-slate-600 font-bold mt-0.5 text-center truncate w-full uppercase tracking-tight">Vitals</span>
             </button>
-            <button onClick={() => setActiveTab('family')} className="bg-[#E3F2FD] py-4 px-1 rounded-[18px] flex flex-col items-center justify-center gap-1.5 active:scale-95 transition-transform hover:opacity-90 border border-blue-100">
-              <Users size={24} className="text-blue-700" strokeWidth={1.5} />
-              <span className="text-[20px] font-black text-slate-900 leading-none">0</span>
-              <span className="text-[10px] text-slate-600 font-bold mt-1 text-center whitespace-nowrap uppercase tracking-wide">Family Profiles</span>
+            <button onClick={() => setActiveTab('family')} className="bg-[#E3F2FD] py-3 px-1 rounded-[14px] flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform hover:opacity-90 border border-blue-100 min-w-0">
+              <Users size={20} className="text-blue-700" strokeWidth={1.5} />
+              <span className="text-[16px] font-black text-slate-900 leading-none">0</span>
+              <span className="text-[8px] text-slate-600 font-bold mt-0.5 text-center truncate w-full uppercase tracking-tight">Family</span>
             </button>
           </div>
         </div>
 
         {/* UPCOMING CONSULTATION SESSION */}
-        <div className="mt-8 px-4 lg:px-0">
-          <div className="bg-white rounded-[24px] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2.5">
+        <div className="mt-6 px-4 lg:px-0">
+          <div className="bg-white rounded-[20px] p-4 shadow-sm border border-slate-100 relative overflow-hidden">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700">
                   <Calendar size={18} strokeWidth={2} />
                 </div>
-                <h3 className="text-[16px] font-black text-slate-800 tracking-tight">Upcoming Consultation Session</h3>
+                <h3 className="text-[14px] font-black text-slate-800 tracking-tight">Upcoming Consultation</h3>
               </div>
               <button 
                 onClick={() => setActiveTab('appointments')} 
-                className="text-[11px] font-extrabold text-[#0A3B24] flex items-center gap-0.5 uppercase tracking-wider"
+                className="text-[9px] font-extrabold text-[#0A3B24] flex items-center gap-0.5 uppercase tracking-wider"
               >
-                <span>See All</span> <ChevronRight size={14} strokeWidth={2.5} />
+                <span>See All</span> <ChevronRight size={12} strokeWidth={2.5} />
               </button>
             </div>
 
             {upcomingConsultations.length === 0 ? (
-              <div className="flex flex-col md:flex-row items-center gap-5 py-2">
-                <div className="w-20 h-20 rounded-2xl bg-[#E8F5E9] flex items-center justify-center shrink-0">
-                  <Calendar size={36} className="text-emerald-500" strokeWidth={1.5} />
+              <div className="flex items-center gap-3 py-1">
+                <div className="w-12 h-12 rounded-xl bg-[#E8F5E9] flex items-center justify-center shrink-0">
+                  <Calendar size={24} className="text-emerald-500" strokeWidth={1.5} />
                 </div>
-                <div className="text-left flex-1 w-full">
-                  <h4 className="text-[15px] font-extrabold text-slate-800 leading-tight">No Active Appointments</h4>
-                  <p className="text-[12px] text-slate-400 mt-1 mb-4 font-medium">You don't have any upcoming appointments.</p>
-                  <button 
-                    onClick={() => { const el = document.getElementById('consultants-section'); if(el) el.scrollIntoView({ behavior: 'smooth' }); }} 
-                    className="w-full bg-[#0A3B24] hover:bg-[#0A3B24]/95 text-white py-3.5 rounded-xl text-[12px] font-extrabold flex items-center justify-center gap-2 shadow-md transition-all uppercase tracking-wider"
-                  >
-                    <span>Book New Consultation</span> <ArrowRight size={15} strokeWidth={2.5} />
-                  </button>
+                <div className="text-left flex-1 min-w-0">
+                  <h4 className="text-[13px] font-black text-slate-800 leading-tight truncate">No Active Sessions</h4>
+                  <p className="text-[10px] text-slate-400 mt-0.5 font-medium truncate">Book your next consultation now.</p>
                 </div>
+                <button 
+                  onClick={() => { const el = document.getElementById('consultants-section'); if(el) el.scrollIntoView({ behavior: 'smooth' }); }} 
+                  className="bg-[#0A3B24] text-white p-2.5 rounded-lg active:scale-95 transition-all shadow-sm"
+                >
+                  <Plus size={16} strokeWidth={3} />
+                </button>
               </div>
             ) : (
-              <div className="flex flex-col md:flex-row items-center gap-4 py-2">
-                <div className="flex-1 w-full">
-                  <div className="flex justify-between items-start mb-2">
-                     <div className="w-14 h-14 bg-[#E8F5E9] rounded-xl flex flex-col items-center justify-center text-[#0A3B24] border border-emerald-100">
-                      <span className="text-[9px] font-black uppercase tracking-wider">{new Date(upcomingConsultations[0].scheduledAt).toLocaleDateString('en-US', { month: 'short' })}</span>
-                      <span className="text-[22px] font-black leading-none mt-0.5">{new Date(upcomingConsultations[0].scheduledAt).getDate()}</span>
-                     </div>
-                     <span className="px-3 py-1 bg-[#E8F5E9] text-emerald-800 text-[9px] font-extrabold tracking-wider uppercase rounded-full border border-emerald-100">
-                       {upcomingConsultations[0].status === 'ACCEPTED' ? 'Ready to Join' : 'Upcoming'}
-                     </span>
+              <div className="flex flex-col gap-3 py-1">
+                <div className="flex items-center gap-3 p-3 bg-slate-50/50 rounded-xl border border-slate-100/50">
+                  <div className="w-11 h-11 bg-white rounded-lg flex flex-col items-center justify-center text-[#0A3B24] border border-emerald-100 shrink-0">
+                    <span className="text-[8px] font-black uppercase tracking-wider leading-none">{new Date(upcomingConsultations[0].scheduledAt).toLocaleDateString('en-US', { month: 'short' })}</span>
+                    <span className="text-[18px] font-black leading-none mt-0.5">{new Date(upcomingConsultations[0].scheduledAt).getDate()}</span>
                   </div>
-                  <h4 className="text-[15px] font-extrabold text-slate-800 mt-2">
-                    {formatConsultantName(upcomingConsultations[0].consultantName, upcomingConsultations[0].consultantPrefix)}
-                  </h4>
-                  <div className="flex items-center gap-3 mt-1.5 text-[12px] text-slate-500 font-bold">
-                    <span className="flex items-center gap-1.5 text-slate-500"><Clock size={14} className="text-slate-400" /> {new Date(upcomingConsultations[0].scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    <span className="flex items-center gap-1.5 text-slate-500"><Video size={14} className="text-slate-400" /> Telehealth</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex justify-between items-start">
+                      <h4 className="text-[13px] font-black text-slate-800 truncate">
+                        {formatConsultantName(upcomingConsultations[0].consultantName, upcomingConsultations[0].consultantPrefix)}
+                      </h4>
+                      <span className="px-2 py-0.5 bg-[#E8F5E9] text-emerald-800 text-[8px] font-black tracking-wider uppercase rounded-full border border-emerald-100 shrink-0 ml-2">
+                        {upcomingConsultations[0].status === 'ACCEPTED' ? 'Ready' : 'Upcoming'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2.5 mt-1 text-[10px] text-slate-500 font-bold">
+                      <span className="flex items-center gap-1"><Clock size={12} className="text-slate-400" /> {new Date(upcomingConsultations[0].scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="flex items-center gap-1"><Video size={12} className="text-slate-400" /> Video</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
+                <div className="flex flex-col gap-2">
                   <button 
                     onClick={() => navigate(`/room/${upcomingConsultations[0].sessionId}`)}
-                    className="w-full md:w-auto bg-[#0A3B24] hover:bg-[#0A3B24]/95 text-white px-6 py-4 rounded-xl text-[12px] font-extrabold transition-all flex items-center justify-center gap-2 uppercase tracking-wider shadow-md cursor-pointer"
+                    className="w-full bg-[#0A3B24] text-white py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5"
                   >
-                    <Video size={16} /> <span>Enter Room</span>
+                    <Video size={14} strokeWidth={2.5} />
+                    Enter Room
                   </button>
 
                   {(upcomingConsultations[0].dispatchStatus !== 'accepted' && upcomingConsultations[0].status !== 'IN_PROGRESS' && upcomingConsultations[0].status !== 'ACCEPTED') && (
@@ -1071,9 +1073,9 @@ export default function PatientDashboard({
                           }
                         }
                       }}
-                      className="w-full md:w-auto bg-rose-50 hover:bg-rose-100 text-rose-600 px-5 py-4 rounded-xl text-[12px] font-black transition-all flex items-center justify-center gap-1.5 uppercase tracking-wider border border-rose-200 cursor-pointer"
+                      className="w-full bg-rose-50 text-rose-600 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 border border-rose-200 cursor-pointer"
                     >
-                      <X size={16} /> <span>Cancel Request</span>
+                      <X size={14} /> Cancel Request
                     </button>
                   )}
                 </div>
@@ -1142,26 +1144,26 @@ export default function PatientDashboard({
               {upcomingConsultations.map(c => {
                 const isAccepted = c.status === 'IN_PROGRESS' || c.status === 'ACTIVE' || c.dispatchStatus === 'accepted';
                 return (
-                  <li key={c.sessionId} className="p-6 hover:bg-white/50 transition-colors">
-                    <div className="flex flex-col md:flex-row gap-6 justify-between md:items-center">
-                      <div className="flex gap-4">
-                        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-600 shrink-0 border border-indigo-100">
-                          <UserCircle size={28} />
+                  <li key={c.sessionId} className="p-4 hover:bg-white/50 transition-colors">
+                    <div className="flex flex-col md:flex-row gap-4 justify-between md:items-center">
+                      <div className="flex gap-3">
+                        <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-600 shrink-0 border border-slate-100">
+                          <UserCircle size={22} />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="font-bold text-slate-800">{formatConsultantName(c.consultantName, c.consultantPrefix)}</h4>
-                            <span className={`text-[9px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full border ${
+                            <h4 className="font-bold text-slate-800 text-[13px] truncate">{formatConsultantName(c.consultantName, c.consultantPrefix)}</h4>
+                            <span className={`text-[8px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full border ${
                               isAccepted 
                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                                : 'bg-amber-50 text-amber-700 border-amber-200 animate-pulse'
+                                : 'bg-amber-50 text-amber-700 border-amber-200'
                             }`}>
-                              {isAccepted ? 'ACCEPTED & IN SESSION' : 'AWAITING ACCEPTANCE'}
+                              {isAccepted ? 'ACTIVE' : 'PENDING'}
                             </span>
                           </div>
-                          <div className="flex flex-wrap gap-4 text-xs text-slate-600 mt-1.5 font-medium">
-                            <span className="flex items-center gap-1"><Calendar size={13}/> {new Date(c.scheduledAt).toLocaleDateString()}</span>
-                            <span className="flex items-center gap-1"><Clock size={13}/> {new Date(c.scheduledAt).toLocaleTimeString()}</span>
+                          <div className="flex flex-wrap gap-3 text-[10px] text-slate-500 mt-1 font-medium">
+                            <span className="flex items-center gap-1"><Calendar size={12}/> {new Date(c.scheduledAt).toLocaleDateString()}</span>
+                            <span className="flex items-center gap-1"><Clock size={12}/> {new Date(c.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
                         </div>
                       </div>
@@ -1323,27 +1325,27 @@ export default function PatientDashboard({
           ) : (
             <ul className="divide-y divide-slate-100">
               {activePrescriptions.map(p => (
-                <li key={p.rxId} className="p-6 hover:bg-white/50 transition-colors">
-                  <div className="flex flex-col sm:flex-row gap-4 justify-between sm:items-center">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-bold text-slate-800">Rx: {p.rxId}</h4>
-                        <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">VERIFIED</span>
+                <li key={p.rxId} className="p-4 hover:bg-white/50 transition-colors">
+                  <div className="flex flex-col sm:flex-row gap-3 justify-between sm:items-center">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h4 className="font-bold text-slate-800 text-[13px] truncate">Rx: {p.rxId}</h4>
+                        <span className="bg-emerald-100 text-emerald-700 text-[8px] font-black px-2 py-0.5 rounded-full uppercase">VERIFIED</span>
                       </div>
-                      <p className="text-xs text-slate-600 font-medium">Issued by {p.consultantName} on {new Date(p.createdAt || Date.now()).toLocaleDateString()}</p>
-                      <div className="mt-3 flex flex-wrap gap-2">
+                      <p className="text-[10px] text-slate-500 font-medium">Issued by {p.consultantName} on {new Date(p.createdAt || Date.now()).toLocaleDateString()}</p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
                         {(p.medications || []).map((med, i) => (
-                          <span key={i} className="inline-flex items-center bg-white text-slate-600 px-3 py-1 rounded-lg text-xs font-semibold border border-slate-200 shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300 border border-slate-200">
-                            {med.drugName || med.name} ({med.dosage})
+                          <span key={i} className="inline-flex items-center bg-white text-slate-600 px-2 py-1 rounded-lg text-[10px] font-bold border border-slate-200 shadow-sm truncate max-w-[150px]">
+                            {med.drugName || med.name}
                           </span>
                         ))}
                       </div>
                     </div>
                     <Link 
                       to={`/prescriptions/${p.rxId}`}
-                      className="bg-white hover:bg-white text-slate-600 border border-slate-300 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex items-center justify-center shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap uppercase tracking-wide"
+                      className="bg-white hover:bg-slate-50 text-slate-600 border border-slate-300 px-3 py-1.5 rounded-xl text-[10px] font-black transition-all flex items-center justify-center shadow-sm whitespace-nowrap uppercase tracking-wider"
                     >
-                      VIEW SLIP <ArrowRight size={14} className="ml-1" />
+                      VIEW SLIP <ArrowRight size={12} className="ml-1" />
                     </Link>
                   </div>
                 </li>
@@ -1619,21 +1621,21 @@ export default function PatientDashboard({
     <div className="min-h-screen bg-slate-50 flex flex-col lg:flex-row w-full overflow-x-hidden">
       
       {/* Mobile Top Navigation Header */}
-      <div className="lg:hidden bg-[#0A3B24] text-white px-[16px] pt-[32px] pb-[32px] rounded-b-[28px] flex flex-col shadow-sm relative z-20">
+      <div className="lg:hidden bg-[#0A3B24] text-white px-4 pt-3 pb-3 rounded-b-xl flex flex-col shadow-sm relative z-20">
         <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-[10px]">
+          <div className="flex items-center gap-2.5">
             {globalLogoUrl ? (
-              <img src={globalLogoUrl} alt="PockettClinic" className="w-[46px] h-[46px] rounded-[14px] object-cover bg-white p-0.5 shrink-0 shadow-sm" />
+              <img src={globalLogoUrl} alt="PockettClinic" className="w-7 h-7 rounded-lg object-cover bg-white p-0.5 shrink-0 shadow-sm" />
             ) : (
-              <div className="w-[46px] h-[46px] rounded-[14px] bg-[#C8E6C9] text-[#0A3B24] flex items-center justify-center shrink-0 shadow-sm">
-                <Heart size={24} className="fill-[#0A3B24] text-[#0A3B24]" strokeWidth={2.5} />
+              <div className="w-7 h-7 rounded-lg bg-[#C8E6C9] text-[#0A3B24] flex items-center justify-center shrink-0 shadow-sm">
+                <Heart size={16} className="fill-[#0A3B24] text-[#0A3B24]" strokeWidth={2.5} />
               </div>
             )}
-            <div className="flex flex-col justify-center">
-              <h1 className="text-[20px] font-extrabold leading-none tracking-tight text-white mb-1">
-                PockettClinic
+            <div className="flex flex-col justify-center min-w-0">
+              <h1 className="text-[14px] font-black leading-none tracking-tight text-white mb-0.5 truncate uppercase">
+                {globalTitle || 'PockettClinic'}
               </h1>
-              <span className="text-[11px] text-emerald-100/90 font-medium leading-[1.2] block">Your Digital Hospital Anywhere</span>
+              <span className="text-[8px] text-emerald-100/90 font-bold leading-none block truncate uppercase tracking-wider">{globalSlogan || 'Your Digital Hospital Anywhere'}</span>
             </div>
           </div>
 
@@ -1641,9 +1643,9 @@ export default function PatientDashboard({
             <NotificationManager iconClassName="text-white hover:bg-white/10" />
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-[36px] h-[36px] flex items-center justify-center text-white hover:text-emerald-200 transition-colors"
+              className="w-[32px] h-[32px] flex items-center justify-center text-white hover:text-emerald-200 transition-colors"
             >
-              {mobileMenuOpen ? <X size={24} strokeWidth={2} /> : <Menu size={24} strokeWidth={2} />}
+              {mobileMenuOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
             </button>
           </div>
         </div>
@@ -2351,71 +2353,71 @@ export default function PatientDashboard({
         </div>
       )}
 
-      {/* Mobile Bottom Navigation (Glassmorphic, Compact, Unified Layout) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/60 z-[90] pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
-        <div className="flex items-center justify-between px-2 pt-2.5 pb-3">
+      {/* Mobile Bottom Navigation (Flush Micro Design) */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 z-[90] pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+        <div className="flex items-center justify-between h-12">
           <button 
             onClick={() => setActiveTab('overview')}
-            className={`flex flex-col items-center justify-center flex-1 relative py-1 ${activeTab === 'overview' ? 'text-[#0A3B24]' : 'text-slate-400'}`}
+            className={`flex flex-col items-center justify-center flex-1 relative h-full ${activeTab === 'overview' ? 'text-[#0A3B24]' : 'text-slate-400'}`}
           >
-            <Home size={22} strokeWidth={activeTab === 'overview' ? 2.5 : 2} className="mb-1" />
-            <span className="text-[9px] font-extrabold tracking-wider">{"Home".toUpperCase()}</span>
+            <Home size={18} strokeWidth={activeTab === 'overview' ? 2.5 : 2} />
+            <span className="text-[8px] font-black tracking-tight uppercase">Home</span>
             {activeTab === 'overview' && (
-              <div className="absolute -bottom-1.5 w-6 h-[3px] bg-[#0A3B24] rounded-full"></div>
+              <div className="absolute top-0 w-8 h-0.5 bg-[#0A3B24] rounded-full"></div>
             )}
           </button>
           
           <button 
             onClick={() => setActiveTab('appointments')}
-            className={`flex flex-col items-center justify-center flex-1 relative py-1 ${activeTab === 'appointments' ? 'text-[#0A3B24]' : 'text-slate-400'}`}
+            className={`flex flex-col items-center justify-center flex-1 relative h-full ${activeTab === 'appointments' ? 'text-[#0A3B24]' : 'text-slate-400'}`}
           >
-            <div className="relative mb-1">
-              <Calendar size={22} strokeWidth={activeTab === 'appointments' ? 2.5 : 2} />
+            <div className="relative">
+              <Calendar size={18} strokeWidth={activeTab === 'appointments' ? 2.5 : 2} />
               {upcomingConsultations.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
+                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
               )}
             </div>
-            <span className="text-[9px] font-extrabold tracking-wider">{"Appointments".toUpperCase()}</span>
+            <span className="text-[8px] font-black tracking-tight uppercase">Visits</span>
             {activeTab === 'appointments' && (
-              <div className="absolute -bottom-1.5 w-6 h-[3px] bg-[#0A3B24] rounded-full"></div>
+              <div className="absolute top-0 w-8 h-0.5 bg-[#0A3B24] rounded-full"></div>
             )}
           </button>
 
           <button 
             onClick={() => setActiveTab('history')}
-            className={`flex flex-col items-center justify-center flex-1 relative py-1 ${activeTab === 'history' ? 'text-[#0A3B24]' : 'text-slate-400'}`}
+            className={`flex flex-col items-center justify-center flex-1 relative h-full ${activeTab === 'history' ? 'text-[#0A3B24]' : 'text-slate-400'}`}
           >
-            <Clock size={22} strokeWidth={activeTab === 'history' ? 2.5 : 2} className="mb-1" />
-            <span className="text-[9px] font-extrabold tracking-wider">{"History".toUpperCase()}</span>
+            <Clock size={18} strokeWidth={activeTab === 'history' ? 2.5 : 2} />
+            <span className="text-[8px] font-black tracking-tight uppercase">History</span>
             {activeTab === 'history' && (
-              <div className="absolute -bottom-1.5 w-6 h-[3px] bg-[#0A3B24] rounded-full"></div>
+              <div className="absolute top-0 w-8 h-0.5 bg-[#0A3B24] rounded-full"></div>
             )}
           </button>
 
           <button 
             onClick={() => setActiveTab('medications')}
-            className={`flex flex-col items-center justify-center flex-1 relative py-1 ${activeTab === 'medications' ? 'text-[#0A3B24]' : 'text-slate-400'}`}
+            className={`flex flex-col items-center justify-center flex-1 relative h-full ${activeTab === 'medications' ? 'text-[#0A3B24]' : 'text-slate-400'}`}
           >
-            <div className="relative mb-1">
-              <Pill size={22} strokeWidth={activeTab === 'medications' ? 2.5 : 2} />
+            <div className="relative">
+              <Pill size={18} strokeWidth={activeTab === 'medications' ? 2.5 : 2} />
               {totalMedsCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-sky-500 rounded-full border-2 border-white"></span>
+                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-sky-500 rounded-full"></span>
               )}
             </div>
-            <span className="text-[9px] font-extrabold tracking-wider">{"Medications".toUpperCase()}</span>
+            <span className="text-[8px] font-black tracking-tight uppercase">Meds</span>
             {activeTab === 'medications' && (
-              <div className="absolute -bottom-1.5 w-6 h-[3px] bg-[#0A3B24] rounded-full"></div>
+              <div className="absolute top-0 w-8 h-0.5 bg-[#0A3B24] rounded-full"></div>
             )}
           </button>
 
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`flex flex-col items-center justify-center flex-1 relative py-1 ${mobileMenuOpen ? 'text-[#0A3B24]' : 'text-slate-400'}`}
+            className={`flex flex-col items-center justify-center flex-1 relative h-full ${mobileMenuOpen ? 'text-[#0A3B24]' : 'text-slate-400'}`}
           >
-            <MoreHorizontal size={22} strokeWidth={2} className="mb-1" />
-            <span className="text-[9px] font-extrabold tracking-wider">{"More".toUpperCase()}</span>
+            <MoreHorizontal size={18} strokeWidth={2} />
+            <span className="text-[8px] font-black tracking-tight uppercase">More</span>
             {mobileMenuOpen && (
-              <div className="absolute -bottom-1.5 w-6 h-[3px] bg-[#0A3B24] rounded-full"></div>
+              <div className="absolute top-0 w-8 h-0.5 bg-[#0A3B24] rounded-full"></div>
             )}
           </button>
         </div>
