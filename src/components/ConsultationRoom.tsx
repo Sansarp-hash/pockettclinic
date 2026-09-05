@@ -669,7 +669,6 @@ function VideoStageWithHardwareStream({
                   {activeOverlay === 'history' && <FileText size={16} className="text-blue-400" />}
                   {activeOverlay === 'vitals' && <HeartPulse size={16} className="text-rose-400" />}
                   {activeOverlay === 'stg' && <BookOpen size={16} className="text-teal-400" />}
-                  {activeOverlay === 'verify' && <ShieldCheck size={16} className="text-purple-400" />}
                   <span className="tracking-widest">
                     {activeOverlay === 'chat' && 'Secure Chat Room'}
                     {activeOverlay === 'soap' && 'SOAP Note Documentation'}
@@ -677,7 +676,6 @@ function VideoStageWithHardwareStream({
                     {activeOverlay === 'history' && 'Patient Medical History'}
                     {activeOverlay === 'vitals' && 'Patient Vitals Overview'}
                     {activeOverlay === 'stg' && 'Clinical Treatment Guidelines'}
-                    {activeOverlay === 'verify' && 'Identity Verification'}
                   </span>
                 </div>
                 <button
@@ -1050,20 +1048,6 @@ function VideoStageWithHardwareStream({
                   <button
                     type="button"
                     onClick={() => {
-                      setActiveOverlay(activeOverlay === 'verify' ? null : 'verify');
-                      setShowFolderDropdown(false);
-                    }}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left font-semibold cursor-pointer ${
-                      activeOverlay === 'verify' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'hover:bg-white/10 text-slate-200'
-                    }`}
-                  >
-                    <ShieldCheck size={15} className="text-purple-400" />
-                    <span>Identity Verification</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
                       setActiveOverlay(activeOverlay === 'stg' ? null : 'stg');
                       setShowFolderDropdown(false);
                     }}
@@ -1367,20 +1351,6 @@ function VideoStageWithHardwareStream({
                   <button
                     type="button"
                     onClick={() => {
-                      setActiveOverlay(activeOverlay === 'verify' ? null : 'verify');
-                      setShowFolderDropdown(false);
-                    }}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left font-semibold cursor-pointer ${
-                      activeOverlay === 'verify' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'hover:bg-white/10 text-slate-200'
-                    }`}
-                  >
-                    <ShieldCheck size={15} className="text-purple-400" />
-                    <span>Identity Verification</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
                       setActiveOverlay(activeOverlay === 'stg' ? null : 'stg');
                       setShowFolderDropdown(false);
                     }}
@@ -1464,19 +1434,6 @@ function VideoStageWithHardwareStream({
                     <span>Scan / Upload Prescription</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveOverlay(activeOverlay === 'verify' ? null : 'verify');
-                      setShowFolderDropdown(false);
-                    }}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left font-semibold cursor-pointer ${
-                      activeOverlay === 'verify' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'hover:bg-white/10 text-slate-200'
-                    }`}
-                  >
-                    <ShieldCheck size={15} className="text-purple-400" />
-                    <span>My Identity Verification</span>
-                  </button>
                 </>
               )}
             </motion.div>

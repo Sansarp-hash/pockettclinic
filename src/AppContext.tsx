@@ -613,12 +613,19 @@ export function AppProvider({
   // Synchronize incoming currentUser changes
   useEffect(() => {
     setIsLoading(true);
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    let userUnsub: (() => void) | null = null;
+
+    const authUnsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (userUnsub) {
+        userUnsub();
+        userUnsub = null;
+      }
+
       if (firebaseUser) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-          if (userDoc.exists()) {
-            let data = userDoc.data() as User;
+        // Create a real-time listener for the user document
+        userUnsub = onSnapshot(doc(db, 'users', firebaseUser.uid), (snap) => {
+          if (snap.exists()) {
+            let data = snap.data() as User;
             
             // Self-healing role normalization for consultant accounts
             if (data && data.cadre) {
@@ -655,8 +662,9 @@ export function AppProvider({
             setUserState(fallbackUser);
             if (onUserUpdate) onUserUpdate(fallbackUser);
           }
-        } catch (error) {
-          console.error("Error fetching user data, attempting fallback or cache:", error);
+          setIsLoading(false);
+        }, (error) => {
+          console.error("Error in user document listener, attempting cache fallback:", error);
           
           let cachedUser: User | null = null;
           try {
@@ -671,31 +679,21 @@ export function AppProvider({
           if (cachedUser) {
             setUserState(cachedUser);
             if (onUserUpdate) onUserUpdate(cachedUser);
-          } else {
-            const fallbackUser: User = {
-              uid: firebaseUser.uid,
-              email: firebaseUser.email || '',
-              displayName: firebaseUser.displayName || 'User',
-              fullName: firebaseUser.displayName || 'User',
-              role: 'patient',
-              isVerified: true,
-              verificationStatus: 'verified',
-              termsAccepted: true,
-              walletBalanceGHS: 250,
-              createdAt: new Date().toISOString()
-            };
-            setUserState(fallbackUser);
-            if (onUserUpdate) onUserUpdate(fallbackUser);
           }
-        }
+          setIsLoading(false);
+        });
       } else {
         setUserState(null);
         if (onUserUpdate) onUserUpdate(null);
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
-    return () => unsubscribe();
-  }, []);
+
+    return () => {
+      authUnsubscribe();
+      if (userUnsub) userUnsub();
+    };
+  }, [onUserUpdate]);
 
   const logout = useCallback(async () => {
     try {
@@ -1105,8 +1103,8 @@ export function AppProvider({
       await setDoc(userRef, data, { merge: true });
       setUser(prev => prev ? { ...prev, ...data } : null);
     } catch (err) {
-      console.warn('updateUserProfile error:', err);
-      setUser(prev => prev ? { ...prev, ...data } : null);
+      console.error('updateUserProfile error:', err);
+      throw err;
     }
   }, [user?.uid, setUser]);
 

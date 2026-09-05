@@ -100,7 +100,9 @@ service cloud.firestore {
             'uid', 'id', 'displayName', 'fullName', 'phone', 'email', 'avatarUrl', 'profilePhotoUrl', 
             'photoUrl', 'profilePhoto', 'photoURL', 'isOnline', 'activeSessionId', 'lastActiveAt', 
             'termsAccepted', 'termsAcceptedAt', 'hasAcceptedGlobalTerms', 'hasAcceptedCareTerms', 
-            'independentContractorAffirmed', 'indemnityStatus', 'legalSignature', 'preferredLanguage', 
+            'independentContractorAffirmed', 'contractorAffirmedAt', 'reviewTermsAcceptedAt', 
+            'pushNotificationsEnabled', 'fcmTokenUpdatedAt', 'indemnityStatus', 'legalSignature', 
+            'preferredLanguage', 
             'bio', 'pendingProfileChanges', 'indemnityDocUrl', 'indemnityPolicyNo', 
             'indemnityInsuranceProvider', 'indemnityExpiryDate', 'ghanaCardNo', 'licenseNo', 
             'councilPin', 'governingCouncil', 'cadre', 'indemnityAgreed', 'prefix', 'walletBalanceGHS', 
@@ -112,9 +114,14 @@ service cloud.firestore {
             'certifyCredentials', 'assumeLiability', 'indemnifyPlatform', 'affirmIndependentContractor', 
             'typedLegalSignature', 'availabilityDays', 'availabilityHours', 'consultantTitle', 
             'consultationFeeGHS', 'rating', 'reviewCount', 'verificationStatus', 'isVerified', 
-            'verificationPendingReview', 'updatedAt', 'createdAt'
+            'verificationPendingReview', 'updatedAt', 'createdAt', 'videoChatTickets', 'role'
           ]) &&
-          (!('role' in resource.data) || !('role' in request.resource.data) || request.resource.data.role == resource.data.role)
+          (
+            !('role' in request.resource.data) || 
+            !('role' in resource.data) || 
+            request.resource.data.role == resource.data.role ||
+            (resource.data.role == 'public' && request.resource.data.role == 'patient')
+          )
         )
       );
       allow delete: if isAdmin();

@@ -1258,7 +1258,7 @@ export default function AdminDashboard() {
             </div>
             <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm p-2 md:p-6">
               <ConsultantDashboard 
-                targetConsultant={selectedConsultantForView || consultants[0]}
+                targetConsultant={consultants.find(c => c.id === (selectedConsultantForView?.id || selectedConsultantForView?.uid)) || selectedConsultantForView || consultants[0]}
                 allConsultants={consultants}
                 onSelectConsultant={(c) => setSelectedConsultantForView(c)}
                 onBackToList={() => setActiveTab('consultants')}

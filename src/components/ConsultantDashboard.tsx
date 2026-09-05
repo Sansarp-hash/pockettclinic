@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { collection, query, where, onSnapshot, doc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, setDoc, serverTimestamp, orderBy, limit } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAppContext } from '../AppContext';
 import { formatConsultantName } from '../lib/formatters';
@@ -11,7 +11,7 @@ import {
   MessageSquare, Settings, FileText, Wifi, WifiOff, PhoneCall, AlertCircle, 
   Landmark, Wallet, ShieldAlert, Scale, ShieldCheck, History, Loader2, 
   Building2, LayoutDashboard, Stethoscope, Bell, BellRing, HeartPulse, 
-  AlertTriangle, DollarSign, ArrowLeft, Activity, LogOut 
+  AlertTriangle, DollarSign, ArrowLeft, Activity, LogOut, BookOpen, Share2, CalendarCheck
 } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'motion/react';
@@ -20,22 +20,24 @@ import UploadIndemnityModal from './UploadIndemnityModal';
 import { PayoutRequest } from '../types';
 import { DashboardSkeleton } from './Skeleton';
 
+import { ConsultantSidebar } from './consultant/ConsultantSidebar';
 import { ConsultantStats } from './consultant/ConsultantStats';
 import { ConsultantPatientQueue } from './consultant/ConsultantPatientQueue';
-import { ConsultantProfileEditor } from './consultant/ConsultantProfileEditor';
-import { ConsultantFeedbackView } from './consultant/ConsultantFeedbackView';
 import ConsultantSoapNoteAssistant from './consultant/ConsultantSoapNoteAssistant';
 import DrugSafetyChecker from './consultant/DrugSafetyChecker';
 import SpecialistReferralNetwork from './consultant/SpecialistReferralNetwork';
 import FollowUpScheduler from './consultant/FollowUpScheduler';
 import ConsultantPayoutHub from './consultant/ConsultantPayoutHub';
+import { ConsultantProfileEditor } from './consultant/ConsultantProfileEditor';
 import ConsultantGuidelinesDrawer from './ConsultantGuidelinesDrawer';
+import { ConsultantFeedbackView } from './consultant/ConsultantFeedbackView';
+import { NotificationsCenter } from './consultant/NotificationsCenter';
+import { DashboardOverview } from './consultant/DashboardOverview';
+import { ChatFollowUpView } from './consultant/ChatFollowUpView';
 import ConsultationChat from './ConsultationChat';
 import ProfileModal from './ProfileModal';
 import SubscriptionCard from './SubscriptionCard';
 import AccountDeletionModal from './AccountDeletionModal';
-import ConsultantSidebar from './consultant/ConsultantSidebar';
-import ConsultantMobileDashboard from './consultant/ConsultantMobileDashboard';
 import { NetworkSyncIndicator } from './NetworkSyncIndicator';
 // Removed redundant IncomingCallOverlay in favor of App-level IncomingCallModal
 import { declineOrForwardConsultation } from '../lib/consultationDispatch';
@@ -71,7 +73,12 @@ export default function ConsultantDashboard({
   const navigate = useNavigate();
 
   const effectiveUser = targetConsultant || (searchParams.get('consultantId') ? allConsultants.find(c => (c.uid || c.id) === searchParams.get('consultantId')) : null) || user;
-  const isAdminView = Boolean(targetConsultant || user?.role === 'admin' || searchParams.get('consultantId'));
+  const isConsultantThemselves = Boolean(user && (effectiveUser?.uid === user.uid || effectiveUser?.id === user.uid));
+  const isAdminView = Boolean(
+    (targetConsultant && !isConsultantThemselves) || 
+    (user?.role === 'admin' && !isConsultantThemselves) || 
+    (searchParams.get('consultantId') && searchParams.get('consultantId') !== user?.uid)
+  );
 
   const activeDashboardTab = (searchParams.get('tab') || 'appointments') as any;
   const setActiveDashboardTab = (tab: string) => {
@@ -83,13 +90,57 @@ export default function ConsultantDashboard({
   const [historyPatient, setHistoryPatient] = useState<any>(null);
   const [isAffirmationModalOpen, setIsAffirmationModalOpen] = useState(false);
   const [isSubmittingAffirmation, setIsSubmittingAffirmation] = useState(false);
+  const [typedSignature, setTypedSignature] = useState('');
   const [reviewTermsChecked, setReviewTermsChecked] = useState(false);
   const [isAcceptingReviewTerms, setIsAcceptingReviewTerms] = useState(false);
   const [payoutRequests, setPayoutRequests] = useState<PayoutRequest[]>([]);
-  const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
   const [isIndemnityModalOpen, setIsIndemnityModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loadingNotifs, setLoadingNotifs] = useState(true);
+
+  useEffect(() => {
+    if (!db) {
+      setLoadingNotifs(false);
+      return;
+    }
+
+    const uid = effectiveUser?.uid || effectiveUser?.id;
+    if (!uid) {
+      setNotifications([]);
+      setLoadingNotifs(false);
+      return;
+    }
+
+    try {
+      const q = query(
+        collection(db, 'user_notifications', uid, 'items'),
+        orderBy('createdAt', 'desc'),
+        limit(20)
+      );
+
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const fetched = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+
+        setNotifications(fetched);
+        setLoadingNotifs(false);
+      }, (err) => {
+        console.warn('Notification stream warning:', err);
+        setLoadingNotifs(false);
+      });
+
+      return () => unsubscribe();
+    } catch (err) {
+      console.error('Error starting notifications stream:', err);
+      setLoadingNotifs(false);
+    }
+  }, [effectiveUser]);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
   const [isMobileViewport, setIsMobileViewport] = useState(false);
 
   useEffect(() => {
@@ -122,11 +173,12 @@ export default function ConsultantDashboard({
   const independentContractorAffirmed = user?.independentContractorAffirmed;
   const userUid = user?.uid;
 
+  // Background notification enablement as requested
   useEffect(() => {
-    if (user?.uid && user?.role === 'consultant' && !user?.isOnline) {
-      updateUserProfile({ isOnline: true });
+    if (user?.uid && (user?.role === 'consultant' || user?.cadre) && user?.pushNotificationsEnabled !== true) {
+      updateUserProfile({ pushNotificationsEnabled: true });
     }
-  }, [user?.uid, user?.role]);
+  }, [user?.uid, user?.role, user?.cadre, user?.pushNotificationsEnabled, updateUserProfile]);
 
   useEffect(() => {
     if (!isAdminView && userUid && !isVerified && !verificationStatus) {
@@ -144,13 +196,16 @@ export default function ConsultantDashboard({
     if (!user) return;
     setIsSubmittingAffirmation(true);
     try {
-      await updateDoc(doc(db, 'users', user.uid), {
+      // Use updateUserProfile instead of direct updateDoc to ensure local context state synchronizes immediately
+      await updateUserProfile({
         independentContractorAffirmed: true,
         termsAccepted: true,
         indemnityAgreed: true,
+        isOnline: true, // Automatically go online upon signing
         contractorAffirmedAt: new Date().toISOString()
       });
       setIsAffirmationModalOpen(false);
+      showToast("Clinical affirmation recorded and status updated to Online.", "success");
     } catch (err) {
       console.error("Error affirming status:", err);
       showToast("Failed to record affirmation. Please try again.", "error");
@@ -175,7 +230,7 @@ export default function ConsultantDashboard({
   };
 
   const windowStatus = getWithdrawalWindowStatus();
-  const isOnline = effectiveUser?.isOnline !== undefined ? effectiveUser.isOnline : true;
+  const isOnline = effectiveUser?.isOnline === true;
 
   const handleEnableNotifications = async () => {
     setIsEnablingNotifs(true);
@@ -441,163 +496,14 @@ export default function ConsultantDashboard({
 
   return (
     <>
-      {isMobileViewport ? (
-        <ConsultantMobileDashboard
-          effectiveUser={effectiveUser}
-          effectiveConsultations={effectiveConsultations}
-          patientsSeen={patientsSeen}
-          consultant70Earnings={consultant70Earnings}
-          averageRating={averageRating}
-          isPendingReview={isPendingReview}
-          setActiveDashboardTab={setActiveDashboardTab}
-          activeDashboardTab={activeDashboardTab}
-          isOnline={isOnline}
-          globalLogoUrl={globalLogoUrl}
-          onOpenSettings={() => setIsProfileModalOpen(true)}
-          onOpenDeletion={() => setIsDeleteModalOpen(true)}
-          renderActiveTabContent={() => {
-            switch (activeDashboardTab) {
-              case 'queue':
-                return (
-                  <ConsultantPatientQueue 
-                    consultations={effectiveConsultations}
-                    isPendingReview={isPendingReview}
-                    onOpenHistory={(p) => {
-                      setHistoryPatient(p);
-                      setIsHistoryDrawerOpen(true);
-                    }}
-                    onJoinSession={handleJoin}
-                    isLoading={isLoading}
-                  />
-                );
-              case 'soap':
-                return (
-                  <ConsultantSoapNoteAssistant
-                    consultantId={consultantId}
-                    consultantName={formatConsultantName(effectiveUser?.fullName || effectiveUser?.displayName, effectiveUser?.prefix) || 'Consultant'}
-                  />
-                );
-              case 'drug-safety':
-                return (
-                  <DrugSafetyChecker />
-                );
-              case 'referrals':
-                return (
-                  <SpecialistReferralNetwork
-                    consultantId={consultantId}
-                    consultantName={formatConsultantName(effectiveUser?.fullName || effectiveUser?.displayName, effectiveUser?.prefix) || 'Consultant'}
-                    consultantCadre={normalizeCadre(effectiveUser?.cadre)}
-                  />
-                );
-              case 'follow-ups':
-                return (
-                  <FollowUpScheduler
-                    consultantId={consultantId}
-                    consultantName={formatConsultantName(effectiveUser?.fullName || effectiveUser?.displayName, effectiveUser?.prefix) || 'Consultant'}
-                  />
-                );
-              case 'payout-hub':
-              case 'ledger':
-                return (
-                  <ConsultantPayoutHub
-                    consultantId={consultantId}
-                    consultantName={formatConsultantName(effectiveUser?.fullName || effectiveUser?.displayName, effectiveUser?.prefix) || 'Consultant'}
-                    totalGrossGHS={totalGrossTotalEarnings}
-                    consultant70Earnings={consultant70Earnings}
-                  />
-                );
-              case 'portfolio':
-                return (
-                  <ConsultantProfileEditor 
-                    user={user}
-                    isEditingPortfolio={isEditingPortfolio}
-                    setIsEditingPortfolio={setIsEditingPortfolio}
-                    isSavingPortfolio={isSavingPortfolio}
-                  />
-                );
-              case 'subscription':
-                return (
-                  <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    <SubscriptionCard />
-                  </div>
-                );
-              case 'schedule':
-                return (
-                  <ConsultantPatientQueue 
-                    consultations={effectiveConsultations}
-                    isPendingReview={isPendingReview}
-                    onOpenHistory={(p) => {
-                      setHistoryPatient(p);
-                      setIsHistoryDrawerOpen(true);
-                    }}
-                    onJoinSession={handleJoin}
-                    isLoading={isLoading}
-                  />
-                );
-              case 'stg-reference':
-                return (
-                  <ConsultantGuidelinesDrawer
-                    isOpen={true}
-                    onClose={() => setActiveDashboardTab('appointments')}
-                  />
-                );
-              case 'feedback':
-                return (
-                  <ConsultantFeedbackView reviews={reviews} />
-                );
-              case 'chat': {
-                const chatSessions = effectiveConsultations.filter(c => c.status === 'COMPLETED' || c.status === 'CLINICAL_ESCALATION' || c.status === 'IN_PROGRESS' || c.status === 'ACTIVE' || c.status === 'PAID' || c.status === 'PENDING');
-                const activeSession = chatSessions.find(s => ((s as any).id || s.sessionId) === selectedChatSessionId) || chatSessions[0];
-                const currentChatId = activeSession ? ((activeSession as any).id || activeSession.sessionId) : null;
-  
-                return (
-                  <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden min-h-[500px] grid grid-cols-1">
-                    <div className="border-b border-slate-200 bg-white p-4">
-                      <h3 className="font-bold text-slate-950 text-sm">Patient Messages & Follow-ups</h3>
-                    </div>
-                    {activeSession && currentChatId ? (
-                      <div className="flex flex-col h-full min-h-[450px]">
-                        <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-                          <div>
-                            <h4 className="font-bold text-slate-950 text-sm">{activeSession.patientName || 'Patient'}</h4>
-                          </div>
-                        </div>
-                        <div className="flex-1 p-4 bg-slate-50/30">
-                          <ConsultationChat
-                            consultationId={currentChatId}
-                            currentUserId={consultantId}
-                            currentUserRole="consultant"
-                            currentUserName={formatConsultantName(effectiveUser?.fullName || effectiveUser?.displayName, effectiveUser?.prefix) || 'Consultant'}
-                            isCompleted={activeSession.status === 'COMPLETED'}
-                            followUpWindowClosesAt={(activeSession as any).followUpWindowClosesAt}
-                            followUpMessagesRemaining={(activeSession as any).followUpMessagesRemaining || 5}
-                            className="h-full border border-slate-200 rounded-2xl shadow-sm bg-white"
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="p-8 text-center text-slate-600">
-                        <p className="text-xs font-semibold">No active conversation thread.</p>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-              case 'more':
-                return null;
-              default:
-                return null;
-            }
-          }}
-        />
-      ) : (
-        <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)] w-full bg-slate-50">
+      <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)] w-full bg-slate-50">
           <ConsultantSidebar
             activeDashboardTab={activeDashboardTab}
             setActiveDashboardTab={setActiveDashboardTab}
             globalLogoUrl={globalLogoUrl}
             onOpenSettings={() => setIsProfileModalOpen(true)}
             onOpenDeletion={() => setIsDeleteModalOpen(true)}
+            unreadCount={unreadCount}
           />
           
           <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
@@ -605,22 +511,32 @@ export default function ConsultantDashboard({
             <div className="md:hidden bg-white border-b border-slate-200 p-3 sticky top-0 z-30 shadow-xs flex flex-col gap-2">
               <div className="flex items-center justify-between px-1">
                 <span className="text-xs font-black text-slate-950 uppercase tracking-tight">Consultant Workspace</span>
-                <NetworkSyncIndicator compact={true} />
+                <div className="flex items-center gap-3">
+                  <NetworkSyncIndicator compact={true} />
+                  <button 
+                    onClick={() => setIsProfileModalOpen(true)}
+                    className="p-1.5 text-slate-600 hover:text-slate-900 transition-colors"
+                  >
+                    <Settings size={18} />
+                  </button>
+                </div>
               </div>
               <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
                 {[
                   { id: 'appointments', label: 'Dashboard', icon: LayoutDashboard },
                   { id: 'queue', label: 'Patient Queue', icon: Users },
-                  { id: 'stg-reference', label: 'Ghana STG', icon: Stethoscope },
-                  { id: 'soap', label: 'SOAP Notes', icon: FileText },
-                  { id: 'drug-safety', label: 'Drug Safety', icon: ShieldAlert },
-                  { id: 'referrals', label: 'Referrals', icon: Building2 },
-                  { id: 'follow-ups', label: 'Follow-ups', icon: Clock },
-                  { id: 'payout-hub', label: 'Earnings & Payouts', icon: Landmark },
-                  { id: 'schedule', label: 'Schedule', icon: Calendar },
-                  { id: 'chat', label: 'Messages', icon: MessageSquare },
-                  { id: 'portfolio', label: 'Portfolio', icon: UserCircle },
+                  { id: 'notifications', label: 'Notifications', icon: Bell },
+                  { id: 'stg-reference', label: 'Ghana STG & Medscape', icon: BookOpen },
+                  { id: 'soap', label: 'SOAP Notes & Voice', icon: FileText },
+                  { id: 'drug-safety', label: 'Drug Safety Checker', icon: ShieldAlert },
+                  { id: 'referrals', label: 'Specialist Referrals', icon: Share2 },
+                  { id: 'follow-ups', label: 'Follow-up Scheduler', icon: CalendarCheck },
+                  { id: 'payout-hub', label: 'Earnings and Payout', icon: Landmark },
+                  { id: 'schedule', label: 'Schedule', icon: Clock },
+                  { id: 'chat', label: 'Follow-up Chat', icon: MessageSquare },
+                  { id: 'portfolio', label: 'Professional Portfolio', icon: UserCircle },
                   { id: 'feedback', label: 'Feedback', icon: Star },
+                  { id: 'subscription', label: 'Subscription', icon: ShieldCheck },
                   { id: 'signout', label: 'Sign Out', icon: LogOut },
                 ].map((tab) => {
                   const Icon = tab.icon;
@@ -635,7 +551,7 @@ export default function ConsultantDashboard({
                           setActiveDashboardTab(tab.id);
                         }
                       }}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 border cursor-pointer ${
+                      className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 border cursor-pointer ${
                         isActive
                           ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
                           : tab.id === 'signout'
@@ -645,6 +561,9 @@ export default function ConsultantDashboard({
                     >
                       <Icon size={14} className={isActive ? 'text-white' : tab.id === 'signout' ? 'text-red-500' : 'text-slate-700'} />
                       <span>{tab.label.toUpperCase()}</span>
+                      {tab.id === 'notifications' && unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+                      )}
                     </button>
                   );
                 })}
@@ -768,17 +687,36 @@ export default function ConsultantDashboard({
               
               <div className="flex items-center gap-3 flex-wrap">
                 <button
-                  onClick={() => {
-                    if (!user?.independentContractorAffirmed) {
+                  id="consultant-online-toggle"
+                  onClick={async () => {
+                    const currentId = effectiveUser?.uid || effectiveUser?.id;
+                    if (!currentId) return;
+
+                    // If not admin view, check for affirmation
+                    if (!isAdminView && !user?.independentContractorAffirmed) {
                       setIsAffirmationModalOpen(true);
                       return;
                     }
-                    updateUserProfile({ isOnline: !isOnline });
+
+                    try {
+                      const newStatus = !isOnline;
+                      if (!isAdminView || isConsultantThemselves) {
+                        // Consultants update themselves via context (or admin viewing themselves)
+                        await updateUserProfile({ isOnline: newStatus });
+                      } else {
+                        // Admins update the target consultant directly
+                        await updateDoc(doc(db, 'users', currentId), { isOnline: newStatus });
+                      }
+                      showToast(`You are now ${newStatus ? 'Online' : 'Offline'}.`, newStatus ? 'success' : 'info');
+                    } catch (err) {
+                      console.error("Error toggling online status:", err);
+                      showToast("Failed to update status. Please try again.", "error");
+                    }
                   }}
                   className={`px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 border shadow-sm cursor-pointer whitespace-nowrap ${
                     isOnline
-                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600'
-                      : 'bg-slate-800 hover:bg-slate-900 text-slate-100 border-slate-800'
+                      ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-600'
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600'
                   }`}
                 >
                   {isOnline ? <Wifi size={16} /> : <WifiOff size={16} />}
@@ -786,32 +724,6 @@ export default function ConsultantDashboard({
                 </button>
               </div>
             </div>
-
-            {/* Notification Permission Prompt */}
-            {!isAdminView && notifPermission !== 'granted' && !hideNotificationBanner && (
-              <div className="bg-indigo-900 text-white rounded-3xl p-6 mb-8 shadow-xl shadow-indigo-500/20 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="relative z-10 flex items-start gap-4">
-                  <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-indigo-200 shrink-0 border border-white/10 backdrop-blur-sm">
-                    <BellRing size={28} className="animate-bounce" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-black uppercase tracking-tight">Stay Alerted for Bookings</h4>
-                    <p className="text-indigo-200 text-sm mt-1 max-w-xl font-semibold leading-relaxed">
-                      Enable background push notifications to receive real-time mobile alerts when a patient books a consultation, even when your app is closed.
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={handleEnableNotifications}
-                  disabled={isEnablingNotifs}
-                  className="relative z-10 bg-white text-indigo-900 hover:bg-indigo-50 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl transition-all flex items-center gap-3 whitespace-nowrap cursor-pointer"
-                >
-                  {isEnablingNotifs ? <Loader2 size={20} className="animate-spin" /> : <Bell size={20} />}
-                  {notifPermission === 'denied' ? 'Re-enable Notifications' : 'Enable Native Alerts'}
-                </button>
-                <div className="absolute -right-24 -bottom-24 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl" />
-              </div>
-            )}
 
             {/* Indemnity Warning */}
             {user?.indemnityStatus === 'deferred_pending' && (
@@ -836,127 +748,32 @@ export default function ConsultantDashboard({
               </div>
             )}
 
+            {activeDashboardTab === 'notifications' && (
+              <NotificationsCenter
+                notifications={notifications}
+                loadingNotifs={loadingNotifs}
+                unreadCount={unreadCount}
+                userUid={effectiveUser?.uid || effectiveUser?.id || ''}
+                onNavigateToFeedback={() => setActiveDashboardTab('feedback')}
+              />
+            )}
+
             {activeDashboardTab === 'appointments' && (
-              <div className="space-y-8 animate-in fade-in duration-500">
-                <ConsultantStats 
-                  pendingQueueCount={effectiveConsultations.filter(c => c.status === 'PAID' || c.status === 'PENDING').length}
-                  patientsSeen={patientsSeen}
-                  consultant70Earnings={consultant70Earnings}
-                  averageRating={averageRating}
-                  isLoading={isLoading}
-                />
-
-                {/* Next Consultations Widget */}
-                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="text-sm font-black text-slate-950 uppercase tracking-wider">Next 3 Upcoming Consultations</h3>
-                      <p className="text-xs text-slate-700 font-semibold mt-1">Quick-join your scheduled patient virtual meeting rooms</p>
-                    </div>
-                    <span className="bg-indigo-50 text-indigo-700 text-[10px] font-black uppercase px-2.5 py-1 rounded-full tracking-wider">
-                      Real-time Queue
-                    </span>
-                  </div>
-
-                  {(() => {
-                    const upcoming = [...effectiveConsultations]
-                      .filter(c => (c.status === 'IN_PROGRESS' || c.status === 'ACTIVE') && (c.consultantId === consultantId || c.assignedConsultantId === consultantId) && !isStaleSession(c))
-                      .sort((a, b) => {
-                        const dateA = a.scheduledAt ? new Date(a.scheduledAt).getTime() : 0;
-                        const dateB = b.scheduledAt ? new Date(b.scheduledAt).getTime() : 0;
-                        return dateA - dateB;
-                      })
-                      .slice(0, 3);
-
-                    if (upcoming.length === 0) {
-                      return (
-                        <div className="text-center py-8 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                          <Calendar className="mx-auto text-slate-500 mb-2" size={32} />
-                          <p className="text-xs text-slate-700 font-bold uppercase tracking-wider">No Upcoming Consultations</p>
-                          <p className="text-[11px] text-slate-600 mt-1 font-semibold">Your schedule is currently clear of any active or pending sessions.</p>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {upcoming.map((session) => {
-                          const sessionTime = session.scheduledAt ? new Date(session.scheduledAt) : null;
-                          const formattedTime = sessionTime 
-                            ? sessionTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-                            : 'N/A';
-                          const formattedDate = sessionTime 
-                            ? sessionTime.toLocaleDateString([], { month: 'short', day: 'numeric' }) 
-                            : 'N/A';
-
-                          return (
-                            <div 
-                              key={session.sessionId}
-                              className="bg-slate-50 hover:bg-slate-100/50 p-5 rounded-2xl border border-slate-200/80 transition-all flex flex-col justify-between gap-4 group animate-in fade-in slide-in-from-bottom-2 duration-300"
-                            >
-                              <div>
-                                <div className="flex items-center justify-between mb-3">
-                                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${
-                                    session.sessionType === 'VIDEO'
-                                      ? 'bg-sky-50 text-sky-700 border border-sky-100'
-                                      : session.sessionType === 'AUDIO_ONLY'
-                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                                        : 'bg-indigo-50 text-indigo-700 border border-indigo-100'
-                                  }`}>
-                                    {session.sessionType === 'VIDEO' && <Video size={10} />}
-                                    {session.sessionType === 'AUDIO_ONLY' && <PhoneCall size={10} />}
-                                    {session.sessionType === 'CHAT_ONLY' && <MessageSquare size={10} />}
-                                    {session.sessionType?.replace('_', ' ')}
-                                  </span>
-
-                                  <div className="flex items-center gap-1 text-[10px] font-bold text-slate-700">
-                                    <Clock size={11} className="text-slate-600" />
-                                    <span>{formattedDate}, {formattedTime}</span>
-                                  </div>
-                                </div>
-
-                                <h4 className="font-bold text-slate-950 text-sm group-hover:text-indigo-600 transition-colors">
-                                  {session.patientName || 'Anonymous Patient'}
-                                </h4>
-                                
-                                <p className="text-[10px] text-slate-600 font-bold uppercase mt-1">
-                                  {session.patientGender || 'Unspecified'} • {session.patientAge ? `${session.patientAge} Years` : 'Age N/A'}
-                                </p>
-
-                                {session.chiefComplaints && (
-                                  <p className="text-xs text-slate-700 mt-2 line-clamp-2 italic font-semibold leading-relaxed bg-white p-2 rounded-lg border border-slate-100">
-                                    "{session.chiefComplaints}"
-                                  </p>
-                                )}
-                              </div>
-
-                              <button
-                                onClick={() => handleJoin(session.sessionId)}
-                                disabled={isPendingReview}
-                                className="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white py-2.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer"
-                              >
-                                <Video size={12} />
-                                <span>Join Room</span>
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })()}
-                </div>
-
-                <ConsultantPatientQueue 
-                  consultations={effectiveConsultations}
-                  isPendingReview={isPendingReview}
-                  onOpenHistory={(p) => {
-                    setHistoryPatient(p);
-                    setIsHistoryDrawerOpen(true);
-                  }}
-                  onJoinSession={handleJoin}
-                  isLoading={isLoading}
-                />
-              </div>
+              <DashboardOverview
+                effectiveConsultations={effectiveConsultations}
+                patientsSeen={patientsSeen}
+                consultant70Earnings={consultant70Earnings}
+                averageRating={averageRating}
+                isLoading={isLoading}
+                isPendingReview={isPendingReview}
+                consultantId={consultantId}
+                isStaleSession={isStaleSession}
+                handleJoin={handleJoin}
+                onOpenHistory={(p) => {
+                  setHistoryPatient(p);
+                  setIsHistoryDrawerOpen(true);
+                }}
+              />
             )}
             
             {activeDashboardTab === 'queue' && (
@@ -1071,118 +888,21 @@ export default function ConsultantDashboard({
               <ConsultantFeedbackView reviews={reviews} />
             )}
 
-            {activeDashboardTab === 'chat' && (() => {
-              const chatSessions = effectiveConsultations.filter(c => c.status === 'COMPLETED' || c.status === 'CLINICAL_ESCALATION' || c.status === 'IN_PROGRESS' || c.status === 'ACTIVE' || c.status === 'PAID' || c.status === 'PENDING');
-              const activeSession = chatSessions.find(s => ((s as any).id || s.sessionId) === selectedChatSessionId) || chatSessions[0];
-              const currentChatId = activeSession ? ((activeSession as any).id || activeSession.sessionId) : null;
-
-              return (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                  <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden min-h-[600px] grid grid-cols-1 md:grid-cols-12">
-                    <div className="md:col-span-4 border-r border-slate-200 bg-slate-50/50 flex flex-col">
-                      <div className="p-5 border-b border-slate-200 bg-white">
-                        <h3 className="font-bold text-slate-950 text-base flex items-center gap-2">
-                          <MessageSquare size={18} className="text-indigo-600" />
-                          Patient Messages & Follow-ups
-                        </h3>
-                        <p className="text-xs text-slate-700 mt-1">Direct communication threads for ongoing care and follow-ups.</p>
-                      </div>
-
-                      <div className="p-3 flex-1 overflow-y-auto space-y-2">
-                        {chatSessions.length === 0 ? (
-                          <div className="p-8 text-center text-slate-600">
-                            <MessageSquare size={32} className="mx-auto mb-2 opacity-30" />
-                            <p className="text-xs font-semibold">No patient message threads found.</p>
-                          </div>
-                        ) : (
-                          chatSessions.map((session) => {
-                            const sId = (session as any).id || session.sessionId;
-                            const isSelected = sId === currentChatId;
-                            return (
-                              <button
-                                key={sId}
-                                onClick={() => setSelectedChatSessionId(sId)}
-                                className={`w-full text-left p-4 rounded-2xl transition-all cursor-pointer border ${
-                                  isSelected
-                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/10'
-                                    : 'bg-white hover:bg-slate-100/80 text-slate-900 border-slate-200/80'
-                                }`}
-                              >
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className={`font-bold text-sm truncate ${isSelected ? 'text-white' : 'text-slate-950'}`}>
-                                    {session.patientName || 'Patient'}
-                                  </span>
-                                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
-                                    isSelected ? 'bg-indigo-700 text-indigo-100' : 'bg-slate-100 text-slate-700'
-                                  }`}>
-                                    {session.status || 'ACTIVE'}
-                                  </span>
-                                </div>
-                                <p className={`text-xs truncate ${isSelected ? 'text-indigo-100' : 'text-slate-700'}`}>
-                                  {(session as any).chiefComplaint || session.chiefComplaints || (session as any).symptoms || 'General Consultation'}
-                                </p>
-                                <div className="mt-2 text-[10px] opacity-75 font-semibold">
-                                  {(session as any).createdAt ? new Date((session as any).createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}
-                                </div>
-                              </button>
-                            );
-                          })
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="md:col-span-8 flex flex-col bg-white">
-                      {activeSession && currentChatId ? (
-                        <div className="flex flex-col h-full min-h-[550px]">
-                          <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-                            <div>
-                              <h4 className="font-bold text-slate-950 text-sm">{activeSession.patientName || 'Patient'}</h4>
-                              <p className="text-xs text-slate-700">{(activeSession as any).chiefComplaint || activeSession.chiefComplaints || 'Consultation Follow-up'}</p>
-                            </div>
-                            <span className="text-xs bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-full border border-indigo-100">
-                              Ref: {currentChatId.slice(0, 8)}
-                            </span>
-                          </div>
-                          <div className="flex-1 p-4 bg-slate-50/30">
-                            <ConsultationChat
-                              consultationId={currentChatId}
-                              currentUserId={consultantId}
-                              currentUserRole="consultant"
-                              currentUserName={formatConsultantName(effectiveUser?.fullName || effectiveUser?.displayName, effectiveUser?.prefix) || 'Consultant'}
-                              isCompleted={activeSession.status === 'COMPLETED'}
-                              followUpWindowClosesAt={(activeSession as any).followUpWindowClosesAt}
-                              followUpMessagesRemaining={(activeSession as any).followUpMessagesRemaining || 5}
-                              className="h-full border border-slate-200 rounded-2xl shadow-sm bg-white"
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center p-12 text-slate-600">
-                          <MessageSquare size={48} className="mb-4 opacity-20" />
-                          <p className="text-sm font-semibold">Select a patient thread from the left to start messaging.</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
+            {activeDashboardTab === 'chat' && (
+              <ChatFollowUpView
+                chatSessions={effectiveConsultations.filter(c => c.status === 'COMPLETED' || c.status === 'CLINICAL_ESCALATION' || c.status === 'IN_PROGRESS' || c.status === 'ACTIVE' || c.status === 'PAID' || c.status === 'PENDING')}
+                selectedChatSessionId={selectedChatSessionId}
+                setSelectedChatSessionId={setSelectedChatSessionId}
+                consultantId={consultantId}
+                consultantName={formatConsultantName(effectiveUser?.fullName || effectiveUser?.displayName, effectiveUser?.prefix) || 'Consultant'}
+              />
+            )}
           </main>
           
           </div>
         </div>
-      )}
 
       {/* Shared Modals for Desktop and Mobile */}
-      <PayoutModal 
-        isOpen={isPayoutModalOpen}
-        onClose={() => setIsPayoutModalOpen(false)}
-        availableBalanceGHS={availableBalanceGHS}
-        totalEarningsGHS={consultant70Earnings}
-        pastPayoutRequests={payoutRequests}
-        onSuccess={() => {}}
-      />
-
       <UploadIndemnityModal 
         isOpen={isIndemnityModalOpen}
         onClose={() => setIsIndemnityModalOpen(false)}
@@ -1198,6 +918,108 @@ export default function ConsultantDashboard({
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
       />
+
+      {/* Premium Independent Contractor Agreement Affirmation Modal */}
+      {isAffirmationModalOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
+          />
+          
+          <div className="bg-white rounded-[2.5rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 md:p-10 shadow-2xl border border-white/20 animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 relative z-10 flex flex-col scrollbar-thin">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-md">
+                <Scale size={24} />
+              </div>
+              <div>
+                <h4 className="text-xl font-black text-slate-900 tracking-tight">Independent Contractor Agreement</h4>
+                <p className="text-xs text-slate-500 font-medium">Mandatory clinical affirmation & platform sign-off</p>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-6 pr-1 my-4 text-slate-600 text-sm leading-relaxed border-y border-slate-100 py-6">
+              <p className="font-semibold text-slate-800">
+                Please review and accept the following clinical terms of practice to enable active consultation status (Go Online):
+              </p>
+
+              <div className="space-y-4">
+                {[
+                  { id: 'credentials', label: 'Professional Verification', text: 'I certify that all professional credentials, license PIN numbers, and certificates uploaded are valid, complete, and fully active with our regulatory council.' },
+                  { id: 'liability', label: 'Clinical Indemnity & Liability', text: 'I assume sole professional and legal liability for all medical advice, SOAP notes, and electronic prescriptions generated during my session on this platform.' },
+                  { id: 'negligence', label: 'Zero-Platform Negligence Hold', text: 'I agree to indemnify, defend, and hold harmless PockettClinic and its operating affiliates from any claims arising out of clinical decision-making or negligence.' },
+                  { id: 'status', label: 'Independent Practice Affirmation', text: 'I affirm that I am an independent contractor rendering tele-health consultation services, and that no employment relationship is created hereby.' }
+                ].map((item, index) => (
+                  <div key={item.id} className="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors">
+                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black flex items-center justify-center shrink-0">
+                      {index + 1}
+                    </span>
+                    <div>
+                      <h5 className="font-bold text-slate-800 text-sm mb-1">{item.label}</h5>
+                      <p className="text-xs text-slate-500 font-medium leading-relaxed">{item.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-100 text-amber-800 text-xs flex gap-3">
+                <AlertCircle size={18} className="shrink-0 mt-0.5 text-amber-600" />
+                <p className="font-medium leading-relaxed">
+                  By signing, you digitally lock your clinical profile to "Active". This legal binding is recorded permanently for compliance.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 pb-4 space-y-3 border-t border-slate-100 mt-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block ml-1 mt-4">
+                Type Full Legal Name to Sign (Must match exactly: "{effectiveUser?.fullName || effectiveUser?.displayName || 'Your Name'}")
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  placeholder={`Type "${effectiveUser?.fullName || effectiveUser?.displayName || 'Your Name'}"`}
+                  value={typedSignature}
+                  onChange={(e) => setTypedSignature(e.target.value)}
+                  className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-300"
+                />
+                {typedSignature.trim().toLowerCase() === (effectiveUser?.fullName || effectiveUser?.displayName || '').trim().toLowerCase() && (
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-600">
+                    <ShieldCheck size={20} />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="pt-4 flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAffirmationModalOpen(false);
+                  showToast("You must affirm the agreement to toggle online status.", "info");
+                }}
+                className="w-full sm:w-1/3 py-4 text-slate-400 hover:text-slate-600 font-black text-[10px] uppercase tracking-[0.2em] transition-colors text-center border border-slate-100 rounded-2xl hover:bg-slate-50 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isSubmittingAffirmation || typedSignature.trim().toLowerCase() !== (effectiveUser?.fullName || effectiveUser?.displayName || '').trim().toLowerCase()}
+                onClick={handleAffirmStatus}
+                className="w-full sm:w-2/3 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-black rounded-2xl shadow-xl shadow-emerald-100 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isSubmittingAffirmation ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Signing...</span>
+                  </>
+                ) : (
+                  'Digitally Sign & Affirm'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* IncomingCallOverlay removed - handled by universal IncomingCallModal in App.tsx */}
     </>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppContext } from '../../AppContext';
-import { LayoutDashboard, Users, UserCircle, Clock, MessageSquare, Wallet, Star, FileText, ShieldAlert, Landmark, Share2, CalendarCheck, BookOpen, Heart, Settings, Trash2, LogOut, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Users, UserCircle, Clock, MessageSquare, Wallet, Star, FileText, ShieldAlert, Landmark, Share2, CalendarCheck, BookOpen, Heart, Settings, Trash2, LogOut, ShieldCheck, Bell } from 'lucide-react';
 
 interface ConsultantSidebarProps {
   activeDashboardTab: string;
@@ -8,6 +8,7 @@ interface ConsultantSidebarProps {
   globalLogoUrl?: string | null;
   onOpenSettings: () => void;
   onOpenDeletion: () => void;
+  unreadCount?: number;
 }
 
 export const ConsultantSidebar: React.FC<ConsultantSidebarProps> = ({
@@ -15,18 +16,20 @@ export const ConsultantSidebar: React.FC<ConsultantSidebarProps> = ({
   setActiveDashboardTab,
   globalLogoUrl,
   onOpenSettings,
-  onOpenDeletion
+  onOpenDeletion,
+  unreadCount = 0
 }) => {
   const { globalSlogan, globalTitle, logout } = useAppContext();
   const tabs = [
     { id: 'appointments', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'queue', label: 'Patient Queue', icon: Users },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'stg-reference', label: 'Ghana STG & Medscape', icon: BookOpen },
     { id: 'soap', label: 'SOAP Notes & Voice', icon: FileText },
     { id: 'drug-safety', label: 'Drug Safety Checker', icon: ShieldAlert },
     { id: 'referrals', label: 'Specialist Referrals', icon: Share2 },
     { id: 'follow-ups', label: 'Follow-up Scheduler', icon: CalendarCheck },
-    { id: 'payout-hub', label: 'Earnings & MoMo Payout', icon: Landmark },
+    { id: 'payout-hub', label: 'Earnings and Payout', icon: Landmark },
     { id: 'schedule', label: 'Schedule', icon: Clock },
     { id: 'chat', label: 'Follow-up Chat', icon: MessageSquare },
     { id: 'portfolio', label: 'Professional Portfolio', icon: UserCircle },
@@ -63,7 +66,7 @@ export const ConsultantSidebar: React.FC<ConsultantSidebarProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveDashboardTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer relative ${
                 isActive 
                    ? 'bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100/50' 
                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
@@ -71,6 +74,11 @@ export const ConsultantSidebar: React.FC<ConsultantSidebarProps> = ({
             >
               <Icon size={18} className={isActive ? 'text-emerald-600' : 'text-slate-400'} /> 
               <span>{tab.label}</span>
+              {tab.id === 'notifications' && unreadCount > 0 && (
+                <span className="absolute right-4 w-5 h-5 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full shadow-sm">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </button>
           );
         })}

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Landmark, Wallet, ArrowUpRight, Clock, CheckCircle2, AlertCircle, Phone, Calendar, Download, RefreshCw, ShieldCheck, ChevronRight } from 'lucide-react';
+import { Landmark, Wallet, ArrowUpRight, Clock, CheckCircle2, AlertCircle, Phone, Calendar, Download, RefreshCw, ShieldCheck, ChevronRight, Sparkles } from 'lucide-react';
 import { collection, query, where, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
 import { useAppContext } from '../../AppContext';
 import { PayoutRequest } from '../../types';
+import { getWithdrawalWindowStatus } from '../PayoutModal';
 
 interface ConsultantPayoutHubProps {
   consultantId: string;
@@ -19,6 +20,7 @@ export default function ConsultantPayoutHub({
   consultant70Earnings
 }: ConsultantPayoutHubProps) {
   const { showToast } = useAppContext();
+  const windowStatus = getWithdrawalWindowStatus();
   const [payouts, setPayouts] = useState<PayoutRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
@@ -141,24 +143,25 @@ export default function ConsultantPayoutHub({
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-slate-200/60 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 shrink-0">
-            <Landmark size={24} />
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-[2rem] border border-slate-200/60 shadow-sm">
+        <div className="flex items-start gap-5">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-200 shrink-0">
+            <Landmark size={32} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-black text-slate-800 tracking-tight">
-                Consultant Earnings & Mobile Wallet Payout Hub
+            <div className="flex items-center gap-3">
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                Earnings and Payout
               </h3>
-              <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md">
-                70% Guaranteed Take
-              </span>
+              <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-100">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-widest">70% Net Share</span>
+              </div>
             </div>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Direct Mobile Money disbursement (MTN Mobile Wallet, Telecel Cash) and automated settlement tracking.
+            <p className="text-sm text-slate-500 mt-2 max-w-xl font-medium leading-relaxed">
+              Manage your clinical earnings and initiate secure disbursements to your preferred Mobile Money wallet or commercial bank account.
             </p>
           </div>
         </div>
@@ -166,100 +169,179 @@ export default function ConsultantPayoutHub({
         <button
           onClick={() => setIsWithdrawModalOpen(true)}
           disabled={availableBalanceGHS <= 0}
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-slate-600 px-5 py-2.5 rounded-2xl text-xs font-black shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 shadow-emerald-600/20 transition-all cursor-pointer"
+          className="group flex items-center justify-center gap-3 bg-slate-900 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed text-white px-8 py-4 rounded-2xl text-sm font-black shadow-xl shadow-slate-200 transition-all active:scale-95 shrink-0"
         >
-          <ArrowUpRight size={16} />
-          <span>Withdraw to Mobile Wallet / Bank</span>
+          <ArrowUpRight size={20} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          <span className="uppercase tracking-widest">Initiate Payout</span>
         </button>
       </div>
 
-      {/* Financial Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200">
-          <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Gross Billed (100%)</span>
-          <div className="text-xl font-black text-slate-800 mt-1">
-            GHS {totalGrossGHS.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+      {/* Financial Bento Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white p-7 rounded-[2.5rem] border border-slate-200/60 shadow-sm group hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4">
+            <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[9px] font-black uppercase tracking-tighter ${
+              windowStatus.isOpen ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-100'
+            }`}>
+              <div className={`w-1 h-1 rounded-full ${windowStatus.isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+              {windowStatus.isOpen ? 'Window Open' : 'Batched'}
+            </div>
           </div>
-          <span className="text-[10px] text-slate-600 font-medium">Total patient consult fees</span>
+          <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mb-6 group-hover:bg-emerald-50 group-hover:text-emerald-500 transition-all">
+            <RefreshCw size={24} />
+          </div>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">Gross Billed</p>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-sm font-black text-slate-400">GHS</span>
+            <span className="text-3xl font-black text-slate-900 tracking-tight">
+              {totalGrossGHS.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
+          <p className="text-[10px] text-slate-400 mt-3 font-bold uppercase tracking-tight flex items-center gap-1">
+            <ShieldCheck size={12} />
+            Verified Billings
+          </p>
         </div>
 
-        <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200">
-          <span className="text-[10px] font-black text-emerald-700 uppercase tracking-wider">Your Net Share (70%)</span>
-          <div className="text-xl font-black text-emerald-950 mt-1">
-            GHS {consultant70Earnings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        <div className="bg-white p-7 rounded-[2.5rem] border border-slate-200/60 shadow-sm group hover:border-emerald-200 transition-all duration-300">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6">
+            <RefreshCw size={24} />
           </div>
-          <span className="text-[10px] text-emerald-700 font-medium">Consultant contract entitlement</span>
+          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.15em] mb-1">Your Earnings</p>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-sm font-black text-emerald-600">GHS</span>
+            <span className="text-3xl font-black text-slate-900 tracking-tight">
+              {consultant70Earnings.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
+          <p className="text-[10px] text-slate-400 mt-3 font-bold uppercase tracking-tight flex items-center gap-1">
+            <ShieldCheck size={12} />
+            70% Net Share
+          </p>
         </div>
 
-        <div className="bg-sky-50/70 p-4 rounded-2xl border border-sky-200">
-          <span className="text-[10px] font-black text-sky-700 uppercase tracking-wider">Available for Payout</span>
-          <div className="text-xl font-black text-sky-950 mt-1">
-            GHS {availableBalanceGHS.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        <div className="bg-white p-7 rounded-[2.5rem] border-2 border-emerald-600 shadow-2xl shadow-emerald-100 group relative overflow-hidden transform hover:scale-[1.02] transition-all duration-500">
+          <div className="absolute top-0 right-0 p-5">
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
           </div>
-          <span className="text-[10px] text-sky-700 font-medium">Instant transfer eligible</span>
+          <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mb-6 shadow-lg shadow-emerald-200">
+            <Wallet size={24} />
+          </div>
+          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.15em] mb-1">Available Now</p>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-sm font-black text-emerald-600">GHS</span>
+            <span className="text-4xl font-black text-slate-900 tracking-tighter">
+              {availableBalanceGHS.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
+          <p className="text-[10px] text-emerald-700 mt-3 font-black uppercase tracking-tight flex items-center gap-1.5">
+            <Sparkles size={14} className="animate-pulse" />
+            Ready for withdrawal
+          </p>
         </div>
 
-        <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-300">
-          <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">Settled to Date</span>
-          <div className="text-xl font-black text-purple-950 mt-1">
-            GHS {completedPayoutsSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        <div className="bg-slate-50 p-7 rounded-[2.5rem] border border-slate-200/60 shadow-sm group">
+          <div className="w-12 h-12 rounded-2xl bg-white text-slate-400 flex items-center justify-center mb-6 group-hover:text-slate-600 transition-all">
+            <CheckCircle2 size={24} />
           </div>
-          <span className="text-[10px] text-slate-600 font-medium">Disbursed to your wallet</span>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">Settled to Date</p>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-sm font-black text-slate-400">GHS</span>
+            <span className="text-3xl font-black text-slate-900 tracking-tight">
+              {completedPayoutsSum.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
+          <p className="text-[10px] text-slate-400 mt-3 font-bold uppercase tracking-tight">
+            Successfully Disbursed
+          </p>
         </div>
       </div>
 
-      {/* Payout History Table */}
-      <div className="space-y-3 pt-2">
-        <div className="flex items-center justify-between">
-          <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-            <Clock size={14} className="text-slate-600" /> Recent Payout Dispatches
-          </h4>
-          <span className="text-xs text-slate-500 font-bold">{payouts.length} Records</span>
+      {/* History Table Section */}
+      <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-sm overflow-hidden">
+        <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-slate-400">
+              <Clock size={20} />
+            </div>
+            <div>
+              <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">Payout History</h4>
+              <p className="text-[10px] text-slate-500 font-bold mt-0.5">{payouts.length} total records found</p>
+            </div>
+          </div>
+          <button className="text-xs font-black text-emerald-600 hover:text-emerald-700 transition-colors uppercase tracking-widest flex items-center gap-1.5">
+            <Download size={14} />
+            Export CSV
+          </button>
         </div>
 
         {isLoading ? (
-          <div className="py-6 text-center text-xs text-slate-500">Loading payout records...</div>
+          <div className="p-20 text-center">
+            <div className="w-12 h-12 border-4 border-slate-100 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Retrieving logs...</p>
+          </div>
         ) : payouts.length === 0 ? (
-          <div className="p-6 text-center text-xs text-slate-500 bg-white rounded-2xl border border-slate-200">
-            No withdrawal requests logged yet.
+          <div className="p-20 text-center">
+            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 mx-auto mb-4">
+              <RefreshCw size={32} />
+            </div>
+            <h5 className="text-sm font-black text-slate-400 uppercase tracking-widest">No payout history yet</h5>
+            <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">Once you initiate your first withdrawal, records will appear here for your tracking.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto border border-slate-200 rounded-2xl">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-white text-slate-600 font-bold border-b border-slate-200">
-                <tr>
-                  <th className="p-3">Reference / Date</th>
-                  <th className="p-3">Destination</th>
-                  <th className="p-3">Amount</th>
-                  <th className="p-3">Status</th>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50">
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Reference & Date</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Destination Wallet</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Disbursed Amount</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {payouts.map(p => (
-                  <tr key={p.requestId || Math.random()} className="hover:bg-white/80">
-                    <td className="p-3 font-medium">
-                      <div className="font-bold text-slate-800">{p.requestId}</div>
-                      <span className="text-[11px] text-slate-500">{new Date(p.requestedAt).toLocaleString()}</span>
-                    </td>
-                    <td className="p-3">
-                      <div className="font-bold text-slate-800">
-                        {p.channelType === 'mobile_money' ? `${p.networkProvider} Mobile Wallet` : p.bankName}
+                  <tr key={p.requestId} className="group hover:bg-slate-50/50 transition-colors">
+                    <td className="px-8 py-6">
+                      <div className="font-black text-slate-900 text-sm tracking-tight">{p.requestId}</div>
+                      <div className="text-[11px] text-slate-400 font-bold mt-1 flex items-center gap-1.5">
+                        <Calendar size={12} />
+                        {new Date(p.requestedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </div>
-                      <span className="text-[11px] text-slate-600">{p.accountNumber} ({p.accountName})</span>
                     </td>
-                    <td className="p-3 font-black text-slate-800">
-                      GHS {p.amountGHS.toFixed(2)}
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-white transition-colors shadow-sm">
+                          {p.channelType === 'mobile_money' ? <Phone size={16} /> : <Landmark size={16} />}
+                        </div>
+                        <div>
+                          <div className="font-black text-slate-800 text-xs">
+                            {p.channelType === 'mobile_money' ? `${p.networkProvider} MoMo` : p.bankName}
+                          </div>
+                          <div className="text-[11px] text-slate-500 font-medium mt-0.5">{p.accountNumber}</div>
+                        </div>
+                      </div>
                     </td>
-                    <td className="p-3">
-                      <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-black text-slate-400">GHS</span>
+                        <span className="text-lg font-black text-slate-900 tracking-tight">{p.amountGHS.toFixed(2)}</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${
                         p.status === 'completed' || p.status === 'processed'
-                          ? 'bg-emerald-100 text-emerald-800' 
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
                           : p.status === 'rejected' || p.status === 'failed'
-                          ? 'bg-rose-100 text-rose-800'
-                          : 'bg-amber-100 text-amber-800'
+                          ? 'bg-rose-50 text-rose-700 border border-rose-100'
+                          : 'bg-amber-50 text-amber-700 border border-amber-100'
                       }`}>
-                        {p.status === 'completed' || p.status === 'processed' ? <CheckCircle2 size={11} /> : <RefreshCw size={11} className="animate-spin" />}
-                        <span>{p.status}</span>
+                        {p.status === 'completed' || p.status === 'processed' ? (
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        ) : (
+                          <RefreshCw size={12} className="animate-spin" />
+                        )}
+                        {p.status}
                       </span>
                     </td>
                   </tr>
@@ -270,166 +352,215 @@ export default function ConsultantPayoutHub({
         )}
       </div>
 
+      {/* Compliance / Security Note */}
+      <div className="bg-slate-900 rounded-[2rem] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
+        <div className="relative z-10 flex items-start gap-5">
+          <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-emerald-400 shrink-0 border border-white/10">
+            <ShieldCheck size={28} />
+          </div>
+          <div>
+            <h4 className="text-lg font-black uppercase tracking-widest">Secure Settlements</h4>
+            <p className="text-slate-400 text-sm mt-1 max-w-lg font-medium leading-relaxed">
+              All transactions are encrypted and audited. Disbursements are processed via the national payment gateway ensuring real-time settlement for Mobile Money wallets.
+            </p>
+          </div>
+        </div>
+        <div className="relative z-10">
+          <div className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-2">Operational Status</div>
+          <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-5 py-2.5 rounded-xl flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-black uppercase tracking-widest">Gateway Healthy</span>
+          </div>
+        </div>
+        
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-emerald-500/20 transition-all duration-700" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-sky-500/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+      </div>
+
       {/* Withdrawal Modal */}
       {isWithdrawModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
-                <Wallet size={22} />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
+            onClick={() => setIsWithdrawModalOpen(false)}
+          />
+          
+          <div className="bg-white rounded-[2.5rem] max-w-lg w-full p-8 md:p-10 shadow-2xl border border-white/20 animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 relative z-10">
+            <div className="flex items-center gap-5 mb-8">
+              <div className="w-16 h-16 rounded-[1.25rem] bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-200">
+                <Wallet size={32} />
               </div>
               <div>
-                <h4 className="font-black text-slate-800 text-base">Request Consultant Payout</h4>
-                <p className="text-xs text-slate-600">Available Balance: GHS {availableBalanceGHS.toFixed(2)}</p>
+                <h4 className="text-xl font-black text-slate-900 tracking-tight">Request Payout</h4>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Available</span>
+                  <span className="text-sm font-black text-emerald-600 tracking-tight">GHS {availableBalanceGHS.toFixed(2)}</span>
+                </div>
               </div>
             </div>
 
             {successMessage ? (
-              <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl text-xs font-bold flex items-center gap-2.5 my-4">
-                <ShieldCheck size={18} />
-                <span>{successMessage}</span>
+              <div className="bg-emerald-50 border border-emerald-100 p-8 rounded-[2rem] text-center animate-in zoom-in-95 duration-500">
+                <div className="w-20 h-20 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-200">
+                  <ShieldCheck size={40} />
+                </div>
+                <h5 className="text-lg font-black text-slate-900 mb-2">Request Successful</h5>
+                <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                  {successMessage}
+                </p>
               </div>
             ) : (
-              <form onSubmit={handleRequestPayout} className="space-y-4 text-xs">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Withdrawal Amount (GHS) *</label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-3 font-black text-slate-400">GHS</span>
+              <form onSubmit={handleRequestPayout} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Withdrawal Amount</label>
+                  <div className="relative group">
+                    <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-slate-300 group-focus-within:text-emerald-600 transition-colors">GHS</span>
                     <input
                       type="number"
                       required
                       min="10"
                       max={availableBalanceGHS}
-                      placeholder={`Max ${availableBalanceGHS.toFixed(2)}`}
+                      placeholder="0.00"
                       value={amountGHS}
                       onChange={(e) => setAmountGHS(e.target.value ? Number(e.target.value) : '')}
-                      className="w-full pl-14 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
+                      className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-xl font-black text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-200"
                     />
                   </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Payout Channel *</label>
-                  <div className="grid grid-cols-2 gap-2">
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Payout Method</label>
+                  <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={() => setChannelType('mobile_money')}
-                      className={`p-3 rounded-xl font-bold border transition-all text-sm ${
+                      className={`flex items-center justify-center gap-2 p-4 rounded-2xl font-black text-sm tracking-tight border-2 transition-all ${
                         channelType === 'mobile_money'
-                          ? 'bg-slate-800 border-slate-800 text-white shadow-md transform -translate-y-0.5'
-                          : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                          ? 'bg-slate-900 border-slate-900 text-white shadow-xl scale-[1.02]'
+                          : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
                       }`}
                     >
+                      <Phone size={18} />
                       Mobile Wallet
                     </button>
                     <button
                       type="button"
                       onClick={() => setChannelType('bank_transfer')}
-                      className={`p-3 rounded-xl font-bold border transition-all text-sm ${
+                      className={`flex items-center justify-center gap-2 p-4 rounded-2xl font-black text-sm tracking-tight border-2 transition-all ${
                         channelType === 'bank_transfer'
-                          ? 'bg-slate-800 border-slate-800 text-white shadow-md transform -translate-y-0.5'
-                          : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                          ? 'bg-slate-900 border-slate-900 text-white shadow-xl scale-[1.02]'
+                          : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
                       }`}
                     >
+                      <Landmark size={18} />
                       Bank Transfer
                     </button>
                   </div>
                 </div>
 
                 {channelType === 'mobile_money' ? (
-                  <>
+                  <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="grid grid-cols-3 gap-2">
                       {(['MTN', 'TELECEL', 'AT'] as const).map(net => (
                         <button
                           key={net}
                           type="button"
                           onClick={() => setNetworkProvider(net)}
-                          className={`py-3 rounded-xl font-black border text-center transition-all ${
+                          className={`py-3 rounded-xl font-black text-xs border-2 transition-all ${
                             networkProvider === net
-                              ? 'bg-slate-800 text-white border-slate-800 shadow-md transform -translate-y-0.5'
-                              : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                              ? 'bg-emerald-50 border-emerald-600 text-emerald-700'
+                              : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
                           }`}
                         >
                           {net}
                         </button>
                       ))}
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Mobile Wallet Number *</label>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Wallet Number</label>
                       <input
                         type="tel"
                         required
-                        placeholder="e.g. 0244 000 000"
+                        placeholder="024 XXX XXXX"
                         value={payoutNumber}
                         onChange={(e) => setPayoutNumber(e.target.value)}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
+                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
-                  </>
+                  </div>
                 ) : (
-                  <>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Bank Name *</label>
+                  <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Bank Name</label>
                       <input
                         type="text"
                         required
-                        placeholder="e.g. GCB Bank, Ecobank"
+                        placeholder="e.g. GCB Bank"
                         value={bankName}
                         onChange={(e) => setBankName(e.target.value)}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
+                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Account Number *</label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Account Number</label>
                         <input
                           type="text"
                           required
-                          placeholder="e.g. 1041010000000"
+                          placeholder="Account No."
                           value={bankAccountNumber}
                           onChange={(e) => setBankAccountNumber(e.target.value)}
-                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
+                          className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
                         />
                       </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Branch Code (Optional)</label>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Branch Code</label>
                         <input
                           type="text"
-                          placeholder="e.g. 001"
+                          placeholder="Optional"
                           value={branchCode}
                           onChange={(e) => setBranchCode(e.target.value)}
-                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
+                          className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
                         />
                       </div>
                     </div>
-                  </>
+                  </div>
                 )}
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Registered Account Name *</label>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Beneficiary Name</label>
                   <input
                     type="text"
                     required
-                    placeholder="Exact name registered on the account"
+                    placeholder="Exact registered name"
                     value={accountName}
                     onChange={(e) => setAccountName(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400"
+                    className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
                   />
                 </div>
 
-                <div className="pt-3 flex items-center justify-end gap-2.5 border-t border-slate-200">
-                  <button
-                    type="button"
-                    onClick={() => setIsWithdrawModalOpen(false)}
-                    className="px-4 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-white transition-colors"
-                  >
-                    Cancel
-                  </button>
+                <div className="pt-6 flex flex-col gap-3">
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 transition-all"
+                    className="w-full py-5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-black rounded-2xl shadow-xl shadow-emerald-100 transition-all active:scale-95 text-sm uppercase tracking-widest"
                   >
-                    {isSubmitting ? 'Submitting...' : 'Confirm Withdrawal'}
+                    {isSubmitting ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <RefreshCw size={18} className="animate-spin" />
+                        <span>Processing...</span>
+                      </div>
+                    ) : (
+                      'Confirm Disbursement'
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsWithdrawModalOpen(false)}
+                    className="w-full py-4 text-slate-400 hover:text-slate-600 font-black text-[10px] uppercase tracking-[0.2em] transition-colors"
+                  >
+                    Dismiss Request
                   </button>
                 </div>
               </form>

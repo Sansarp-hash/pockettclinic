@@ -64,6 +64,7 @@ export interface UserProfile {
   // Legal Disclaimers & Status Affirmations
   hasAcceptedCareTerms?: boolean;
   independentContractorAffirmed?: boolean;
+  contractorAffirmedAt?: string;
   indemnityStatus?: 'PENDING_UPLOAD' | 'PERSONAL_LIABILITY_ACCEPTED' | 'VERIFIED' | 'deferred_pending' | 'provided';
   legalSignature?: string;
   
@@ -117,6 +118,7 @@ export interface UserProfile {
   autoRenew?: boolean;
   videoChatTickets?: number;
   paystackAuthorizationCode?: string;
+  pushNotificationsEnabled?: boolean;
 }
 
 export type User = UserProfile;

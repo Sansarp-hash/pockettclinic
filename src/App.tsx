@@ -477,7 +477,7 @@ function MainDashboard() {
             ))}
 
           {activeTab === 'patient' && <PatientDashboard />}
-          {activeTab === 'consultant' && <ConsultantDashboard targetConsultant={currentUser} />}
+          {activeTab === 'consultant' && <ConsultantDashboard />}
         </main>
       )}
 
