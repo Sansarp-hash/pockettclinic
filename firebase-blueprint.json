@@ -180,6 +180,13 @@
         "activeSessionId": { "type": "string" },
         "lastActiveAt": { "type": "string" },
         "bio": { "type": "string" },
+        "cvUrl": { "type": "string" },
+        "educationEntries": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "educationHistory": { "type": "string" },
+        "pastWorkHistory": { "type": "string" },
         "availabilityDays": { "type": "array", "items": { "type": "string" } },
         "availabilityHours": { "type": "string" },
         "createdAt": { "type": "string" }

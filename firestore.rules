@@ -106,7 +106,7 @@ service cloud.firestore {
             'bio', 'pendingProfileChanges', 'indemnityDocUrl', 'indemnityPolicyNo', 
             'indemnityInsuranceProvider', 'indemnityExpiryDate', 'ghanaCardNo', 'licenseNo', 
             'councilPin', 'governingCouncil', 'cadre', 'indemnityAgreed', 'prefix', 'walletBalanceGHS', 
-            'degrees', 'degreeCertificateUrl', 'educationHistory', 'pastWorkHistory', 'mdcPin', 
+            'degrees', 'degreeCertificateUrl', 'cvUrl', 'educationHistory', 'educationEntries', 'pastWorkHistory', 'mdcPin', 
             'mdcExpiryDate', 'indemnityPolicyNumber', 'indemnityProvider', 'languages', 'clinicalFocus', 
             'mdcLicenseProofUrl', 'indemnityProofUrl', 'indemnityProvideLater', 'acceptFullPersonalLiability', 
             'specialty', 'specialization', 'qualification', 'pharmacistDegreeTrack', 'degreeVerified', 
