@@ -177,12 +177,20 @@ export const SPECIALTY_OPTIONS = [
 export const ALL_LANGUAGES = [
   'English',
   'Twi (Akan)',
+  'Fante',
   'Ga',
   'Ewe',
-  'Fante',
   'Dagbani',
   'Hausa',
-  'French'
+  'Dangme',
+  'Nzema',
+  'Gonja',
+  'Kasem',
+  'Dagaare',
+  'Waale',
+  'Mampruli',
+  'French',
+  'Other'
 ];
 
 /**

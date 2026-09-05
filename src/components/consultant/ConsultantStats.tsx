@@ -26,59 +26,69 @@ export const ConsultantStats: React.FC<ConsultantStatsProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
       {/* Card 1: Queue Status */}
-      <div className="bg-white/85 backdrop-blur-md p-5 rounded-2xl border border-slate-200/50 shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-300 flex flex-col justify-between relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600 rounded-l-2xl"></div>
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest">Queue Status</p>
-          <Users size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
+      <div className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 active:scale-95 transition-all flex flex-col justify-between relative overflow-hidden group">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Live Queue</p>
+          <div className="w-10 h-10 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-all duration-300">
+            <Users size={20} />
+          </div>
         </div>
-        <div className="mt-3">
-          <p className="text-2xl font-black tracking-tight text-slate-900">{pendingQueueCount}</p>
-          <p className="text-[10px] text-slate-600 font-bold mt-1">Pending clinical dispatch</p>
+        <div>
+          <p className="text-3xl font-black tracking-tighter text-slate-950">{pendingQueueCount}</p>
+          <div className="flex items-center gap-1.5 mt-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Pending dispatch</p>
+          </div>
         </div>
       </div>
 
       {/* Card 2: Patients Seen */}
-      <div className="bg-white/85 backdrop-blur-md p-5 rounded-2xl border border-slate-200/50 shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-300 flex flex-col justify-between relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600 rounded-l-2xl"></div>
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest">Patients Seen</p>
-          <CalendarDays size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
+      <div className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 active:scale-95 transition-all flex flex-col justify-between relative overflow-hidden group">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Efficiency</p>
+          <div className="w-10 h-10 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-all duration-300">
+            <CalendarDays size={20} />
+          </div>
         </div>
-        <div className="mt-3">
-          <p className="text-2xl font-black tracking-tight text-slate-900">{patientsSeen}</p>
-          <p className="text-[10px] text-slate-600 font-bold mt-1">Total completed cases</p>
+        <div>
+          <p className="text-3xl font-black tracking-tighter text-slate-950">{patientsSeen}</p>
+          <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-2">Total completed</p>
         </div>
       </div>
 
       {/* Card 3: Wallet Balance */}
-      <div className="bg-white/85 backdrop-blur-md p-5 rounded-2xl border border-slate-200/50 shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-300 flex flex-col justify-between relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600 rounded-l-2xl"></div>
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest">Wallet</p>
-          <TrendingUp size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
+      <div className="bg-slate-950 p-6 md:p-8 rounded-[2.5rem] border border-slate-900 shadow-2xl shadow-slate-950/20 active:scale-95 transition-all flex flex-col justify-between relative overflow-hidden group">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">Net Wallet</p>
+          <div className="w-10 h-10 rounded-2xl bg-white/10 text-emerald-400 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 border border-white/5">
+            <TrendingUp size={20} />
+          </div>
         </div>
-        <div className="mt-3">
-          <p className="text-2xl font-black tracking-tight text-[#0A3B24]">GHS {consultant70Earnings.toFixed(2)}</p>
-          <p className="text-[10px] text-slate-600 font-bold mt-1">Consultant earnings</p>
+        <div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-xs font-black text-slate-500">GHS</span>
+            <p className="text-2xl font-black tracking-tight text-white">{consultant70Earnings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          </div>
+          <p className="text-[10px] text-emerald-500 font-black uppercase tracking-widest mt-2">70% Clinical Share</p>
         </div>
       </div>
 
       {/* Card 4: Avg Rating */}
-      <div className="bg-white/85 backdrop-blur-md p-5 rounded-2xl border border-slate-200/50 shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-300 flex flex-col justify-between relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600 rounded-l-2xl"></div>
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest">Avg Rating</p>
-          <Star className="text-amber-400 fill-amber-400 group-hover:scale-110 transition-transform" size={14} />
-        </div>
-        <div className="mt-3">
-          <div className="flex items-baseline gap-1.5">
-            <p className="text-2xl font-black tracking-tight text-slate-900">{averageRating}</p>
-            <span className="text-[10px] text-emerald-600 font-bold">★ 100%</span>
+      <div className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 active:scale-95 transition-all flex flex-col justify-between relative overflow-hidden group">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Reputation</p>
+          <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 border border-amber-100">
+            <Star size={20} className="fill-current" />
           </div>
-          <p className="text-[10px] text-slate-600 font-bold mt-1">Patient satisfaction</p>
+        </div>
+        <div>
+          <div className="flex items-center gap-2">
+            <p className="text-3xl font-black tracking-tighter text-slate-950">{averageRating}</p>
+            <div className="bg-emerald-50 text-emerald-700 text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest border border-emerald-100">Verified</div>
+          </div>
+          <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-2">Avg satisfaction</p>
         </div>
       </div>
     </div>

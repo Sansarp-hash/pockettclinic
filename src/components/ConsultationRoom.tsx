@@ -230,9 +230,9 @@ function ElapsedTimeOverlay() {
   const formattedTime = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
   return (
-    <div className="absolute top-4 left-4 z-20 bg-slate-50 backdrop-blur-md text-slate-600 px-3 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium shadow-lg border border-white/10">
-      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-      {formattedTime}
+    <div className="absolute top-4 left-4 z-50 bg-slate-900/80 backdrop-blur-xl text-white px-3 py-1.5 rounded-full flex items-center gap-2 text-[11px] font-bold shadow-2xl border border-white/10">
+      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></div>
+      <span className="tracking-tight">{formattedTime}</span>
     </div>
   );
 }
@@ -449,25 +449,8 @@ function VideoStageWithHardwareStream({
     }
   };
 
-  const { localCameraTrack, isLoading: isCameraLoading } = useLocalCameraTrack(true);
-  const { localMicrophoneTrack, isLoading: isMicLoading } = useLocalMicrophoneTrack(true);
-
-  useEffect(() => {
-    if (localCameraTrack) {
-      localCameraTrack.setEnabled(isVideoOn).catch(e => console.warn("Camera enable error:", e));
-    }
-  }, [localCameraTrack, isVideoOn]);
-
-  useEffect(() => {
-    if (localMicrophoneTrack) {
-      localMicrophoneTrack.setEnabled(isMicOn).catch(e => console.warn("Mic enable error:", e));
-    }
-  }, [localMicrophoneTrack, isMicOn]);
-
-  usePublish([localCameraTrack, localMicrophoneTrack]);
-
-  const remoteUsers = useRemoteUsers();
   const connectionState = useConnectionState();
+  const remoteUsers = useRemoteUsers();
 
   useEffect(() => {
     console.log("[Agora Stage] Connection State:", connectionState);
@@ -476,6 +459,23 @@ function VideoStageWithHardwareStream({
       console.log("[Agora Stage] Remote User 0 Video Track:", !!remoteUsers[0].videoTrack);
     }
   }, [connectionState, remoteUsers]);
+
+  const { localCameraTrack, isLoading: isCameraLoading } = useLocalCameraTrack(true);
+  const { localMicrophoneTrack, isLoading: isMicLoading } = useLocalMicrophoneTrack(true);
+
+  useEffect(() => {
+    if (localCameraTrack && connectionState === 'CONNECTED') {
+      localCameraTrack.setEnabled(isVideoOn).catch(e => console.warn("Camera enable error:", e));
+    }
+  }, [localCameraTrack, isVideoOn, connectionState]);
+
+  useEffect(() => {
+    if (localMicrophoneTrack && connectionState === 'CONNECTED') {
+      localMicrophoneTrack.setEnabled(isMicOn).catch(e => console.warn("Mic enable error:", e));
+    }
+  }, [localMicrophoneTrack, isMicOn, connectionState]);
+
+  usePublish(connectionState === 'CONNECTED' ? [localCameraTrack, localMicrophoneTrack] : []);
 
   const remoteUser = remoteUsers[0]; 
   const { track: remoteVideoTrack } = useRemoteUserTrack(remoteUser && remoteUser.hasVideo ? remoteUser : undefined, "video");
@@ -534,7 +534,7 @@ function VideoStageWithHardwareStream({
   const toggleMicrophone = async () => {
     const nextState = !isMicOn;
     setIsMicOn(nextState);
-    if (localMicrophoneTrack) {
+    if (localMicrophoneTrack && connectionState === 'CONNECTED') {
       try {
         await localMicrophoneTrack.setEnabled(nextState);
       } catch (err) {
@@ -546,7 +546,7 @@ function VideoStageWithHardwareStream({
   const toggleCamera = async () => {
     const nextState = !isVideoOn;
     setIsVideoOn(nextState);
-    if (localCameraTrack) {
+    if (localCameraTrack && connectionState === 'CONNECTED') {
       try {
         await localCameraTrack.setEnabled(nextState);
       } catch (err) {
@@ -1110,6 +1110,51 @@ function VideoStageWithHardwareStream({
       onClick={handleStageTap}
       className={`${isFullScreen ? 'fixed inset-0 z-[100] bg-slate-950 rounded-none' : 'relative w-full h-full bg-slate-950 rounded-none md:rounded-[32px] overflow-hidden'} flex flex-col items-center justify-center select-none cursor-pointer`}
     >
+      {/* Top Header Section: Individual Slim Pills */}
+      <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between gap-2 pointer-events-none">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pointer-events-auto max-w-[70%]">
+          {/* Back/Nav Pill */}
+          <button 
+            onClick={(e) => { e.stopPropagation(); onEndCall(); }}
+            className="flex-shrink-0 bg-slate-900/80 backdrop-blur-xl border border-white/10 text-white p-2 rounded-full shadow-2xl hover:bg-slate-800 transition-all active:scale-90"
+          >
+            <ArrowLeft size={16} />
+          </button>
+
+          {/* Session Info Pill */}
+          <div className="flex-shrink-0 bg-slate-900/80 backdrop-blur-xl border border-white/10 px-3 py-1.5 rounded-full shadow-2xl flex items-center gap-2">
+            <UserCircle size={14} className="text-emerald-400" />
+            <span className="text-[11px] font-bold text-white whitespace-nowrap">
+              {isConsultant ? patientName : consultantName}
+            </span>
+          </div>
+
+          {/* Timer Pill */}
+          <div className="flex-shrink-0">
+             <ElapsedTimeOverlay />
+          </div>
+
+          {/* Alert/Status Pill (Optional/Conditional) */}
+          {connectionState !== 'CONNECTED' && (
+             <div className="flex-shrink-0 bg-amber-500/80 backdrop-blur-xl border border-amber-400/20 px-3 py-1.5 rounded-full shadow-2xl flex items-center gap-2">
+               <AlertCircle size={14} className="text-white animate-pulse" />
+               <span className="text-[10px] font-black uppercase tracking-tighter text-white">Reconnecting</span>
+             </div>
+          )}
+        </div>
+
+        {/* Complete/End Action Pill */}
+        <div className="pointer-events-auto">
+          <button
+            onClick={(e) => { e.stopPropagation(); onEndCall(); }}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-1.5 rounded-full shadow-2xl border border-emerald-400/20 flex items-center gap-2 transition-all active:scale-95 group"
+          >
+            <span className="text-[11px] font-black uppercase tracking-widest">Complete</span>
+            <CheckCircle2 size={16} className="group-hover:scale-110 transition-transform" />
+          </button>
+        </div>
+      </div>
+
       {!canPlayAudio && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-40 bg-amber-500/90 border border-amber-300/40 text-slate-950 px-5 py-2 rounded-full shadow-2xl flex items-center gap-3 text-xs font-bold animate-bounce backdrop-blur-md">
           <VolumeX size={18} />
@@ -1143,7 +1188,7 @@ function VideoStageWithHardwareStream({
             <RemoteVideoTrack
               track={activeRemoteVideoTrack}
               play={true}
-              className="w-full h-full object-cover brightness-105 contrast-105"
+              className="w-full h-full object-cover"
               style={{ objectFit: 'cover' }}
             />
           ) : (
@@ -1159,12 +1204,8 @@ function VideoStageWithHardwareStream({
               </p>
             </div>
           )}
-          <div className="hidden md:flex absolute top-16 left-4 bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold text-white items-center gap-2 border border-white/20 z-20">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
-            <span>{isConsultant ? patientName : consultantName}</span>
-          </div>
 
-          {/* Self-View Video (Draggable Bubble) */}
+          {/* Self-View Video (Floating Rounded PiP) */}
           <motion.div 
             drag
             dragConstraints={stageContainerRef}
@@ -1172,9 +1213,9 @@ function VideoStageWithHardwareStream({
             dragMomentum={false}
             onClick={(e: any) => e.stopPropagation()}
             onDoubleClick={(e: any) => { e.stopPropagation(); setIsPipZoomed(!isPipZoomed); }}
-            className={`absolute z-20 ${isPipZoomed ? 'w-40 h-56 sm:w-48 sm:h-64' : 'w-24 h-36 sm:w-32 sm:h-44'} rounded-2xl border-2 border-white/80 overflow-hidden shadow-2xl bg-slate-900 flex items-center justify-center transition-all group cursor-move`}
+            className={`absolute z-20 ${isPipZoomed ? 'w-40 h-56 sm:w-48 sm:h-64' : 'w-24 h-32 sm:w-28 sm:h-40'} rounded-2xl border border-white/20 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-slate-900 flex items-center justify-center transition-all group cursor-move backdrop-blur-xl`}
             title="Self View - Drag to move, Double-tap to zoom"
-            style={{ bottom: 32, right: 32 }}
+            style={{ bottom: 100, right: 20 }}
           >
             {localCameraTrack && isVideoOn ? (
               <LocalVideoTrack
@@ -1200,72 +1241,72 @@ function VideoStageWithHardwareStream({
               </button>
             </div>
 
-            <div className="absolute bottom-1 bg-black/75 backdrop-blur-xs px-2 py-0.5 rounded-full text-[10px] font-bold text-white border border-white/15">
+            <div className="absolute bottom-1 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full text-[9px] font-bold text-white border border-white/10">
               You
             </div>
           </motion.div>
         </div>
       </div>
 
-      {/* Call Controls: Minimal FaceTime-Style Pill-shaped Bar Centered at Bottom Edge */}
+      {/* Call Controls: Slim FaceTime-Style Pill centered at Bottom */}
       <AnimatePresence>
         {showControls && (
           <motion.div
-            initial={{ opacity: 0, y: 50, x: '-50%' }}
+            initial={{ opacity: 0, y: 30, x: '-50%' }}
             animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0, y: 50, x: '-50%' }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            exit={{ opacity: 0, y: 30, x: '-50%' }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
             onClick={(e) => e.stopPropagation()}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 bg-slate-950/85 backdrop-blur-xl px-5 py-3 rounded-full border border-white/10 shadow-2xl"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-slate-900/70 backdrop-blur-2xl px-4 py-2.5 rounded-full border border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
           >
             {/* Mute Microphone */}
             <button
               type="button"
               onClick={toggleMicrophone}
-              className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-md ${
+              className={`w-11 h-11 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-lg ${
                 isMicOn 
-                  ? 'bg-slate-800/90 hover:bg-slate-700 text-white border border-white/10' 
-                  : 'bg-rose-600 text-white shadow-lg shadow-rose-600/30'
+                  ? 'bg-slate-800/80 hover:bg-slate-700 text-white border border-white/5' 
+                  : 'bg-rose-500 text-white shadow-rose-500/20'
               }`}
               title={isMicOn ? 'Mute Microphone' : 'Unmute Microphone'}
             >
-              {isMicOn ? <Mic size={20} /> : <MicOff size={20} />}
+              {isMicOn ? <Mic size={18} /> : <MicOff size={18} />}
             </button>
 
             {/* Camera Off / Video Pause */}
             <button
               type="button"
               onClick={toggleCamera}
-              className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-md ${
+              className={`w-11 h-11 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-lg ${
                 isVideoOn 
-                  ? 'bg-slate-800/90 hover:bg-slate-700 text-white border border-white/10' 
-                  : 'bg-rose-600 text-white shadow-lg shadow-rose-600/30'
+                  ? 'bg-slate-800/80 hover:bg-slate-700 text-white border border-white/5' 
+                  : 'bg-rose-500 text-white shadow-rose-500/20'
               }`}
               title={isVideoOn ? 'Turn Off Camera' : 'Turn On Camera'}
             >
-              {isVideoOn ? <Video size={20} /> : <VideoOff size={20} />}
+              {isVideoOn ? <Video size={18} /> : <VideoOff size={18} />}
             </button>
 
             {/* Camera Flip */}
             <button
               type="button"
               onClick={handleCameraFlip}
-              className="w-12 h-12 rounded-full bg-slate-800/90 hover:bg-slate-700 text-white border border-white/10 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-md"
+              className="w-11 h-11 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white border border-white/5 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-lg"
               title="Camera Flip"
             >
-              <RefreshCw size={20} />
+              <RefreshCw size={18} />
             </button>
 
-            <div className="w-px h-6 bg-white/15 mx-1" />
+            <div className="w-[1px] h-6 bg-white/10 mx-0.5" />
 
-            {/* End Call (Prominent Red Button) */}
+            {/* End Call (Red Button) */}
             <button
               type="button"
               onClick={onEndCall}
-              className="w-12 h-12 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-lg shadow-rose-600/40"
+              className="w-11 h-11 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-[0_0_20px_rgba(225,29,72,0.4)]"
               title={isConsultant ? 'End & Complete Session' : 'End Call'}
             >
-               <Phone className="rotate-[135deg]" size={20} />
+               <Phone className="rotate-[135deg]" size={18} />
             </button>
           </motion.div>
         )}

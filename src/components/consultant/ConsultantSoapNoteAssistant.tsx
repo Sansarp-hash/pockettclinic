@@ -160,59 +160,61 @@ export default function ConsultantSoapNoteAssistant({
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-slate-200/60 space-y-6">
+    <div className="bg-white rounded-[2.5rem] p-6 md:p-10 shadow-xl shadow-slate-200/40 border border-slate-100 space-y-8 animate-in fade-in zoom-in-95 duration-500">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-600 flex items-center justify-center border border-indigo-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 shrink-0">
-            <FileText size={24} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-slate-50">
+        <div className="flex items-center gap-5">
+          <div className="w-16 h-16 rounded-[24px] bg-slate-900 text-white flex items-center justify-center shadow-2xl shadow-slate-900/20 shrink-0">
+            <FileText size={28} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-black text-slate-800 tracking-tight">
-                Clinical SOAP Note & Voice Assistant
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-2xl font-black text-slate-950 tracking-tight uppercase">
+                Clinical Note Pad
               </h3>
-              <span className="text-[10px] font-black uppercase tracking-wider bg-slate-200 text-slate-600 px-2 py-0.5 rounded-md">
-                Fast EMR
-              </span>
+              <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-100">
+                <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[9px] font-black uppercase tracking-widest">Voice Enabled</span>
+              </div>
             </div>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Structured clinical documentation with 1-click disease templates and voice dictation.
+            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">
+              Structured SOAP Documentation
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             onClick={handleCopyNote}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 rounded-xl text-xs font-bold transition-all cursor-pointer"
+            className="flex items-center gap-2 px-5 py-3 bg-slate-50 hover:bg-slate-100 text-slate-900 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 border border-slate-200"
           >
             {copied ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-            <span>{copied ? 'Copied' : 'Copy Formatted'}</span>
+            <span>{copied ? 'Copied' : 'Copy'}</span>
           </button>
 
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 shadow-indigo-600/20 transition-all cursor-pointer"
+            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-600/20 transition-all active:scale-95 disabled:opacity-50"
           >
-            {saveSuccess ? <ShieldCheck size={15} /> : <Save size={15} />}
-            <span>{saveSuccess ? 'Signed & Saved!' : isSaving ? 'Saving...' : 'Save & Sign Note'}</span>
+            {saveSuccess ? <ShieldCheck size={16} /> : <Save size={16} />}
+            <span>{saveSuccess ? 'Finalized' : isSaving ? 'Signing...' : 'Sign & Save'}</span>
           </button>
         </div>
       </div>
 
-      {/* Disease Presets Bar */}
-      <div className="space-y-2">
-        <div className="text-[11px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-          <Sparkles size={13} className="text-amber-500" /> Quick Disease Templates
+      {/* Disease Presets - Modern Pills */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+          <Sparkles size={14} className="text-amber-500" /> 
+          Clinical Presets
         </div>
         <div className="flex flex-wrap gap-2">
           {CONSULTANT_PRESETS.map((preset, idx) => (
             <button
               key={idx}
               onClick={() => applyPreset(preset)}
-              className="px-3 py-1.5 bg-white hover:bg-slate-50 hover:text-slate-600 border border-slate-200 hover:border-slate-300 text-slate-800 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm"
             >
               {preset.name}
             </button>
@@ -220,127 +222,46 @@ export default function ConsultantSoapNoteAssistant({
         </div>
       </div>
 
-      {/* Structured SOAP Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Subjective */}
-        <div className="bg-white/70 p-4 rounded-2xl border border-slate-200 space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded-md bg-emerald-600 text-white flex items-center justify-center text-[10px]">S</span>
-              Subjective (Chief Complaint & HPI)
-            </label>
-            <button
-              type="button"
-              onClick={() => toggleVoiceDictation('S')}
-              className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
-                isDictating && activeDictationField === 'S'
-                  ? 'bg-rose-500 text-slate-600 animate-pulse'
-                  : 'bg-white text-slate-600 hover:text-slate-600 border border-slate-200'
-              }`}
-              title="Voice Dictate"
-            >
-              {isDictating && activeDictationField === 'S' ? <MicOff size={13} /> : <Mic size={13} />}
-              <span className="text-[10px]">{isDictating && activeDictationField === 'S' ? 'Listening...' : 'Dictate'}</span>
-            </button>
+      {/* Structured SOAP Grid - Premium Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {[
+          { label: 'Subjective', id: 'S' as const, field: 'subjective', icon: 'S', color: 'bg-indigo-600', val: subjective, set: setSubjective, placeholder: 'Symptoms, onset, HPI...' },
+          { label: 'Objective', id: 'O' as const, field: 'objective', icon: 'O', color: 'bg-emerald-600', val: objective, set: setObjective, placeholder: 'Vitals, physical exam, labs...' },
+          { label: 'Assessment', id: 'A' as const, field: 'assessment', icon: 'A', color: 'bg-amber-600', val: assessment, set: setAssessment, placeholder: 'Clinical impression, diagnosis...' },
+          { label: 'Plan', id: 'P' as const, field: 'plan', icon: 'P', color: 'bg-rose-600', val: plan, set: setPlan, placeholder: 'Rx, follow-up, advice...' },
+        ].map((item) => (
+          <div key={item.id} className="group bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:border-slate-200 transition-all duration-300 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-xl ${item.color} text-white flex items-center justify-center text-xs font-black shadow-lg`}>
+                  {item.icon}
+                </div>
+                <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                  {item.label}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => toggleVoiceDictation(item.id)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
+                  isDictating && activeDictationField === item.id
+                    ? 'bg-rose-600 text-white animate-pulse'
+                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                }`}
+              >
+                {isDictating && activeDictationField === item.id ? <MicOff size={12} /> : <Mic size={12} />}
+                <span>{isDictating && activeDictationField === item.id ? 'Listening' : 'Voice'}</span>
+              </button>
+            </div>
+            <textarea
+              rows={4}
+              value={item.val}
+              onChange={(e) => item.set(e.target.value)}
+              placeholder={item.placeholder}
+              className="w-full p-4 bg-slate-50 border border-transparent rounded-2xl text-xs font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-bold focus:bg-white focus:border-slate-200 focus:ring-4 focus:ring-slate-100 transition-all outline-none resize-none leading-relaxed"
+            />
           </div>
-          <textarea
-            rows={4}
-            value={subjective}
-            onChange={(e) => setSubjective(e.target.value)}
-            placeholder="Patient's reported symptoms, onset, severity, aggravating/relieving factors..."
-            className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
-          />
-        </div>
-
-        {/* Objective */}
-        <div className="bg-white/70 p-4 rounded-2xl border border-slate-200 space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded-md bg-emerald-600 text-white flex items-center justify-center text-[10px]">O</span>
-              Objective (Vitals, Physical Exam, Labs)
-            </label>
-            <button
-              type="button"
-              onClick={() => toggleVoiceDictation('O')}
-              className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
-                isDictating && activeDictationField === 'O'
-                  ? 'bg-rose-500 text-slate-600 animate-pulse'
-                  : 'bg-white text-slate-600 hover:text-slate-600 border border-slate-200'
-              }`}
-              title="Voice Dictate"
-            >
-              {isDictating && activeDictationField === 'O' ? <MicOff size={13} /> : <Mic size={13} />}
-              <span className="text-[10px]">{isDictating && activeDictationField === 'O' ? 'Listening...' : 'Dictate'}</span>
-            </button>
-          </div>
-          <textarea
-            rows={4}
-            value={objective}
-            onChange={(e) => setObjective(e.target.value)}
-            placeholder="Blood pressure, heart rate, temperature, visual findings, lab tests..."
-            className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
-          />
-        </div>
-
-        {/* Assessment */}
-        <div className="bg-white/70 p-4 rounded-2xl border border-slate-200 space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded-md bg-amber-600 text-slate-600 flex items-center justify-center text-[10px]">A</span>
-              Assessment (Working Diagnosis / ICD-10)
-            </label>
-            <button
-              type="button"
-              onClick={() => toggleVoiceDictation('A')}
-              className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
-                isDictating && activeDictationField === 'A'
-                  ? 'bg-rose-500 text-slate-600 animate-pulse'
-                  : 'bg-white text-slate-600 hover:text-slate-600 border border-slate-200'
-              }`}
-              title="Voice Dictate"
-            >
-              {isDictating && activeDictationField === 'A' ? <MicOff size={13} /> : <Mic size={13} />}
-              <span className="text-[10px]">{isDictating && activeDictationField === 'A' ? 'Listening...' : 'Dictate'}</span>
-            </button>
-          </div>
-          <textarea
-            rows={4}
-            value={assessment}
-            onChange={(e) => setAssessment(e.target.value)}
-            placeholder="Primary clinical impression, differential diagnoses..."
-            className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
-          />
-        </div>
-
-        {/* Plan */}
-        <div className="bg-white/70 p-4 rounded-2xl border border-slate-200 space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded-md bg-emerald-600 text-white flex items-center justify-center text-[10px]">P</span>
-              Plan (Prescriptions, Diagnostics, Patient Advice)
-            </label>
-            <button
-              type="button"
-              onClick={() => toggleVoiceDictation('P')}
-              className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
-                isDictating && activeDictationField === 'P'
-                  ? 'bg-rose-500 text-slate-600 animate-pulse'
-                  : 'bg-white text-slate-600 hover:text-slate-600 border border-slate-200'
-              }`}
-              title="Voice Dictate"
-            >
-              {isDictating && activeDictationField === 'P' ? <MicOff size={13} /> : <Mic size={13} />}
-              <span className="text-[10px]">{isDictating && activeDictationField === 'P' ? 'Listening...' : 'Dictate'}</span>
-            </button>
-          </div>
-          <textarea
-            rows={4}
-            value={plan}
-            onChange={(e) => setPlan(e.target.value)}
-            placeholder="Medication orders, follow-up timeline, red flags and warning signs given..."
-            className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
-          />
-        </div>
+        ))}
       </div>
     </div>
   );

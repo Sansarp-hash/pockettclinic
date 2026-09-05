@@ -21,22 +21,25 @@ export const ChatFollowUpView: React.FC<ChatFollowUpViewProps> = ({
   const currentChatId = activeSession ? ((activeSession as any).id || activeSession.sessionId) : null;
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden min-h-[600px] grid grid-cols-1 md:grid-cols-12">
-        <div className="md:col-span-4 border-r border-slate-200 bg-slate-50/50 flex flex-col">
-          <div className="p-5 border-b border-slate-200 bg-white">
-            <h3 className="font-bold text-slate-950 text-base flex items-center gap-2">
-              <MessageSquare size={18} className="text-indigo-600" />
-              Patient Messages & Follow-ups
-            </h3>
-            <p className="text-xs text-slate-700 mt-1">Direct communication threads for ongoing care and follow-ups.</p>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden min-h-[700px] grid grid-cols-1 md:grid-cols-12">
+        {/* Sidebar: Patient List */}
+        <div className="md:col-span-4 border-r border-slate-50 bg-slate-50/30 flex flex-col">
+          <div className="p-8 border-b border-slate-100 bg-white relative z-10">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <MessageSquare size={20} />
+              </div>
+              <h3 className="text-lg font-black text-slate-950 uppercase tracking-tight">Clinical Comms</h3>
+            </div>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Active Patient Dispatches</p>
           </div>
 
-          <div className="p-3 flex-1 overflow-y-auto space-y-2">
+          <div className="p-6 flex-1 overflow-y-auto no-scrollbar space-y-3 relative z-10">
             {chatSessions.length === 0 ? (
-              <div className="p-8 text-center text-slate-600">
-                <MessageSquare size={32} className="mx-auto mb-2 opacity-30" />
-                <p className="text-xs font-semibold">No patient message threads found.</p>
+              <div className="p-12 text-center text-slate-400">
+                <MessageSquare size={48} className="mx-auto mb-4 opacity-10 stroke-[1.5]" />
+                <p className="text-[11px] font-black uppercase tracking-widest">No Active Threads</p>
               </div>
             ) : (
               chatSessions.map((session) => {
@@ -46,28 +49,33 @@ export const ChatFollowUpView: React.FC<ChatFollowUpViewProps> = ({
                   <button
                     key={sId}
                     onClick={() => setSelectedChatSessionId(sId)}
-                    className={`w-full text-left p-4 rounded-2xl transition-all cursor-pointer border ${
+                    className={`w-full text-left p-6 rounded-[2rem] transition-all duration-300 cursor-pointer border group relative overflow-hidden ${
                       isSelected
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/10'
-                        : 'bg-white hover:bg-slate-100/80 text-slate-900 border-slate-200/80'
+                        ? 'bg-slate-950 border-slate-950 text-white shadow-2xl shadow-slate-950/20 scale-[1.02]'
+                        : 'bg-white hover:bg-slate-100 border-slate-100 text-slate-900 shadow-sm'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`font-bold text-sm truncate ${isSelected ? 'text-white' : 'text-slate-950'}`}>
-                        {session.patientName || 'Patient'}
+                    <div className="flex items-center justify-between mb-2 relative z-10">
+                      <span className={`font-black text-xs uppercase tracking-tight truncate ${isSelected ? 'text-white' : 'text-slate-950 group-hover:text-indigo-600'}`}>
+                        {session.patientName || 'Patient User'}
                       </span>
-                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
-                        isSelected ? 'bg-indigo-700 text-indigo-100' : 'bg-slate-100 text-slate-700'
+                      <span className={`text-[8px] font-black px-2 py-0.5 rounded-lg uppercase tracking-tighter ${
+                        isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'
                       }`}>
                         {session.status || 'ACTIVE'}
                       </span>
                     </div>
-                    <p className={`text-xs truncate ${isSelected ? 'text-indigo-100' : 'text-slate-700'}`}>
-                      {(session as any).chiefComplaint || session.chiefComplaints || (session as any).symptoms || 'General Consultation'}
+                    <p className={`text-[10px] font-bold leading-relaxed truncate relative z-10 ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
+                      {(session as any).chiefComplaint || session.chiefComplaints || (session as any).symptoms || 'Clinical Consultation'}
                     </p>
-                    <div className="mt-2 text-[10px] opacity-75 font-semibold">
-                      {(session as any).createdAt ? new Date((session as any).createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}
+                    <div className={`mt-3 text-[9px] font-black uppercase tracking-widest relative z-10 ${isSelected ? 'text-slate-500' : 'text-slate-400'}`}>
+                      {(session as any).createdAt ? new Date((session as any).createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent Dispatch'}
                     </div>
+
+                    {/* Hover Glow */}
+                    {!isSelected && (
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                    )}
                   </button>
                 );
               })
@@ -75,35 +83,49 @@ export const ChatFollowUpView: React.FC<ChatFollowUpViewProps> = ({
           </div>
         </div>
 
+        {/* Main Content: Chat Window */}
         <div className="md:col-span-8 flex flex-col bg-white">
           {activeSession && currentChatId ? (
-            <div className="flex flex-col h-full min-h-[550px]">
-              <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+            <div className="flex flex-col h-full min-h-[600px]">
+              <div className="p-8 border-b border-slate-50 bg-white flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-slate-950 text-sm">{activeSession.patientName || 'Patient'}</h4>
-                  <p className="text-xs text-slate-700">{(activeSession as any).chiefComplaint || activeSession.chiefComplaints || 'Consultation Follow-up'}</p>
+                  <h4 className="text-xl font-black text-slate-950 uppercase tracking-tight">{activeSession.patientName || 'Patient'}</h4>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">
+                      {(activeSession as any).chiefComplaint || activeSession.chiefComplaints || 'Consultation Follow-up'}
+                    </p>
+                  </div>
                 </div>
-                <span className="text-xs bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-full border border-indigo-100">
-                  Ref: {currentChatId.slice(0, 8)}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-[9px] bg-slate-50 text-slate-500 font-black px-4 py-2 rounded-full border border-slate-100 uppercase tracking-widest">
+                    ID: {currentChatId.slice(0, 8)}
+                  </span>
+                </div>
               </div>
-              <div className="flex-1 p-4 bg-slate-50/30">
-                <ConsultationChat
-                  consultationId={currentChatId}
-                  currentUserId={consultantId}
-                  currentUserRole="consultant"
-                  currentUserName={consultantName}
-                  isCompleted={activeSession.status === 'COMPLETED'}
-                  followUpWindowClosesAt={(activeSession as any).followUpWindowClosesAt}
-                  followUpMessagesRemaining={(activeSession as any).followUpMessagesRemaining || 5}
-                  className="h-full border border-slate-200 rounded-2xl shadow-sm bg-white"
-                />
+              
+              <div className="flex-1 p-8 bg-slate-50/20">
+                <div className="h-full bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-slate-200/20 overflow-hidden relative">
+                  <ConsultationChat
+                    consultationId={currentChatId}
+                    currentUserId={consultantId}
+                    currentUserRole="consultant"
+                    currentUserName={consultantName}
+                    isCompleted={activeSession.status === 'COMPLETED'}
+                    followUpWindowClosesAt={(activeSession as any).followUpWindowClosesAt}
+                    followUpMessagesRemaining={(activeSession as any).followUpMessagesRemaining || 5}
+                    className="h-full border-0"
+                  />
+                </div>
               </div>
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-12 text-slate-600">
-              <MessageSquare size={48} className="mb-4 opacity-20" />
-              <p className="text-sm font-semibold">Select a patient thread from the left to start messaging.</p>
+            <div className="flex-1 flex flex-col items-center justify-center p-24 text-center">
+              <div className="w-24 h-24 rounded-[2.5rem] bg-slate-50 flex items-center justify-center mb-8 border border-slate-50 shadow-inner">
+                <MessageSquare size={48} className="text-slate-200 stroke-[1.2]" />
+              </div>
+              <h4 className="text-sm font-black text-slate-950 uppercase tracking-[0.2em]">Secure Messaging Locked</h4>
+              <p className="text-[11px] text-slate-400 mt-2 font-bold uppercase tracking-tight">Select a patient dispatch from the ledger to begin care.</p>
             </div>
           )}
         </div>

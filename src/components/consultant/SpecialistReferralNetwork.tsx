@@ -146,24 +146,25 @@ export default function SpecialistReferralNetwork({
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-slate-200/60 space-y-6">
+    <div className="bg-white rounded-[2.5rem] p-6 md:p-10 shadow-xl shadow-slate-200/40 border border-slate-100 space-y-10 animate-in fade-in zoom-in-95 duration-500">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 shrink-0">
-            <Share2 size={24} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-slate-50">
+        <div className="flex items-center gap-5">
+          <div className="w-16 h-16 rounded-[24px] bg-sky-600 text-white flex items-center justify-center shadow-2xl shadow-sky-600/20 shrink-0">
+            <Share2 size={28} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-black text-slate-800 tracking-tight">
-                Multi-Consultant Specialist Referral Network
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-2xl font-black text-slate-950 tracking-tight uppercase">
+                Specialist Network
               </h3>
-              <span className="text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 px-2 py-0.5 rounded-md">
-                Inter-Disciplinary
-              </span>
+              <div className="flex items-center gap-1.5 bg-sky-50 text-sky-700 px-2 py-0.5 rounded-full border border-sky-100">
+                <div className="w-1 h-1 rounded-full bg-sky-500 animate-pulse" />
+                <span className="text-[9px] font-black uppercase tracking-widest">Global Directory</span>
+              </div>
             </div>
-            <p className="text-xs text-slate-600 mt-0.5">
-              1-Click clinical referrals, second opinions, and case handovers to verified platform specialists.
+            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">
+              Inter-Disciplinary Case Handovers
             </p>
           </div>
         </div>
@@ -173,51 +174,56 @@ export default function SpecialistReferralNetwork({
             setSelectedSpecialist(SPECIALIST_DIRECTORY[0]);
             setIsReferModalOpen(true);
           }}
-          className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-slate-600 px-5 py-2.5 rounded-2xl text-xs font-black shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 shadow-sky-600/20 transition-all cursor-pointer"
+          className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-slate-900/20 transition-all active:scale-95"
         >
           <Plus size={16} />
-          <span>New Specialist Referral</span>
+          <span>New Referral</span>
         </button>
       </div>
 
-      {/* Specialist Directory Carousel / Grid */}
-      <div className="space-y-3">
-        <div className="text-[11px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-          <Stethoscope size={13} className="text-sky-600" /> Available On-Call Specialists in Ghana
+      {/* Specialist Directory - Premium Grid */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+          <Stethoscope size={14} className="text-sky-500" /> 
+          On-Call Specialists
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {SPECIALIST_DIRECTORY.map(spec => (
-            <div key={spec.id} className="p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-sky-300 hover:shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 transition-all space-y-2">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-800 flex items-center justify-center font-black text-sm">
+            <div key={spec.id} className="group p-6 rounded-[2rem] border border-slate-100 bg-white hover:border-sky-200 hover:shadow-2xl hover:shadow-sky-100/40 transition-all duration-500 space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 text-slate-950 flex items-center justify-center font-black text-sm group-hover:bg-sky-600 group-hover:text-white group-hover:border-sky-600 transition-all">
                     {spec.name.split(' ')[1]?.[0] || 'D'}
                   </div>
                   <div>
-                    <h5 className="font-black text-slate-800 text-xs">{formatConsultantName(spec.name, spec.prefix)}</h5>
-                    <span className="text-[11px] font-bold text-sky-700">{spec.specialty}</span>
+                    <h5 className="font-black text-slate-950 text-[13px] uppercase tracking-tight">{formatConsultantName(spec.name, spec.prefix)}</h5>
+                    <span className="text-[10px] font-black text-sky-600 uppercase tracking-widest">{spec.specialty}</span>
                   </div>
                 </div>
                 {spec.isOnline && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Online" />
+                  <div className="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100">
+                    <div className="w-1 h-1 rounded-full bg-emerald-500" />
+                    <span className="text-[8px] font-black uppercase tracking-widest">Online</span>
+                  </div>
                 )}
               </div>
 
-              <div className="text-[11px] text-slate-600 font-medium">
-                🏥 {spec.hospital}
+              <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-2 leading-relaxed">
+                <div className="w-1 h-1 rounded-full bg-slate-200" />
+                {spec.hospital}
               </div>
 
-              <div className="pt-2 flex items-center justify-between border-t border-slate-200/60">
-                <span className="text-[10px] font-bold text-slate-500">PIN: {spec.pin}</span>
+              <div className="pt-4 flex items-center justify-between border-t border-slate-50">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em]">{spec.pin}</span>
                 <button
                   onClick={() => {
                     setSelectedSpecialist(spec);
                     setIsReferModalOpen(true);
                   }}
-                  className="inline-flex items-center gap-1 text-sky-600 hover:text-sky-800 font-black text-xs cursor-pointer"
+                  className="flex items-center gap-1 text-slate-950 hover:text-sky-600 font-black text-[10px] uppercase tracking-widest transition-colors group-hover:translate-x-1 duration-300"
                 >
-                  <span>Refer Case</span>
-                  <ArrowRight size={12} />
+                  <span>Refer</span>
+                  <ArrowRight size={14} />
                 </button>
               </div>
             </div>
@@ -225,53 +231,63 @@ export default function SpecialistReferralNetwork({
         </div>
       </div>
 
-      {/* Referral Log Table */}
-      <div className="space-y-3 pt-3">
-        <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-          <Clock size={14} className="text-slate-600" /> Outgoing & Incoming Clinical Referrals
-        </h4>
+      {/* Referral Log Table - Premium Styling */}
+      <div className="space-y-6 pt-4">
+        <div className="flex items-center justify-between">
+          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+            <Clock size={14} className="text-slate-400" /> Activity Log
+          </h4>
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Showing last {referrals.length} cases</span>
+        </div>
 
         {referrals.length === 0 ? (
-          <div className="p-6 text-center text-xs text-slate-500 bg-white rounded-2xl border border-slate-200">
-            No clinical referrals initiated yet.
+          <div className="p-12 text-center bg-slate-50 rounded-[2.5rem] border border-slate-100 border-dashed">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">No clinical referrals documented</p>
           </div>
         ) : (
-          <div className="overflow-x-auto border border-slate-200 rounded-2xl">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-white text-slate-600 font-bold border-b border-slate-200">
+          <div className="overflow-hidden bg-white border border-slate-100 rounded-[2.5rem] shadow-sm">
+            <table className="w-full text-left">
+              <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100">
                 <tr>
-                  <th className="p-3">Patient & Specialty</th>
-                  <th className="p-3">Target Specialist</th>
-                  <th className="p-3">Urgency & Reason</th>
-                  <th className="p-3">Status</th>
+                  <th className="px-8 py-5">Patient & Context</th>
+                  <th className="px-8 py-5">Recipient</th>
+                  <th className="px-8 py-5">Clinical Priority</th>
+                  <th className="px-8 py-5">Outcome</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-50">
                 {referrals.map(ref => (
-                  <tr key={ref.referralId} className="hover:bg-white/80">
-                    <td className="p-3 font-medium">
-                      <div className="font-bold text-slate-800">{ref.patientName} ({ref.patientAge}y, {ref.patientGender})</div>
-                      <span className="text-[11px] font-bold text-sky-700">{ref.targetSpecialty}</span>
+                  <tr key={ref.referralId} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-8 py-6">
+                      <div className="font-black text-slate-950 text-xs uppercase tracking-tight mb-1">{ref.patientName}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-black text-sky-600 uppercase tracking-widest">{ref.targetSpecialty}</span>
+                        <span className="text-[9px] font-bold text-slate-400">({ref.patientAge}y, {ref.patientGender})</span>
+                      </div>
                     </td>
-                    <td className="p-3">
-                      <div className="font-bold text-slate-800">{formatConsultantName(ref.targetConsultantName, ref.targetConsultantPrefix)}</div>
-                      <span className="text-[11px] text-slate-500">{new Date(ref.createdAt).toLocaleDateString()}</span>
+                    <td className="px-8 py-6">
+                      <div className="font-black text-slate-950 text-[11px] uppercase tracking-tight mb-1">
+                        {formatConsultantName(ref.targetConsultantName, ref.targetConsultantPrefix)}
+                      </div>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{new Date(ref.createdAt).toLocaleDateString()}</span>
                     </td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded ${
-                          ref.urgency === 'EMERGENCY' ? 'bg-rose-100 text-rose-800' : ref.urgency === 'URGENT' ? 'bg-amber-100 text-amber-800' : 'bg-white text-slate-800'
+                    <td className="px-8 py-6">
+                      <div className="flex flex-col gap-1.5">
+                        <span className={`w-fit text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
+                          ref.urgency === 'EMERGENCY' ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/20' : 
+                          ref.urgency === 'URGENT' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 
+                          'bg-slate-100 text-slate-600'
                         }`}>
                           {ref.urgency}
                         </span>
+                        <p className="text-[10px] font-bold text-slate-500 lowercase first-letter:uppercase line-clamp-1 italic">"{ref.reasonForReferral}"</p>
                       </div>
-                      <p className="text-[11px] text-slate-600 line-clamp-1">{ref.reasonForReferral}</p>
                     </td>
-                    <td className="p-3">
-                      <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
-                        ref.status === 'ACCEPTED' ? 'bg-emerald-100 text-emerald-800' : 'bg-sky-100 text-sky-800'
+                    <td className="px-8 py-6">
+                      <span className={`inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${
+                        ref.status === 'ACCEPTED' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-slate-100 text-slate-500'
                       }`}>
-                        {ref.status === 'ACCEPTED' ? <CheckCircle2 size={11} /> : <Clock size={11} />}
+                        {ref.status === 'ACCEPTED' ? <CheckCircle2 size={12} /> : <Clock size={12} />}
                         <span>{ref.status}</span>
                       </span>
                     </td>

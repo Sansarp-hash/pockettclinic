@@ -151,24 +151,25 @@ export default function FollowUpScheduler({
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-slate-200/60 space-y-6">
+    <div className="bg-white rounded-[2.5rem] p-6 md:p-10 shadow-xl shadow-slate-200/40 border border-slate-100 space-y-10 animate-in fade-in zoom-in-95 duration-500">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 shrink-0">
-            <Calendar size={24} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-slate-50">
+        <div className="flex items-center gap-5">
+          <div className="w-16 h-16 rounded-[24px] bg-teal-600 text-white flex items-center justify-center shadow-2xl shadow-teal-600/20 shrink-0">
+            <Calendar size={28} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-black text-slate-800 tracking-tight">
-                Automated Follow-Up & Continuity Care Scheduler
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-2xl font-black text-slate-950 tracking-tight uppercase">
+                Care Continuity
               </h3>
-              <span className="text-[10px] font-black uppercase tracking-wider bg-teal-100 text-teal-800 px-2 py-0.5 rounded-md">
-                Patient Retention
-              </span>
+              <div className="flex items-center gap-1.5 bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full border border-teal-100">
+                <div className="w-1 h-1 rounded-full bg-teal-500 animate-pulse" />
+                <span className="text-[9px] font-black uppercase tracking-widest">Auto-Reminders</span>
+              </div>
             </div>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Set post-consultation recovery checkpoints with automated SMS & in-app alerts for patients.
+            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">
+              Automated Patient Recall Scheduler
             </p>
           </div>
         </div>
@@ -178,17 +179,18 @@ export default function FollowUpScheduler({
             setTargetPatientName(patientName);
             setIsScheduleModalOpen(true);
           }}
-          className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-slate-600 px-5 py-2.5 rounded-2xl text-xs font-black shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 shadow-teal-600/20 transition-all cursor-pointer"
+          className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-slate-900/20 transition-all active:scale-95"
         >
           <Plus size={16} />
-          <span>Schedule Follow-Up</span>
+          <span>New Follow-Up</span>
         </button>
       </div>
 
-      {/* Preset Quick Actions */}
-      <div className="space-y-2">
-        <div className="text-[11px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-          <Sparkles size={13} className="text-teal-600" /> Standard Clinical Recall Intervals
+      {/* Preset Quick Actions - Modern Pills */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+          <Sparkles size={14} className="text-teal-500" /> 
+          Recall Presets
         </div>
         <div className="flex flex-wrap gap-2">
           {INTERVAL_PRESETS.map((preset, idx) => (
@@ -198,7 +200,7 @@ export default function FollowUpScheduler({
                 handleApplyPreset(preset);
                 setIsScheduleModalOpen(true);
               }}
-              className="px-3.5 py-1.5 bg-white hover:bg-teal-50 hover:text-teal-800 border border-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              className="px-4 py-2 bg-white hover:bg-teal-50 text-slate-700 border border-slate-200 rounded-full text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm"
             >
               {preset.label}
             </button>
@@ -206,61 +208,66 @@ export default function FollowUpScheduler({
         </div>
       </div>
 
-      {/* Follow-up Queue */}
-      <div className="space-y-3 pt-2">
+      {/* Follow-up Queue - Premium Grid */}
+      <div className="space-y-6 pt-4">
         <div className="flex items-center justify-between">
-          <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-            <Clock size={14} className="text-slate-600" /> Upcoming Scheduled Patient Follow-ups
+          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+            <Clock size={14} className="text-slate-400" /> Upcoming Checkpoints
           </h4>
-          <span className="text-xs text-slate-500 font-bold">{followUps.filter(f => f.status === 'SCHEDULED').length} Active</span>
+          <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full">
+            {followUps.filter(f => f.status === 'SCHEDULED').length} Pending
+          </span>
         </div>
 
         {followUps.length === 0 ? (
-          <div className="p-6 text-center text-xs text-slate-500 bg-white rounded-2xl border border-slate-200">
-            No active follow-ups scheduled.
+          <div className="p-12 text-center bg-slate-50 rounded-[2.5rem] border border-slate-100 border-dashed">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">No scheduled continuity recalls</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {followUps.map(fu => (
               <div 
                 key={fu.followUpId} 
-                className={`p-4 rounded-2xl border transition-all ${
+                className={`group p-6 rounded-[2.5rem] border transition-all duration-500 ${
                   fu.status === 'COMPLETED' 
-                    ? 'bg-slate-50 border-slate-200 opacity-70' 
-                    : 'bg-white border-teal-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300'
+                    ? 'bg-slate-50 border-slate-100 opacity-60' 
+                    : 'bg-white border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-teal-100/40 hover:border-teal-200'
                 }`}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <span className="font-black text-slate-800 text-xs">{fu.patientName}</span>
-                    <div className="text-[11px] text-teal-700 font-bold flex items-center gap-1 mt-0.5">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="space-y-1">
+                    <span className="font-black text-slate-950 text-[13px] uppercase tracking-tight block">{fu.patientName}</span>
+                    <div className="flex items-center gap-2 text-[10px] font-black text-teal-600 uppercase tracking-widest">
                       <Calendar size={12} />
-                      <span>{new Date(fu.scheduledDate).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      <span>{new Date(fu.scheduledDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                     </div>
                   </div>
 
-                  <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
-                    fu.status === 'COMPLETED' ? 'bg-slate-50 text-slate-800' : 'bg-teal-100 text-teal-800'
+                  <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
+                    fu.status === 'COMPLETED' ? 'bg-slate-200 text-slate-600' : 'bg-teal-100 text-teal-700'
                   }`}>
                     {fu.status}
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-600 font-medium mt-2 bg-white p-2.5 rounded-xl border border-slate-200">
-                  {fu.reason}
-                </p>
+                <div className="p-4 bg-slate-50 rounded-2xl border border-transparent group-hover:bg-white group-hover:border-slate-100 transition-all">
+                  <p className="text-[11px] font-bold text-slate-600 leading-relaxed italic">
+                    "{fu.reason}"
+                  </p>
+                </div>
 
-                <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between text-xs">
-                  <span className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
-                    <Bell size={12} className="text-emerald-500" /> Auto-SMS alert active
-                  </span>
+                <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Bell size={12} className="text-emerald-500" />
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">SMS Alert Active</span>
+                  </div>
 
                   {fu.status === 'SCHEDULED' && (
                     <button
                       onClick={() => handleMarkComplete(fu)}
-                      className="px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-800 font-black rounded-lg text-[11px] transition-colors"
+                      className="px-4 py-2 bg-slate-900 hover:bg-teal-600 text-white font-black rounded-xl text-[9px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-slate-900/10"
                     >
-                      ✓ Mark Completed
+                      Complete
                     </button>
                   )}
                 </div>

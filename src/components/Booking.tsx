@@ -430,6 +430,18 @@ export default function Booking() {
     e.preventDefault();
     setFormError(null);
 
+    if (mode === 'instant') {
+      const targetConsultantId = consultantId && !isInstantCadre ? consultantId : null;
+      const isTargetOnline = targetConsultantId 
+        ? consultants.some(c => (c.uid || c.id) === targetConsultantId && c.isOnline)
+        : consultants.some(c => normalizeCadre(c.cadre) === normalizeCadre(effectiveCadre) && c.isOnline);
+      
+      if (!isTargetOnline) {
+        setFormError(`The requested consultant or cadre is currently offline for instant calls. Please return to the dashboard and select an available online consultant.`);
+        return;
+      }
+    }
+
     if (!agreedVideoAudio || !agreedChat || !agreedRecording || !agreedNonEmergency) {
       setFormError("Please toggle YES to all consultation & recording agreements to proceed to payment.");
       return;

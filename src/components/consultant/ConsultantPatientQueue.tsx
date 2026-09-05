@@ -65,57 +65,66 @@ export const ConsultantPatientQueue: React.FC<ConsultantPatientQueueProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 overflow-hidden">
-      <div className="p-6 border-b border-slate-200 bg-white">
-        <h3 className="text-lg font-black tracking-tight text-slate-800">Current Queue</h3>
+    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+      <div className="p-8 md:p-10 border-b border-slate-50 bg-white flex items-center justify-between">
+        <div>
+          <h3 className="text-xl font-black tracking-tight text-slate-950 uppercase">Patient Queue</h3>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Live Consultation Management</p>
+        </div>
+        <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">System Active</span>
+        </div>
       </div>
       {isLoading ? (
         <TableSkeleton />
       ) : consultations.length === 0 ? (
-        <div className="p-20 text-center flex flex-col items-center">
-          <Calendar size={48} className="text-slate-500 mb-4" />
-          <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">No Active Consultations</p>
+        <div className="p-24 text-center flex flex-col items-center">
+          <div className="w-16 h-16 rounded-[24px] bg-slate-50 flex items-center justify-center text-slate-300 mb-6 border border-slate-100">
+            <Calendar size={32} />
+          </div>
+          <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-xs">Queue is currently empty</p>
         </div>
       ) : (
-        <ul className="divide-y divide-slate-100">
+        <ul className="divide-y divide-slate-50">
           {consultations.map(c => (
-            <li key={c.sessionId} className="p-4 md:p-6 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 border-b border-slate-100 last:border-0">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-50 rounded-xl md:rounded-2xl flex items-center justify-center text-slate-600 shrink-0 border border-slate-100">
-                  <UserCircle size={20} className="md:w-6 md:h-6" />
+            <li key={c.sessionId} className="p-6 md:p-10 hover:bg-slate-50/50 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-10">
+              <div className="flex items-center gap-6">
+                <div className="w-14 h-14 bg-slate-100 rounded-[20px] flex items-center justify-center text-slate-950 shrink-0 border border-slate-200">
+                  <UserCircle size={28} />
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="font-bold text-slate-800 text-sm md:text-base truncate">{c.patientName}</h4>
+                  <div className="flex items-center gap-3 flex-wrap mb-2">
+                    <h4 className="font-black text-slate-950 text-base uppercase tracking-tight truncate">{c.patientName}</h4>
                     {c.dispatchStatus === 'ringing' && (
-                      <span className="bg-rose-600 text-white text-[9px] md:text-[10px] font-black px-2 py-0.5 rounded-full animate-pulse uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                      <span className="bg-rose-600 text-white text-[8px] font-black px-2.5 py-1 rounded-full animate-pulse uppercase tracking-widest flex items-center gap-1.5 shadow-lg shadow-rose-600/20">
                         <PhoneCall size={10} /> Ringing
                       </span>
                     )}
                     {c.status === 'PENDING' ? (
-                      <span className="bg-amber-100 text-amber-700 text-[9px] md:text-[10px] font-black px-2 py-0.5 rounded-full uppercase flex items-center gap-1">
+                      <span className="bg-amber-100 text-amber-700 text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest flex items-center gap-1.5 border border-amber-200">
                         <Clock size={10} /> Unpaid
                       </span>
                     ) : c.status !== 'CANCELLED' ? (
-                      <span className="bg-emerald-100 text-emerald-700 text-[9px] md:text-[10px] font-black px-2 py-0.5 rounded-full uppercase flex items-center gap-1">
+                      <span className="bg-emerald-50 text-emerald-700 text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest flex items-center gap-1.5 border border-emerald-100">
                         <CheckCircle2 size={10} /> Paid
                       </span>
                     ) : null}
                   </div>
-                  <div className="flex gap-3 text-[10px] md:text-xs text-slate-500 mt-1 font-bold items-center flex-wrap uppercase tracking-tighter md:tracking-normal">
-                    <span className="flex items-center gap-1"><Calendar size={12}/> {c.scheduledAt ? new Date(c.scheduledAt).toLocaleDateString() : 'Today'}</span>
-                    <span className="flex items-center gap-1"><Clock size={12}/> {c.scheduledAt ? new Date(c.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}</span>
+                  <div className="flex gap-4 text-[10px] text-slate-400 font-black uppercase tracking-[0.1em] items-center flex-wrap">
+                    <span className="flex items-center gap-1.5"><Calendar size={12}/> {c.scheduledAt ? new Date(c.scheduledAt).toLocaleDateString() : 'Today'}</span>
+                    <span className="flex items-center gap-1.5"><Clock size={12}/> {c.scheduledAt ? new Date(c.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}</span>
                   </div>
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 w-full md:w-auto">
+              <div className="flex items-center gap-3 w-full md:w-auto">
                 <button
                   onClick={() => onOpenHistory({ id: c.patientId, name: c.patientName })}
-                  className="p-2.5 md:p-3 bg-white text-slate-600 rounded-xl hover:bg-slate-50 transition-colors border border-slate-200 shadow-sm"
+                  className="p-4 bg-white text-slate-600 rounded-2xl hover:bg-slate-50 transition-all border border-slate-200 shadow-sm hover:shadow-md"
                   title="Patient History"
                 >
-                  <FileText size={16} className="md:w-[18px] md:h-[18px]" />
+                  <FileText size={20} />
                 </button>
                 
                 {((c.dispatchStatus === 'ringing' || c.dispatchStatus === 're-routing' || c.dispatchStatus === 'escalated') && 
@@ -124,33 +133,33 @@ export const ConsultantPatientQueue: React.FC<ConsultantPatientQueueProps> = ({
                   c.dispatchStatus !== 'accepted') ? (
                   <button 
                     onClick={() => handleAcceptBroadcastNatively(c.sessionId)}
-                    className="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95"
+                    className="flex-1 md:flex-none bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 rounded-[1.25rem] font-black text-[10px] uppercase tracking-[0.15em] shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2.5 transition-all active:scale-95"
                   >
-                    <CheckSquare size={14} className="md:w-4 md:h-4" /> 
-                    <span>{c.assignedConsultantId ? 'Accept Consultation' : 'Accept Broadcast'}</span>
+                    <CheckSquare size={16} /> 
+                    <span>{c.assignedConsultantId ? 'Accept' : 'Accept Broadcast'}</span>
                   </button>
                 ) : (c.assignedConsultantId === currentConsultantId && (c.status === 'IN_PROGRESS' || c.status === 'ACTIVE' || c.dispatchStatus === 'accepted')) && (
                   <button 
                     onClick={() => onJoinSession(c.sessionId)}
                     disabled={isPendingReview}
-                    className="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all active:scale-95"
+                    className="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white px-8 py-4 rounded-[1.25rem] font-black text-[10px] uppercase tracking-[0.15em] shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-2.5 transition-all active:scale-95"
                   >
-                    <Video size={14} className="md:w-4 md:h-4" />
-                    <span>Join Room</span>
+                    <Video size={16} />
+                    <span>Enter Room</span>
                   </button>
                 )}
                 
                 {(c.status === 'PAID' || c.status === 'PENDING') && (c.consultantId === currentConsultantId || c.assignedConsultantId === currentConsultantId || !c.assignedConsultantId) && (c.dispatchStatus === 'ringing' || c.dispatchStatus === 're-routing' || c.dispatchStatus === 'escalated' || !c.dispatchStatus) && (
                   <button 
                     onClick={() => handleDeclineNatively(c.sessionId)}
-                    className="p-2.5 md:p-3 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-colors border border-rose-100 shadow-sm cursor-pointer"
+                    className="p-4 bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 rounded-2xl transition-all border border-rose-100 shadow-sm active:scale-95 cursor-pointer"
                     title="Decline & Forward"
                   >
-                    <XCircle size={16} className="md:w-[18px] md:h-[18px]" />
+                    <XCircle size={20} />
                   </button>
                 )}
                 {c.status === 'COMPLETED' && (
-                  <span className="text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-emerald-200">Session Complete</span>
+                  <span className="text-emerald-700 bg-emerald-50 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-emerald-100">Session Complete</span>
                 )}
               </div>
             </li>
@@ -158,6 +167,7 @@ export const ConsultantPatientQueue: React.FC<ConsultantPatientQueueProps> = ({
         </ul>
       )}
     </div>
+
   );
 };
 

@@ -1003,6 +1003,39 @@ async function startServer() {
     }
   });
 
+  app.post("/api/ai/parse-cv", verifyAuth, aiLimiter, async (req: any, res: any) => {
+    try {
+      const { cvBase64, mimeType = "application/pdf" } = req.body;
+      if (!cvBase64) return res.status(400).json({ error: "Missing CV data" });
+
+      const cleanBase64 = cvBase64.replace(/^data:.*?;base64,/, "");
+      
+      const prompt = `You are a medical career consultant. I will provide you with a CV/Resume (either as text or an image/document). 
+      Your task is to:
+      1. Analyze the professional background, clinical experience, education, and achievements.
+      2. Generate a professional, high-impact clinical "Professional Bio" written in the third person.
+      3. Format the bio in clean Markdown.
+      4. Focus on clinical expertise, years of experience, specialized skills, and patient care philosophy.
+      5. The output should be ready to be used in a professional medical portfolio.
+      6. Limit the bio to approximately 250-300 words.
+
+      Return ONLY the bio text in Markdown format. No other commentary.`;
+
+      const response = await generateContentWithFallback({
+        preferredModel: "gemini-3.7-flash",
+        contents: [
+          prompt,
+          { inlineData: { data: cleanBase64, mimeType } }
+        ]
+      });
+
+      res.json({ result: response.text?.trim() });
+    } catch (err: any) {
+      console.error("[CV Parsing Error]:", err);
+      res.status(500).json({ error: "Failed to parse CV and generate bio" });
+    }
+  });
+
   app.post("/api/ai/transcript-summary", verifyAuth, aiLimiter, async (req: any, res: any) => {
     try {
       const { transcript, chiefComplaints, clinicalNotes } = req.body;

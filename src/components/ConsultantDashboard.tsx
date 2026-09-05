@@ -81,7 +81,12 @@ export default function ConsultantDashboard({
   );
 
   const activeDashboardTab = (searchParams.get('tab') || 'appointments') as any;
+  const [prevTab, setPrevTab] = useState('appointments');
+  
   const setActiveDashboardTab = (tab: string) => {
+    if (activeDashboardTab !== 'notifications' && activeDashboardTab !== 'more') {
+      setPrevTab(activeDashboardTab);
+    }
     setSearchParams({ tab });
   };
   
@@ -99,6 +104,7 @@ export default function ConsultantDashboard({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loadingNotifs, setLoadingNotifs] = useState(true);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!db) {
@@ -191,6 +197,24 @@ export default function ConsultantDashboard({
       setIsAffirmationModalOpen(true);
     }
   }, [userUid, independentContractorAffirmed, isVerified, verificationStatus, isAdminView]);
+
+  useEffect(() => {
+    if (!isAdminView && user?.uid && (user?.role === 'consultant' || !!user?.cadre)) {
+      const handleUnload = () => {
+        // Attempt to go offline when closing tab
+        const userRef = doc(db, 'users', user.uid);
+        updateDoc(userRef, { isOnline: false }).catch(() => {});
+      };
+
+      window.addEventListener('beforeunload', handleUnload);
+      return () => {
+        window.removeEventListener('beforeunload', handleUnload);
+        // Also update on unmount (navigation)
+        const userRef = doc(db, 'users', user.uid);
+        updateDoc(userRef, { isOnline: false }).catch(() => {});
+      };
+    }
+  }, [user?.uid, user?.role, user?.cadre, isAdminView]);
 
   const handleAffirmStatus = async () => {
     if (!user) return;
@@ -506,63 +530,68 @@ export default function ConsultantDashboard({
             unreadCount={unreadCount}
           />
           
-          <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-            {/* Mobile Navigation Header & Tab Bar */}
-            <div className="md:hidden bg-white border-b border-slate-200 p-3 sticky top-0 z-30 shadow-xs flex flex-col gap-2">
-              <div className="flex items-center justify-between px-1">
-                <span className="text-xs font-black text-slate-950 uppercase tracking-tight">Consultant Workspace</span>
-                <div className="flex items-center gap-3">
-                  <NetworkSyncIndicator compact={true} />
-                  <button 
-                    onClick={() => setIsProfileModalOpen(true)}
-                    className="p-1.5 text-slate-600 hover:text-slate-900 transition-colors"
-                  >
-                    <Settings size={18} />
-                  </button>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+          <div className="flex-1 flex flex-col min-w-0 h-screen md:h-auto overflow-hidden relative">
+            <div className="flex-1 overflow-y-auto no-scrollbar pb-24 md:pb-0">
+              <main className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+                
+                {/* Mobile Sub-page Back Button */}
+                {!['appointments', 'queue', 'chat', 'payout-hub', 'notifications', 'more'].includes(activeDashboardTab) && (
+                  <div className="md:hidden flex items-center mb-2">
+                    <button
+                      onClick={() => setActiveDashboardTab('more')}
+                      className="flex items-center gap-2 text-slate-500 font-black uppercase tracking-widest text-[9px] active:scale-95 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm"
+                    >
+                      <ArrowLeft size={12} />
+                      Back to Hub
+                    </button>
+                  </div>
+                )}
+            
+            {/* Native Mobile Bottom Navigation Bar */}
+            <div className="md:hidden fixed bottom-6 left-4 right-4 z-50">
+              <div className="bg-slate-950/90 backdrop-blur-2xl border border-white/10 rounded-[28px] p-2 shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center justify-around">
                 {[
-                  { id: 'appointments', label: 'Dashboard', icon: LayoutDashboard },
-                  { id: 'queue', label: 'Patient Queue', icon: Users },
-                  { id: 'notifications', label: 'Notifications', icon: Bell },
-                  { id: 'stg-reference', label: 'Ghana STG & Medscape', icon: BookOpen },
-                  { id: 'soap', label: 'SOAP Notes & Voice', icon: FileText },
-                  { id: 'drug-safety', label: 'Drug Safety Checker', icon: ShieldAlert },
-                  { id: 'referrals', label: 'Specialist Referrals', icon: Share2 },
-                  { id: 'follow-ups', label: 'Follow-up Scheduler', icon: CalendarCheck },
-                  { id: 'payout-hub', label: 'Earnings and Payout', icon: Landmark },
-                  { id: 'schedule', label: 'Schedule', icon: Clock },
-                  { id: 'chat', label: 'Follow-up Chat', icon: MessageSquare },
-                  { id: 'portfolio', label: 'Professional Portfolio', icon: UserCircle },
-                  { id: 'feedback', label: 'Feedback', icon: Star },
-                  { id: 'subscription', label: 'Subscription', icon: ShieldCheck },
-                  { id: 'signout', label: 'Sign Out', icon: LogOut },
+                  { id: 'appointments', label: 'Home', icon: LayoutDashboard },
+                  { id: 'queue', label: 'Queue', icon: Users },
+                  { id: 'chat', label: 'Chat', icon: MessageSquare },
+                  { id: 'payout-hub', label: 'Wallet', icon: Landmark },
+                  { id: 'more', label: 'More', icon: Settings },
                 ].map((tab) => {
                   const Icon = tab.icon;
-                  const isActive = activeDashboardTab === tab.id;
+                  const isActive = tab.id === 'more' 
+                    ? !['appointments', 'queue', 'chat', 'payout-hub', 'notifications'].includes(activeDashboardTab)
+                    : activeDashboardTab === tab.id;
+                  
                   return (
                     <button
                       key={tab.id}
                       onClick={() => {
-                        if (tab.id === 'signout') {
-                          logout();
+                        if (tab.id === 'more') {
+                          setIsMoreMenuOpen(!isMoreMenuOpen);
                         } else {
                           setActiveDashboardTab(tab.id);
+                          setIsMoreMenuOpen(false);
                         }
                       }}
-                      className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 border cursor-pointer ${
-                        isActive
-                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                          : tab.id === 'signout'
-                          ? 'bg-red-50 text-red-700 border-red-200'
-                          : 'bg-slate-50 text-slate-900 border-slate-200 hover:bg-slate-100'
+                      className={`relative flex flex-col items-center gap-1 py-2 px-3 rounded-2xl transition-all active:scale-90 ${
+                        isActive ? 'text-emerald-400' : 'text-slate-400 hover:text-slate-200'
                       }`}
                     >
-                      <Icon size={14} className={isActive ? 'text-white' : tab.id === 'signout' ? 'text-red-500' : 'text-slate-700'} />
-                      <span>{tab.label.toUpperCase()}</span>
-                      {tab.id === 'notifications' && unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+                      <Icon size={20} className={isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'} />
+                      <span className={`text-[10px] font-black uppercase tracking-tighter ${isActive ? 'opacity-100' : 'opacity-60'}`}>
+                        {tab.label}
+                      </span>
+                      {isActive && !isMoreMenuOpen && (
+                        <motion.div 
+                          layoutId="nav-active"
+                          className="absolute -bottom-1 w-1 h-1 bg-emerald-400 rounded-full"
+                        />
+                      )}
+                      {tab.id === 'more' && isMoreMenuOpen && (
+                        <motion.div 
+                          layoutId="nav-active"
+                          className="absolute -bottom-1 w-1 h-1 bg-emerald-400 rounded-full"
+                        />
                       )}
                     </button>
                   );
@@ -570,8 +599,6 @@ export default function ConsultantDashboard({
               </div>
             </div>
 
-            <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
-            
             {/* Pending Review Banner */}
             {isPendingReview && (
               <div className="bg-amber-500 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-xl shadow-amber-500/20 relative overflow-hidden">
@@ -670,58 +697,155 @@ export default function ConsultantDashboard({
               </div>
             )}
 
-            {/* Dashboard Header */}
-            <div className={`flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 ${isPendingReview ? 'opacity-50 pointer-events-none hidden' : ''}`}>
+            {/* Mobile Header: Deep Emerald Banner */}
+            <div className="md:hidden bg-[#0A3B24] -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 mb-6 pt-6 pb-6 px-6 rounded-b-[40px] shadow-2xl relative overflow-hidden">
+              {/* Branding and Action Row */}
+              <div className="relative z-20 flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center p-2 border border-white/10 shadow-inner">
+                    <Activity size={20} className="text-emerald-400" />
+                  </div>
+                  <div>
+                    <h1 className="text-lg font-black text-white tracking-tight leading-none uppercase">
+                      PockettClinic
+                    </h1>
+                    <p className="text-[8px] font-bold text-emerald-400 uppercase tracking-[0.15em] mt-1">
+                      Your Digital Health Anywhere
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => {
+                      if (activeDashboardTab === 'notifications') {
+                        setActiveDashboardTab(prevTab || 'appointments');
+                      } else {
+                        setActiveDashboardTab('notifications');
+                      }
+                    }}
+                    className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white active:scale-90 transition-all border border-white/10 relative"
+                  >
+                    <Bell size={16} />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full border border-[#0A3B24]" />
+                    )}
+                  </button>
+                  <button 
+                    onClick={() => setIsProfileModalOpen(true)}
+                    className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white active:scale-90 transition-all border border-white/10"
+                  >
+                    <Settings size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Status Row */}
+              <div className="relative z-10 flex items-center gap-2 flex-wrap">
+                <h2 className="text-xs font-black text-white tracking-tight whitespace-nowrap">
+                  {user?.fullName?.split(' ')[0] || 'Consultant'}
+                </h2>
+                <div className="flex items-center gap-1.5 bg-black/20 backdrop-blur-md p-1 pr-2 rounded-full border border-white/5 shadow-sm">
+                  <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 shadow-sm">
+                    <CheckCircle2 size={10} className="text-white" />
+                  </div>
+                  <span className="font-mono text-[8px] font-bold text-emerald-100 px-1 whitespace-nowrap opacity-80">
+                    {formatMemberId(user)}
+                  </span>
+                  
+                  {/* Tiny Pause Sync Indicator (Integrated) */}
+                  <div className="flex gap-0.5 px-1 items-center border-l border-white/10 ml-0.5">
+                    <div className="w-0.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                    <div className="w-0.5 h-1.5 bg-emerald-400 rounded-full animate-pulse delay-75" />
+                  </div>
+
+                  <button
+                    id="consultant-online-toggle"
+                    onClick={async () => {
+                      const currentId = effectiveUser?.uid || effectiveUser?.id;
+                      if (!currentId) return;
+
+                      if (!isAdminView && !user?.independentContractorAffirmed) {
+                        setIsAffirmationModalOpen(true);
+                        return;
+                      }
+
+                      try {
+                        const newStatus = !isOnline;
+                        if (!isAdminView || isConsultantThemselves) {
+                          await updateUserProfile({ isOnline: newStatus });
+                        } else {
+                          await updateDoc(doc(db, 'users', currentId), { isOnline: newStatus });
+                        }
+                        showToast(`You are now ${newStatus ? 'Online' : 'Offline'}.`, newStatus ? 'success' : 'info');
+                      } catch (err) {
+                        console.error("Error toggling online status:", err);
+                        showToast("Failed to update status. Please try again.", "error");
+                      }
+                    }}
+                    className={`px-2.5 py-1 rounded-full font-black text-[7px] uppercase tracking-widest transition-all flex items-center gap-1 border shadow-sm cursor-pointer whitespace-nowrap ${
+                      isOnline
+                        ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-600'
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600'
+                    }`}
+                  >
+                    {isOnline ? <Wifi size={9} /> : <WifiOff size={9} />}
+                    <span>{isOnline ? 'Off' : 'On'}</span>
+                  </button>
+                </div>
+              </div>
+              
+              {/* Abstract Background Effect */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-3xl" />
+            </div>
+
+            {/* Desktop Header */}
+            <div className={`hidden md:flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 ${isPendingReview ? 'opacity-50 pointer-events-none hidden' : ''}`}>
               <div className="flex items-center gap-3 flex-wrap">
                 <h2 className="text-xl md:text-2xl font-black text-slate-950 tracking-tight whitespace-nowrap">
                   {user?.fullName?.split(' ')[0] || 'Consultant'} Workspace
                 </h2>
-                <span className="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md shadow-xs whitespace-nowrap">
-                  ID: {formatMemberId(user)}
-                </span>
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-emerald-50 text-emerald-700 border-emerald-200 whitespace-nowrap`}>
-                  <CheckCircle2 size={12} className="text-emerald-500" />
-                  Verified
-                </span>
-              </div>
-              
-              <div className="flex items-center gap-3 flex-wrap">
-                <button
-                  id="consultant-online-toggle"
-                  onClick={async () => {
-                    const currentId = effectiveUser?.uid || effectiveUser?.id;
-                    if (!currentId) return;
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md shadow-xs whitespace-nowrap">
+                    ID: {formatMemberId(user)}
+                  </span>
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-emerald-50 text-emerald-700 border-emerald-200 whitespace-nowrap`}>
+                    <CheckCircle2 size={12} className="text-emerald-500" />
+                    Verified
+                  </span>
+                  <button
+                    onClick={async () => {
+                      const currentId = effectiveUser?.uid || effectiveUser?.id;
+                      if (!currentId) return;
 
-                    // If not admin view, check for affirmation
-                    if (!isAdminView && !user?.independentContractorAffirmed) {
-                      setIsAffirmationModalOpen(true);
-                      return;
-                    }
-
-                    try {
-                      const newStatus = !isOnline;
-                      if (!isAdminView || isConsultantThemselves) {
-                        // Consultants update themselves via context (or admin viewing themselves)
-                        await updateUserProfile({ isOnline: newStatus });
-                      } else {
-                        // Admins update the target consultant directly
-                        await updateDoc(doc(db, 'users', currentId), { isOnline: newStatus });
+                      if (!isAdminView && !user?.independentContractorAffirmed) {
+                        setIsAffirmationModalOpen(true);
+                        return;
                       }
-                      showToast(`You are now ${newStatus ? 'Online' : 'Offline'}.`, newStatus ? 'success' : 'info');
-                    } catch (err) {
-                      console.error("Error toggling online status:", err);
-                      showToast("Failed to update status. Please try again.", "error");
-                    }
-                  }}
-                  className={`px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 border shadow-sm cursor-pointer whitespace-nowrap ${
-                    isOnline
-                      ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-600'
-                      : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600'
-                  }`}
-                >
-                  {isOnline ? <Wifi size={16} /> : <WifiOff size={16} />}
-                  <span>{isOnline ? 'Go Offline' : 'Go Online'}</span>
-                </button>
+
+                      try {
+                        const newStatus = !isOnline;
+                        if (!isAdminView || isConsultantThemselves) {
+                          await updateUserProfile({ isOnline: newStatus });
+                        } else {
+                          await updateDoc(doc(db, 'users', currentId), { isOnline: newStatus });
+                        }
+                        showToast(`You are now ${newStatus ? 'Online' : 'Offline'}.`, newStatus ? 'success' : 'info');
+                      } catch (err) {
+                        console.error("Error toggling online status:", err);
+                        showToast("Failed to update status. Please try again.", "error");
+                      }
+                    }}
+                    className={`px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 border shadow-sm cursor-pointer whitespace-nowrap ${
+                      isOnline
+                        ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-600'
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600'
+                    }`}
+                  >
+                    {isOnline ? <Wifi size={16} /> : <WifiOff size={16} />}
+                    <span>{isOnline ? 'Go Offline' : 'Go Online'}</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -747,6 +871,94 @@ export default function ConsultantDashboard({
                 </button>
               </div>
             )}
+
+            {/* More Menu Drawer */}
+            <AnimatePresence>
+              {isMoreMenuOpen && (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setIsMoreMenuOpen(false)}
+                    className="md:hidden fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-[45]"
+                  />
+                  <motion.div
+                    initial={{ y: '100%' }}
+                    animate={{ y: 0 }}
+                    exit={{ y: '100%' }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                    className="md:hidden fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] z-[46] shadow-[0_-20px_50px_rgba(0,0,0,0.2)] max-h-[85vh] overflow-y-auto no-scrollbar border-t border-slate-100 pb-32"
+                  >
+                    <div className="sticky top-0 bg-white/80 backdrop-blur-md px-10 py-8 border-b border-slate-50 flex items-center justify-between z-10">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-slate-950 text-white flex items-center justify-center shadow-2xl shadow-slate-950/20">
+                          <Settings size={24} />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-black text-slate-950 tracking-tight uppercase">Feature Hub</h3>
+                          <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Professional Suite</p>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => setIsMoreMenuOpen(false)}
+                        className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors border border-slate-100"
+                      >
+                        <LogOut size={16} className="rotate-90" />
+                      </button>
+                    </div>
+
+                    <div className="p-8 grid grid-cols-2 gap-4 pb-48">
+                      {[
+                        { id: 'notifications', label: 'Dispatch', icon: Bell, desc: 'Alerts & News' },
+                        { id: 'stg-reference', label: 'STG Guides', icon: BookOpen, desc: 'Ghana Clinical STG' },
+                        { id: 'soap', label: 'SOAP Notes', icon: FileText, desc: 'Voice Documentation' },
+                        { id: 'drug-safety', label: 'Safety Check', icon: ShieldAlert, desc: 'Drug Interaction' },
+                        { id: 'referrals', label: 'Referrals', icon: Share2, desc: 'Specialist Network' },
+                        { id: 'follow-ups', label: 'Scheduler', icon: CalendarCheck, desc: 'Patient Recall' },
+                        { id: 'schedule', label: 'Availability', icon: Clock, desc: 'Consulting Hours' },
+                        { id: 'portfolio', label: 'Portfolio', icon: UserCircle, desc: 'Profile & Credentials' },
+                        { id: 'feedback', label: 'Feedback', icon: Star, desc: 'Patient Ratings' },
+                        { id: 'subscription', label: 'Account', icon: ShieldCheck, desc: 'Tier & Membership' },
+                        { id: 'signout', label: 'Exit Vault', icon: LogOut, desc: 'Secure Sign Out', color: 'bg-rose-50 border-rose-100 text-rose-600' },
+                      ].map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => {
+                              if (item.id === 'signout') {
+                                if (window.confirm('Are you sure you want to sign out?')) {
+                                  logout().then(() => navigate('/'));
+                                }
+                              } else {
+                                setActiveDashboardTab(item.id);
+                                setIsMoreMenuOpen(false);
+                              }
+                            }}
+                            className={`flex flex-col items-start p-6 rounded-[2rem] border transition-all active:scale-95 text-left h-full group ${
+                              item.color || 'bg-white border-slate-100 shadow-xl shadow-slate-200/20'
+                            }`}
+                          >
+                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${
+                              item.color ? 'bg-rose-100' : 'bg-slate-50 group-hover:bg-slate-950 group-hover:text-white'
+                            }`}>
+                              <Icon size={20} className={item.color ? 'text-rose-600' : 'text-slate-500 group-hover:text-white'} />
+                            </div>
+                            <span className="text-[11px] font-black text-slate-950 uppercase tracking-tight leading-none mb-1 group-hover:text-emerald-600 transition-colors">
+                              {item.label}
+                            </span>
+                            <span className="text-[9px] text-slate-400 font-bold leading-tight line-clamp-1 uppercase tracking-tighter">
+                              {item.desc}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
 
             {activeDashboardTab === 'notifications' && (
               <NotificationsCenter
@@ -901,6 +1113,7 @@ export default function ConsultantDashboard({
           
           </div>
         </div>
+      </div>
 
       {/* Shared Modals for Desktop and Mobile */}
       <UploadIndemnityModal 

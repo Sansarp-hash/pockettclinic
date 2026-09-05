@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { doc, setDoc, getDocs, query, collection, where } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db, auth } from '../../firebase';
 import { useAppContext } from '../../AppContext';
 import { 
   CADRE_CONFIGS, 
@@ -14,8 +14,16 @@ import { formatConsultantName } from '../../lib/formatters';
 import { 
   UserCircle, ShieldCheck, Loader2, Award, BookOpen, Calendar, 
   FileCheck, Stethoscope, CheckCircle2, 
-  AlertTriangle, Upload, Search, Building2
+  AlertTriangle, Upload, Search, Building2,
+  Plus, Trash2, FileUp
 } from 'lucide-react';
+
+interface EducationEntry {
+  institution: string;
+  degree: string;
+  year: string;
+  status: 'Complete' | 'Ongoing';
+}
 
 interface ConsultantProfileEditorProps {
   user: any;
@@ -93,7 +101,17 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
   const [degreeCertificateFile, setDegreeCertificateFile] = useState<string | null>(user?.mdcLicenseProofUrl || null);
   const degreeCertInputRef = useRef<HTMLInputElement>(null);
   const [educationHistory, setEducationHistory] = useState<string>(user?.educationHistory || '');
+  const [educationEntries, setEducationEntries] = useState<EducationEntry[]>(
+    user?.educationEntries || [
+      { institution: '', degree: '', year: '', status: 'Complete' }
+    ]
+  );
   const [bio, setBio] = useState<string>(user?.bio || '');
+  const [customLanguage, setCustomLanguage] = useState('');
+  const [customService, setCustomService] = useState('');
+  const [isParsingCV, setIsParsingCV] = useState(false);
+  const [cvFile, setCvFile] = useState<string | null>(user?.cvUrl || null);
+  const cvInputRef = useRef<HTMLInputElement>(null);
   const [pastWorkHistory, setPastWorkHistory] = useState<string>(user?.pastWorkHistory || '');
   const [isVerifyingPin, setIsVerifyingPin] = useState(false);
   const [pinLookupSuccess, setPinLookupSuccess] = useState('');
@@ -150,6 +168,9 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
       setQualification(user.qualification || (Array.isArray(user.degrees) ? user.degrees.join(', ') : user.degrees || ''));
       setDegreeCertificateFile(user.mdcLicenseProofUrl || null);
       setEducationHistory(user.educationHistory || '');
+      setEducationEntries(user.educationEntries || [
+        { institution: '', degree: '', year: '', status: 'Complete' }
+      ]);
       setBio(user.bio || '');
       setPastWorkHistory(user.pastWorkHistory || '');
       
@@ -311,6 +332,79 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
   const hasMissingDocs = isDegreeMissing || isIndemnityMissing || isPinMissing || isGhanaCardMissing;
 
   // Save Complete Portfolio Handler
+  const handleAddCustomLanguage = () => {
+    if (customLanguage.trim()) {
+      if (!languages.includes(customLanguage.trim())) {
+        setLanguages([...languages, customLanguage.trim()]);
+      }
+      setCustomLanguage('');
+    }
+  };
+
+  const handleAddEducation = () => {
+    setEducationEntries([
+      ...educationEntries,
+      { institution: '', degree: '', year: '', status: 'Complete' }
+    ]);
+  };
+
+  const handleRemoveEducation = (index: number) => {
+    const updated = [...educationEntries];
+    updated.splice(index, 1);
+    setEducationEntries(updated);
+  };
+
+  const handleEducationChange = (index: number, field: keyof EducationEntry, value: string) => {
+    const updated = [...educationEntries];
+    updated[index] = { ...updated[index], [field]: value };
+    setEducationEntries(updated);
+  };
+
+  const handleAddCustomService = () => {
+    if (customService.trim()) {
+      if (!scopeOfServices.includes(customService.trim())) {
+        setScopeOfServices([...scopeOfServices, customService.trim()]);
+      }
+      setCustomService('');
+    }
+  };
+
+  const handleCVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setCvFile(base64);
+        parseCV(base64, file.type);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const parseCV = async (base64: string, mimeType: string) => {
+    setIsParsingCV(true);
+    try {
+      const idToken = await auth.currentUser?.getIdToken();
+      const response = await fetch('/api/ai/parse-cv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ cvBase64: base64, mimeType })
+      });
+      const data = await response.json();
+      if (data.result) {
+        setBio(data.result);
+      }
+    } catch (err) {
+      console.error("Error parsing CV:", err);
+    } finally {
+      setIsParsingCV(false);
+    }
+  };
+
   const handleSaveCompletePortfolio = async () => {
     setIsSaving(true);
     try {
@@ -335,7 +429,9 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
         qualification,
         degrees: degreesArray,
         mdcLicenseProofUrl: degreeCertificateFile,
+        cvUrl: cvFile,
         educationHistory,
+        educationEntries,
         bio,
         pastWorkHistory,
 
@@ -386,230 +482,248 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
   };
 
   return (
-    <div className={`bg-white md:rounded-3xl border border-slate-200 md:shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 ${isEditingPortfolio ? 'fixed inset-0 z-[100] md:relative md:inset-auto md:z-auto overflow-y-auto' : 'relative'}`}>
+    <div className={`bg-white md:rounded-[2.5rem] border border-slate-100 md:shadow-2xl md:shadow-slate-200/40 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 ${isEditingPortfolio ? 'fixed inset-0 z-[100] md:relative md:inset-auto md:z-auto overflow-y-auto' : 'relative'}`}>
       
       {/* Dashboard Section Header */}
-      <div className="sticky top-0 z-30 p-4 md:p-6 border-b border-slate-100 bg-white/95 backdrop-blur-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-[#0A3B24] flex items-center justify-center font-bold">
-            <UserCircle size={24} />
+      <div className="sticky top-0 z-30 p-6 md:p-10 border-b border-slate-50 bg-white/95 backdrop-blur-xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-sm">
+        <div className="flex items-center gap-5">
+          <div className="w-16 h-16 rounded-[24px] bg-slate-900 text-white flex items-center justify-center shadow-2xl shadow-slate-900/20 shrink-0">
+            <UserCircle size={32} />
           </div>
           <div>
-            <h3 className="text-base font-black text-slate-800 uppercase tracking-wide">Professional Portfolio</h3>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">
-              Council Compliance & Specialty Scope
+            <h3 className="text-2xl font-black text-slate-950 uppercase tracking-tight">Professional Portfolio</h3>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">
+              Credentialing & Specialty Scope
             </p>
           </div>
         </div>
         <button
           onClick={() => setIsEditingPortfolio(!isEditingPortfolio)}
-          className={`w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer ${
+          className={`w-full sm:w-auto px-8 py-4 rounded-[1.25rem] text-[10px] font-black uppercase tracking-[0.15em] transition-all active:scale-95 shadow-xl ${
             isEditingPortfolio 
-              ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200' 
-              : 'bg-emerald-50 text-[#0A3B24] hover:bg-emerald-100 border border-emerald-200'
+              ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100 shadow-rose-600/10' 
+              : 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/20'
           }`}
         >
-          {isEditingPortfolio ? 'Cancel Editing' : 'Edit Full Portfolio'}
+          {isEditingPortfolio ? 'Exit Editor' : 'Edit Portfolio'}
         </button>
       </div>
 
       {/* Missing Documents Alert Box */}
       {hasMissingDocs && !isEditingPortfolio && (
-        <div className="m-4 md:m-6 p-4 md:p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="text-amber-600 shrink-0 mt-0.5" size={20} />
+        <div className="m-6 md:m-10 p-8 rounded-[2rem] bg-amber-50 border border-amber-100 text-amber-900 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm shrink-0 mt-0.5">
+              <AlertTriangle className="text-amber-600" size={24} />
+            </div>
             <div>
-              <h4 className="text-xs font-black uppercase tracking-wider text-amber-950">Action Required: Complete Professional Portfolio</h4>
-              <p className="text-[11px] md:text-xs text-amber-800 mt-1 leading-relaxed">
-                Your profile is missing key compliance documents:
-                <span className="font-bold block sm:inline mt-1 sm:mt-0">
-                  {isDegreeMissing ? ' [Degree Certificate]' : ''}
-                  {isIndemnityMissing ? ' [Indemnity Insurance]' : ''}
-                  {isPinMissing ? ' [Council PIN]' : ''}
-                  {isGhanaCardMissing ? ' [Ghana Card No.]' : ''}
+              <h4 className="text-xs font-black uppercase tracking-[0.15em] text-amber-950">Pending Credentials</h4>
+              <p className="text-[11px] md:text-xs text-amber-800/80 mt-1.5 leading-relaxed font-bold uppercase tracking-tight">
+                Missing compliance files:
+                <span className="text-amber-600 ml-1">
+                  {isDegreeMissing ? '[Degree Certificate] ' : ''}
+                  {isIndemnityMissing ? '[Indemnity Proof] ' : ''}
+                  {isPinMissing ? '[Council PIN] ' : ''}
+                  {isGhanaCardMissing ? '[Ghana Card] ' : ''}
                 </span> 
-                Upload them to accelerate your face-to-face admin verification.
               </p>
             </div>
           </div>
           <button
             onClick={() => setIsEditingPortfolio(true)}
-            className="w-full md:w-auto px-4 py-3 md:py-2 bg-amber-600 text-white font-bold text-xs rounded-xl hover:bg-amber-700 transition-all shrink-0 cursor-pointer shadow-sm uppercase tracking-widest"
+            className="w-full md:w-auto px-6 py-3 bg-amber-600 text-white font-black text-[10px] rounded-xl hover:bg-amber-700 transition-all shrink-0 cursor-pointer shadow-lg shadow-amber-600/20 uppercase tracking-widest"
           >
-            Upload Documents Now
+            Update Now
           </button>
         </div>
       )}
 
-      <div className={`p-4 md:p-8 ${isEditingPortfolio ? 'pb-24 md:pb-8' : ''}`}>
+      <div className={`p-6 md:p-12 ${isEditingPortfolio ? 'pb-24 md:pb-12' : ''}`}>
         {!isEditingPortfolio ? (
           /* ================= VIEW PORTFOLIO MODE ================= */
-          <div className="space-y-6 md:space-y-8">
+          <div className="space-y-10 md:space-y-12">
             {/* Master Cadre Header Card */}
-            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
+            <div className="bg-slate-50 p-8 md:p-12 rounded-[3rem] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-8">
+              <div className="flex items-center gap-6">
                 {profilePhoto ? (
                   <img 
                     src={profilePhoto} 
                     alt={fullName} 
                     onError={() => setProfilePhoto(null)} 
-                    className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-600 shadow-sm" 
+                    className="w-24 h-24 rounded-[32px] object-cover border-4 border-white shadow-2xl" 
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-[#0A3B24] text-white flex items-center justify-center font-black text-xl">
+                  <div className="w-24 h-24 rounded-[32px] bg-slate-900 text-white flex items-center justify-center font-black text-3xl shadow-2xl">
                     {prefix.replace('.', '')}
                   </div>
                 )}
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-black text-slate-900">{formatConsultantName(fullName, prefix)}</h3>
-                    <span className="text-[10px] bg-emerald-100 text-[#0A3B24] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-2xl font-black text-slate-950 uppercase tracking-tight">{formatConsultantName(fullName, prefix)}</h3>
+                    <div className="bg-emerald-50 text-emerald-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-[0.15em] border border-emerald-100 flex items-center gap-1.5">
+                      <div className="w-1 h-1 rounded-full bg-emerald-500" />
                       {cadreConfig.label}
-                    </span>
+                    </div>
                   </div>
-                  <p className="text-xs text-slate-500 font-semibold mt-1 flex items-center gap-2">
-                    <Building2 size={13} className="text-slate-400" />
-                    {institution || 'Primary Clinical Facility Not Specified'}
+                  <p className="text-[11px] text-slate-500 font-black uppercase tracking-[0.1em] flex items-center gap-2">
+                    <Building2 size={14} className="text-slate-400" />
+                    {institution || 'Facility Not Documented'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-col items-start md:items-end gap-1">
-                <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider">{cadreConfig.governingCouncil}</span>
-                <span className="text-xs font-black text-slate-800 bg-white px-3 py-1 rounded-xl border border-slate-200 shadow-xs">
-                  PIN: {pin || 'NOT DECLARED'}
-                </span>
+              <div className="flex flex-col items-start md:items-end gap-2">
+                <span className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">{cadreConfig.governingCouncil}</span>
+                <div className="flex items-center gap-3 bg-white px-5 py-2.5 rounded-2xl border border-slate-100 shadow-sm">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">PIN</span>
+                  <span className="text-xs font-black text-slate-950 uppercase tracking-widest">{pin || 'UNVERIFIED'}</span>
+                </div>
               </div>
             </div>
 
             {/* Section I: Bio & Qualifications */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-2 space-y-3">
-                <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-                  <BookOpen size={16} className="text-[#0A3B24]" />
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Professional Bio</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              <div className="md:col-span-2 space-y-4">
+                <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  <BookOpen size={16} className="text-slate-900" />
+                  Professional Summary
                 </div>
-                <p className="text-sm text-slate-700 leading-relaxed font-medium bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-                  {bio || 'No bio specified. Click "Edit Full Portfolio" to add your clinical summary.'}
-                </p>
+                <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm leading-relaxed text-slate-600 text-[13px] font-bold italic">
+                  "{bio || 'Clinical profile summary pending update.'}"
+                </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-                  <Award size={16} className="text-[#0A3B24]" />
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Highest Qualification</h4>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  <Award size={16} className="text-slate-900" />
+                  Credentials
                 </div>
-                <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-                  <p className="text-xs font-black text-[#0A3B24] uppercase tracking-wider">{qualification || 'Not Specified'}</p>
+                <div className="bg-slate-900 p-8 rounded-[2rem] shadow-xl shadow-slate-900/10 border border-slate-950 space-y-4">
+                  <div>
+                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Academic Rank</span>
+                    <p className="text-xs font-black text-white uppercase tracking-wider">{qualification || 'Generalist'}</p>
+                  </div>
                   {cadre === 'PHARMACIST' && (
-                    <span className="text-[9px] bg-blue-50 text-blue-800 font-bold px-2 py-0.5 rounded-md border border-blue-200 inline-block mt-2">
-                      Track: {pharmacistDegreeTrack || 'B_PHARM'} {degreeVerified ? '(PharmD Registry Verified)' : ''}
-                    </span>
+                    <div className="pt-4 border-t border-slate-800">
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">PharmD Track</span>
+                      <span className="text-[10px] text-emerald-400 font-black uppercase tracking-widest">
+                        {pharmacistDegreeTrack || 'B_PHARM'} {degreeVerified ? '• Registry Match' : ''}
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>
             </div>
 
             {/* Section II: Compliance & Insurance */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-slate-100">
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
-                <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Ghana Card No.</span>
-                <p className="text-xs font-bold text-slate-900">{ghanaCardNo || 'Not Entered'}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-10 border-t border-slate-50">
+              <div className="group p-6 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2">Ghana Card</span>
+                <p className="text-[11px] font-black text-slate-950 uppercase tracking-widest">{ghanaCardNo || 'PENDING'}</p>
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
-                <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Indemnity Policy No.</span>
-                <p className="text-xs font-bold text-slate-900">{indemnityPolicyNo || 'None'}</p>
-                <span className="text-[9px] text-slate-500 font-semibold block">{insuranceProvider}</span>
+              <div className="group p-6 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2">Indemnity Policy</span>
+                <p className="text-[11px] font-black text-slate-950 uppercase tracking-widest mb-1">{indemnityPolicyNo || 'NONE'}</p>
+                <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest block">{insuranceProvider}</span>
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
-                <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Indemnity Expiry</span>
-                <p className="text-xs font-bold text-slate-900">{expiryDate || 'N/A'}</p>
+              <div className="group p-6 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2">Insurance Expiry</span>
+                <p className="text-[11px] font-black text-slate-950 uppercase tracking-widest">{expiryDate || 'N/A'}</p>
                 {provideLater && (
-                  <span className="text-[8px] bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-black uppercase">
-                    Provide Later Waiver Active
+                  <span className="mt-2 text-[8px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-amber-100 inline-block">
+                    Liability Waiver Active
                   </span>
                 )}
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
-                <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Availability Window</span>
-                <p className="text-xs font-bold text-slate-900">{availabilityDays}</p>
-                <span className="text-[9px] text-slate-500 font-semibold block">{availabilityHours}</span>
+              <div className="group p-6 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2">Availability</span>
+                <p className="text-[11px] font-black text-slate-950 uppercase tracking-widest mb-1">{availabilityDays}</p>
+                <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest block">{availabilityHours}</span>
               </div>
             </div>
 
             {/* Section III: Document Certificates */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-              <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <FileCheck className="text-[#0A3B24]" size={20} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-50">
+              <div className="p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100 flex items-center justify-between group hover:bg-white hover:shadow-2xl hover:shadow-slate-200/40 transition-all duration-500">
+                <div className="flex items-center gap-5">
+                  <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-sm group-hover:bg-slate-950 group-hover:text-white transition-all">
+                    <FileCheck size={24} />
+                  </div>
                   <div>
-                    <h5 className="text-xs font-black text-slate-900 uppercase">Degree Certificate</h5>
-                    <p className="text-[10px] text-slate-500">{degreeCertificateFile ? 'Uploaded on file' : 'No document attached'}</p>
+                    <h5 className="text-[11px] font-black text-slate-950 uppercase tracking-widest">Degree Certificate</h5>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{degreeCertificateFile ? 'Verified on File' : 'Missing File'}</p>
                   </div>
                 </div>
                 {degreeCertificateFile && (
-                  <a href={degreeCertificateFile} target="_blank" rel="noreferrer" className="text-xs font-black text-[#0A3B24] hover:underline">
-                    View Doc
+                  <a href={degreeCertificateFile} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-950 hover:text-white hover:border-slate-950 transition-all">
+                    <Search size={16} />
                   </a>
                 )}
               </div>
 
-              <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <ShieldCheck className="text-[#0A3B24]" size={20} />
+              <div className="p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100 flex items-center justify-between group hover:bg-white hover:shadow-2xl hover:shadow-slate-200/40 transition-all duration-500">
+                <div className="flex items-center gap-5">
+                  <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-sm group-hover:bg-slate-950 group-hover:text-white transition-all">
+                    <ShieldCheck size={24} />
+                  </div>
                   <div>
-                    <h5 className="text-xs font-black text-slate-900 uppercase">Indemnity Insurance Doc</h5>
-                    <p className="text-[10px] text-slate-500">{indemnityDocData ? 'Uploaded on file' : provideLater ? 'Postponed (Waiver Accepted)' : 'Missing'}</p>
+                    <h5 className="text-[11px] font-black text-slate-950 uppercase tracking-widest">Indemnity Insurance</h5>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{indemnityDocData ? 'Policy Verified' : provideLater ? 'Waiver Documented' : 'Action Required'}</p>
                   </div>
                 </div>
                 {indemnityDocData && (
-                  <a href={indemnityDocData} target="_blank" rel="noreferrer" className="text-xs font-black text-[#0A3B24] hover:underline">
-                    View Doc
+                  <a href={indemnityDocData} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-950 hover:text-white hover:border-slate-950 transition-all">
+                    <Search size={16} />
                   </a>
                 )}
               </div>
             </div>
 
             {/* Section IV: Languages & Scope */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
-              <div className="space-y-2">
-                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Spoken Languages</h5>
-                <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-10 border-t border-slate-50">
+              <div className="space-y-6">
+                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Spoken Languages</h5>
+                <div className="flex flex-wrap gap-2.5">
                   {languages.map((l, i) => (
-                    <span key={i} className="px-3 py-1 rounded-lg bg-slate-100 text-slate-800 text-xs font-bold">
+                    <span key={i} className="px-5 py-2 rounded-xl bg-slate-50 text-slate-950 text-[10px] font-black uppercase tracking-widest border border-slate-100">
                       {l}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Scope of Clinical Practice</h5>
-                <div className="flex flex-wrap gap-2">
+              <div className="space-y-6">
+                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Clinical Scope</h5>
+                <div className="flex flex-wrap gap-2.5">
                   {scopeOfServices.length > 0 ? (
                     scopeOfServices.map((s, i) => (
-                      <span key={i} className="px-3 py-1 rounded-lg bg-emerald-100 text-[#0A3B24] text-xs font-bold border border-emerald-200">
+                      <span key={i} className="px-5 py-2 rounded-xl bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest border border-emerald-100">
                         {s}
                       </span>
                     ))
                   ) : (
-                    <span className="text-xs text-slate-400 italic">General Clinical Scope</span>
+                    <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest italic">Full Medical Capacity</span>
                   )}
                 </div>
               </div>
             </div>
 
             {/* Section V: Legal Affirmations */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-4 text-xs font-bold text-slate-700">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="text-emerald-600" size={16} />
-                <span>Legal Terms & Contractor Agreement Affirmed</span>
+            <div className="p-8 rounded-[2.5rem] bg-slate-950 text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl shadow-slate-900/40">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10">
+                  <CheckCircle2 className="text-emerald-400" size={24} />
+                </div>
+                <div>
+                  <h5 className="text-xs font-black uppercase tracking-widest">Affirmed Contractor Status</h5>
+                  <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1">Legal Liability & Indemnity Agreement Signed</p>
+                </div>
               </div>
-              <div className="text-[10px] text-slate-500 uppercase tracking-wider font-mono">
-                Signature: <span className="text-slate-900 font-bold">{typedLegalSignature || fullName}</span>
+              <div className="px-6 py-3 bg-white/5 rounded-2xl border border-white/10 text-[10px] font-black uppercase tracking-[0.2em]">
+                Digital Signature: <span className="text-emerald-400 ml-2">{typedLegalSignature || fullName}</span>
               </div>
             </div>
           </div>
@@ -797,6 +911,33 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
                       </button>
                     );
                   })}
+                  {languages.filter(l => !ALL_LANGUAGES.includes(l)).map((lang, idx) => (
+                    <button
+                      key={`custom-${idx}`}
+                      type="button"
+                      onClick={() => toggleLanguage(lang)}
+                      className="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border bg-[#0A3B24] text-white border-[#0A3B24]"
+                    >
+                      {lang}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 mt-3">
+                  <input
+                    type="text"
+                    value={customLanguage}
+                    onChange={(e) => setCustomLanguage(e.target.value)}
+                    placeholder="Add other language..."
+                    className="flex-1 p-2 rounded-xl bg-white border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-emerald-600 outline-none"
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCustomLanguage())}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomLanguage}
+                    className="p-2 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 transition-colors"
+                  >
+                    <Plus size={16} />
+                  </button>
                 </div>
               </div>
             </div>
@@ -854,54 +995,156 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
                 </div>
               </div>
 
-              {/* Degree Cert Upload */}
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Degree Certificate Document</label>
-                <div className="flex items-center gap-3">
-                  <input 
-                    type="file" 
-                    ref={degreeCertInputRef}
-                    onChange={handleDegreeCertUpload}
-                    accept="image/*,application/pdf"
-                    className="hidden" 
-                  />
-                  <button
-                    type="button"
-                    onClick={() => degreeCertInputRef.current?.click()}
-                    className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold hover:bg-slate-100 transition-all flex items-center gap-2 cursor-pointer"
-                  >
-                    <Upload size={14} />
-                    {degreeCertificateFile ? 'Replace Degree Document' : 'Upload Degree Certificate'}
-                  </button>
-                  {degreeCertificateFile && (
-                    <span className="text-xs text-emerald-700 font-bold flex items-center gap-1">
-                      <CheckCircle2 size={14} /> Document Attached
-                    </span>
-                  )}
+              {/* Degree & CV Upload */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Degree Certificate Document</label>
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="file" 
+                      ref={degreeCertInputRef}
+                      onChange={handleDegreeCertUpload}
+                      accept="image/*,application/pdf"
+                      className="hidden" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => degreeCertInputRef.current?.click()}
+                      className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold hover:bg-slate-100 transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      <Upload size={14} />
+                      {degreeCertificateFile ? 'Replace Degree Document' : 'Upload Degree Certificate'}
+                    </button>
+                    {degreeCertificateFile && (
+                      <span className="text-xs text-emerald-700 font-bold flex items-center gap-1">
+                        <CheckCircle2 size={14} /> Attached
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Curriculum Vitae (CV)</label>
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="file" 
+                      ref={cvInputRef}
+                      onChange={handleCVUpload}
+                      accept="image/*,application/pdf"
+                      className="hidden" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => cvInputRef.current?.click()}
+                      className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold hover:bg-slate-100 transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      <FileUp size={14} />
+                      {cvFile ? 'Replace CV' : 'Upload CV'}
+                    </button>
+                    {cvFile && (
+                      <span className="text-xs text-emerald-700 font-bold flex items-center gap-1">
+                        <CheckCircle2 size={14} /> Attached
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[9px] text-slate-400">Upload your CV to automatically generate your professional bio using AI.</p>
                 </div>
               </div>
 
-              {/* Education & Bio */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+              {/* Professional Bio */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Professional Bio</label>
-                  <textarea
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    rows={3}
-                    className="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-emerald-600 outline-none"
-                    placeholder="Describe your active clinical interests..."
-                  />
+                  {isParsingCV && (
+                    <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
+                      <Loader2 size={12} className="animate-spin" /> Analyzing CV...
+                    </span>
+                  )}
                 </div>
-                <div className="space-y-2">
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  rows={4}
+                  className="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-emerald-600 outline-none"
+                  placeholder="Describe your clinical expertise and patient care philosophy..."
+                />
+              </div>
+
+              {/* Education History */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Education History</label>
-                  <textarea
-                    value={educationHistory}
-                    onChange={(e) => setEducationHistory(e.target.value)}
-                    rows={3}
-                    className="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-emerald-600 outline-none"
-                    placeholder="e.g. University of Ghana Medical School (MBChB)..."
-                  />
+                  <button
+                    type="button"
+                    onClick={handleAddEducation}
+                    className="text-[10px] font-black text-emerald-700 uppercase tracking-widest flex items-center gap-1 hover:text-emerald-800"
+                  >
+                    <Plus size={14} /> Add Education
+                  </button>
+                </div>
+                
+                <div className="space-y-3">
+                  {educationEntries.map((entry, idx) => (
+                    <div key={idx} className="p-4 bg-white rounded-xl border border-slate-200 space-y-3 relative group">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveEducation(idx)}
+                        className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[9px] font-bold text-slate-400 uppercase">Institution</label>
+                          <input
+                            type="text"
+                            value={entry.institution}
+                            onChange={(e) => handleEducationChange(idx, 'institution', e.target.value)}
+                            className="w-full p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-emerald-600 outline-none"
+                            placeholder="e.g. University of Ghana"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] font-bold text-slate-400 uppercase">Degree / Qualification</label>
+                          <input
+                            type="text"
+                            value={entry.degree}
+                            onChange={(e) => handleEducationChange(idx, 'degree', e.target.value)}
+                            className="w-full p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-emerald-600 outline-none"
+                            placeholder="e.g. MBChB Medicine"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[9px] font-bold text-slate-400 uppercase">Year</label>
+                          <input
+                            type="text"
+                            value={entry.year}
+                            onChange={(e) => handleEducationChange(idx, 'year', e.target.value)}
+                            className="w-full p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-emerald-600 outline-none"
+                            placeholder="e.g. 2018 - 2024"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] font-bold text-slate-400 uppercase">Status</label>
+                          <select
+                            value={entry.status}
+                            onChange={(e) => handleEducationChange(idx, 'status', e.target.value as any)}
+                            className="w-full p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-emerald-600 outline-none"
+                          >
+                            <option value="Complete">Complete</option>
+                            <option value="Ongoing">Ongoing</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {educationEntries.length === 0 && (
+                    <p className="text-xs text-slate-400 text-center py-4 italic">No education history added yet.</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -997,6 +1240,33 @@ export const ConsultantProfileEditor: React.FC<ConsultantProfileEditorProps> = (
                       </button>
                     );
                   })}
+                  {scopeOfServices.filter(s => !cadreConfig.scopeOfServices.includes(s)).map((service, idx) => (
+                    <button
+                      key={`custom-${idx}`}
+                      type="button"
+                      onClick={() => toggleScope(service)}
+                      className="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border bg-emerald-700 text-white border-emerald-700"
+                    >
+                      {service}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 mt-3">
+                  <input
+                    type="text"
+                    value={customService}
+                    onChange={(e) => setCustomService(e.target.value)}
+                    placeholder="Add other clinical service..."
+                    className="flex-1 p-2 rounded-xl bg-white border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-emerald-600 outline-none"
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCustomService())}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomService}
+                    className="p-2 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 transition-colors"
+                  >
+                    <Plus size={16} />
+                  </button>
                 </div>
               </div>
             </div>

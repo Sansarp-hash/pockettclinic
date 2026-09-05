@@ -181,6 +181,21 @@ export function AppProvider({
     announcements: { headerBannerActive: false, headerBannerText: '', headerBannerType: 'info' }
   });
 
+  useEffect(() => {
+    try {
+      const unsub = onSnapshot(doc(db, 'app_settings', 'system_config'), (snap) => {
+        if (snap.exists()) {
+          setSystemConfig(snap.data());
+        }
+      }, (err) => {
+        console.warn('System config firestore listener error:', err.message);
+      });
+      return () => unsub();
+    } catch (err) {
+      console.warn('Failed to listen to system config:', err);
+    }
+  }, []);
+
   const [authError, setAuthError] = useState<string | null>(null);
   const [isPopupBlocked, setIsPopupBlocked] = useState<boolean>(false);
   const redirectCheckStarted = useRef(false);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Landmark, Wallet, ArrowUpRight, Clock, CheckCircle2, AlertCircle, Phone, Calendar, Download, RefreshCw, ShieldCheck, ChevronRight, Sparkles } from 'lucide-react';
+import { Landmark, Wallet, ArrowUpRight, Clock, CheckCircle2, AlertCircle, Phone, Calendar, Download, RefreshCw, ShieldCheck, ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
 import { collection, query, where, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
 import { useAppContext } from '../../AppContext';
@@ -143,25 +143,25 @@ export default function ConsultantPayoutHub({
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-[2rem] border border-slate-200/60 shadow-sm">
-        <div className="flex items-start gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-200 shrink-0">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-white p-8 md:p-12 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden group">
+        <div className="flex items-start gap-6 relative z-10">
+          <div className="w-16 h-16 rounded-[24px] bg-slate-900 text-white flex items-center justify-center shadow-2xl shadow-slate-900/20 shrink-0 group-hover:scale-110 transition-transform duration-500">
             <Landmark size={32} />
           </div>
           <div>
-            <div className="flex items-center gap-3">
-              <h3 className="text-2xl font-black text-slate-900 tracking-tight">
-                Earnings and Payout
+            <div className="flex items-center gap-4">
+              <h3 className="text-2xl font-black text-slate-950 uppercase tracking-tight">
+                Earnings & Settlements
               </h3>
-              <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-100">
+              <div className="hidden sm:flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-100">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-widest">70% Net Share</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">Revenue Hub</span>
               </div>
             </div>
-            <p className="text-sm text-slate-500 mt-2 max-w-xl font-medium leading-relaxed">
-              Manage your clinical earnings and initiate secure disbursements to your preferred Mobile Money wallet or commercial bank account.
+            <p className="text-[13px] text-slate-500 mt-2 max-w-xl font-bold leading-relaxed uppercase tracking-tight italic">
+              "Clinical practice revenue management with real-time Mobile Money and commercial bank settlement gateway."
             </p>
           </div>
         </div>
@@ -169,177 +169,169 @@ export default function ConsultantPayoutHub({
         <button
           onClick={() => setIsWithdrawModalOpen(true)}
           disabled={availableBalanceGHS <= 0}
-          className="group flex items-center justify-center gap-3 bg-slate-900 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed text-white px-8 py-4 rounded-2xl text-sm font-black shadow-xl shadow-slate-200 transition-all active:scale-95 shrink-0"
+          className="relative z-10 group flex items-center justify-center gap-3 bg-slate-950 hover:bg-slate-800 disabled:bg-slate-200 disabled:cursor-not-allowed text-white px-10 py-5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-slate-950/20 transition-all active:scale-95 shrink-0"
         >
           <ArrowUpRight size={20} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          <span className="uppercase tracking-widest">Initiate Payout</span>
+          <span>Initiate Payout</span>
         </button>
+
+        {/* Decorative Background */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-slate-50 rounded-full blur-3xl opacity-50 group-hover:bg-emerald-50 transition-all duration-700" />
       </div>
 
       {/* Financial Bento Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-7 rounded-[2.5rem] border border-slate-200/60 shadow-sm group hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4">
-            <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[9px] font-black uppercase tracking-tighter ${
+        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 group hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
+          <div className="flex items-center justify-between mb-8">
+            <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-slate-950 group-hover:text-white transition-all duration-300">
+              <RefreshCw size={24} />
+            </div>
+            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[8px] font-black uppercase tracking-widest ${
               windowStatus.isOpen ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-100'
             }`}>
               <div className={`w-1 h-1 rounded-full ${windowStatus.isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
-              {windowStatus.isOpen ? 'Window Open' : 'Batched'}
+              {windowStatus.isOpen ? 'Live Gateway' : 'Syncing'}
             </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mb-6 group-hover:bg-emerald-50 group-hover:text-emerald-500 transition-all">
-            <RefreshCw size={24} />
-          </div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">Gross Billed</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Gross Billing</p>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-sm font-black text-slate-400">GHS</span>
-            <span className="text-3xl font-black text-slate-900 tracking-tight">
+            <span className="text-xs font-black text-slate-400">GHS</span>
+            <span className="text-3xl font-black text-slate-950 tracking-tighter">
               {totalGrossGHS.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </span>
           </div>
-          <p className="text-[10px] text-slate-400 mt-3 font-bold uppercase tracking-tight flex items-center gap-1">
-            <ShieldCheck size={12} />
-            Verified Billings
-          </p>
         </div>
 
-        <div className="bg-white p-7 rounded-[2.5rem] border border-slate-200/60 shadow-sm group hover:border-emerald-200 transition-all duration-300">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6">
-            <RefreshCw size={24} />
+        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 group hover:border-emerald-200 transition-all duration-300">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-8">
+            <TrendingUp size={24} />
           </div>
-          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.15em] mb-1">Your Earnings</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Earnings</p>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-sm font-black text-emerald-600">GHS</span>
-            <span className="text-3xl font-black text-slate-900 tracking-tight">
+            <span className="text-xs font-black text-emerald-600">GHS</span>
+            <span className="text-3xl font-black text-slate-950 tracking-tighter">
               {consultant70Earnings.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </span>
           </div>
-          <p className="text-[10px] text-slate-400 mt-3 font-bold uppercase tracking-tight flex items-center gap-1">
-            <ShieldCheck size={12} />
-            70% Net Share
-          </p>
+          <div className="mt-3 flex items-center gap-1.5 text-[8px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 self-start inline-flex">
+            <ShieldCheck size={10} /> 70% Share Verified
+          </div>
         </div>
 
-        <div className="bg-white p-7 rounded-[2.5rem] border-2 border-emerald-600 shadow-2xl shadow-emerald-100 group relative overflow-hidden transform hover:scale-[1.02] transition-all duration-500">
-          <div className="absolute top-0 right-0 p-5">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mb-6 shadow-lg shadow-emerald-200">
+        <div className="bg-slate-950 p-8 rounded-[2.5rem] border border-slate-900 shadow-2xl shadow-slate-950/20 group relative overflow-hidden transform hover:scale-[1.02] transition-all duration-500">
+          <div className="w-12 h-12 rounded-2xl bg-white/10 text-emerald-400 flex items-center justify-center mb-8 border border-white/5">
             <Wallet size={24} />
           </div>
-          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.15em] mb-1">Available Now</p>
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Current Balance</p>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-sm font-black text-emerald-600">GHS</span>
-            <span className="text-4xl font-black text-slate-900 tracking-tighter">
+            <span className="text-xs font-black text-emerald-500">GHS</span>
+            <span className="text-4xl font-black text-white tracking-tighter">
               {availableBalanceGHS.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </span>
           </div>
-          <p className="text-[10px] text-emerald-700 mt-3 font-black uppercase tracking-tight flex items-center gap-1.5">
-            <Sparkles size={14} className="animate-pulse" />
-            Ready for withdrawal
-          </p>
+          <div className="mt-4 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Liquid Asset</span>
+          </div>
         </div>
 
-        <div className="bg-slate-50 p-7 rounded-[2.5rem] border border-slate-200/60 shadow-sm group">
-          <div className="w-12 h-12 rounded-2xl bg-white text-slate-400 flex items-center justify-center mb-6 group-hover:text-slate-600 transition-all">
+        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 group">
+          <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mb-8 group-hover:bg-slate-950 group-hover:text-white transition-all duration-300">
             <CheckCircle2 size={24} />
           </div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">Settled to Date</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Payouts</p>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-sm font-black text-slate-400">GHS</span>
-            <span className="text-3xl font-black text-slate-900 tracking-tight">
+            <span className="text-xs font-black text-slate-400">GHS</span>
+            <span className="text-3xl font-black text-slate-950 tracking-tighter">
               {completedPayoutsSum.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </span>
           </div>
-          <p className="text-[10px] text-slate-400 mt-3 font-bold uppercase tracking-tight">
-            Successfully Disbursed
-          </p>
         </div>
       </div>
 
       {/* History Table Section */}
-      <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-sm overflow-hidden">
-        <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-slate-400">
-              <Clock size={20} />
+      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+        <div className="p-8 md:p-10 border-b border-slate-50 flex items-center justify-between bg-white">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-950 border border-slate-100 shadow-sm">
+              <Clock size={24} />
             </div>
             <div>
-              <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">Payout History</h4>
-              <p className="text-[10px] text-slate-500 font-bold mt-0.5">{payouts.length} total records found</p>
+              <h4 className="text-xl font-black text-slate-950 uppercase tracking-tight">Ledger History</h4>
+              <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">{payouts.length} Transactions Documented</p>
             </div>
           </div>
-          <button className="text-xs font-black text-emerald-600 hover:text-emerald-700 transition-colors uppercase tracking-widest flex items-center gap-1.5">
+          <button className="hidden sm:flex px-6 py-3 rounded-xl bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest items-center gap-2 hover:bg-slate-800 transition-all active:scale-95 shadow-xl shadow-slate-900/10">
             <Download size={14} />
-            Export CSV
+            Export Audit
           </button>
         </div>
 
         {isLoading ? (
-          <div className="p-20 text-center">
-            <div className="w-12 h-12 border-4 border-slate-100 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Retrieving logs...</p>
+          <div className="p-24 text-center">
+            <div className="w-12 h-12 border-4 border-slate-100 border-t-slate-950 rounded-full animate-spin mx-auto mb-6" />
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Decrypting Ledger...</p>
           </div>
         ) : payouts.length === 0 ? (
-          <div className="p-20 text-center">
-            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 mx-auto mb-4">
+          <div className="p-24 text-center">
+            <div className="w-16 h-16 bg-slate-50 rounded-[20px] flex items-center justify-center text-slate-300 mx-auto mb-6 border border-slate-100 shadow-sm">
               <RefreshCw size={32} />
             </div>
-            <h5 className="text-sm font-black text-slate-400 uppercase tracking-widest">No payout history yet</h5>
-            <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">Once you initiate your first withdrawal, records will appear here for your tracking.</p>
+            <h5 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Vault is Empty</h5>
+            <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-tight max-w-xs mx-auto italic">Disbursement records will populate here upon your first successful settlement.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50/50">
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Reference & Date</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Destination Wallet</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Disbursed Amount</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Status</th>
+                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Audit Reference</th>
+                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Disbursement Point</th>
+                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Amount</th>
+                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-50">
                 {payouts.map(p => (
-                  <tr key={p.requestId} className="group hover:bg-slate-50/50 transition-colors">
-                    <td className="px-8 py-6">
-                      <div className="font-black text-slate-900 text-sm tracking-tight">{p.requestId}</div>
-                      <div className="text-[11px] text-slate-400 font-bold mt-1 flex items-center gap-1.5">
-                        <Calendar size={12} />
+                  <tr key={p.requestId} className="group hover:bg-slate-50/50 transition-all duration-300">
+                    <td className="px-10 py-8">
+                      <div className="font-black text-slate-950 text-sm tracking-tight uppercase">{p.requestId}</div>
+                      <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                        <Calendar size={12} className="text-slate-300" />
                         {new Date(p.requestedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </div>
                     </td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-white transition-colors shadow-sm">
-                          {p.channelType === 'mobile_money' ? <Phone size={16} /> : <Landmark size={16} />}
+                    <td className="px-10 py-8">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-slate-400 border border-slate-100 shadow-sm group-hover:bg-slate-950 group-hover:text-white transition-all">
+                          {p.channelType === 'mobile_money' ? <Phone size={18} /> : <Landmark size={18} />}
                         </div>
                         <div>
-                          <div className="font-black text-slate-800 text-xs">
+                          <div className="font-black text-slate-950 text-[11px] uppercase tracking-widest">
                             {p.channelType === 'mobile_money' ? `${p.networkProvider} MoMo` : p.bankName}
                           </div>
-                          <div className="text-[11px] text-slate-500 font-medium mt-0.5">{p.accountNumber}</div>
+                          <div className="text-[10px] text-slate-400 font-black tracking-widest mt-1 opacity-70">{p.accountNumber}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-black text-slate-400">GHS</span>
-                        <span className="text-lg font-black text-slate-900 tracking-tight">{p.amountGHS.toFixed(2)}</span>
+                    <td className="px-10 py-8">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-[10px] font-black text-slate-400">GHS</span>
+                        <span className="text-xl font-black text-slate-950 tracking-tighter">{p.amountGHS.toFixed(2)}</span>
                       </div>
                     </td>
-                    <td className="px-8 py-6 text-right">
-                      <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${
+                    <td className="px-10 py-8 text-right">
+                      <span className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
                         p.status === 'completed' || p.status === 'processed'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100 shadow-sm' 
                           : p.status === 'rejected' || p.status === 'failed'
-                          ? 'bg-rose-50 text-rose-700 border border-rose-100'
-                          : 'bg-amber-50 text-amber-700 border border-amber-100'
+                          ? 'bg-rose-50 text-rose-700 border-rose-100 shadow-sm'
+                          : 'bg-amber-50 text-amber-700 border-amber-100 shadow-sm'
                       }`}>
                         {p.status === 'completed' || p.status === 'processed' ? (
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         ) : (
-                          <RefreshCw size={12} className="animate-spin" />
+                          <RefreshCw size={10} className="animate-spin" />
                         )}
                         {p.status}
                       </span>
@@ -353,29 +345,30 @@ export default function ConsultantPayoutHub({
       </div>
 
       {/* Compliance / Security Note */}
-      <div className="bg-slate-900 rounded-[2rem] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
-        <div className="relative z-10 flex items-start gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-emerald-400 shrink-0 border border-white/10">
-            <ShieldCheck size={28} />
+      <div className="bg-slate-950 rounded-[3rem] p-10 text-white flex flex-col md:flex-row items-center justify-between gap-10 overflow-hidden relative group border border-white/5 shadow-2xl shadow-slate-950/40">
+        <div className="relative z-10 flex items-start gap-6">
+          <div className="w-16 h-16 rounded-[24px] bg-white/10 backdrop-blur-xl flex items-center justify-center text-emerald-400 shrink-0 border border-white/10 shadow-2xl">
+            <ShieldCheck size={32} />
           </div>
           <div>
-            <h4 className="text-lg font-black uppercase tracking-widest">Secure Settlements</h4>
-            <p className="text-slate-400 text-sm mt-1 max-w-lg font-medium leading-relaxed">
-              All transactions are encrypted and audited. Disbursements are processed via the national payment gateway ensuring real-time settlement for Mobile Money wallets.
+            <h4 className="text-xl font-black uppercase tracking-tight">Security Protocol</h4>
+            <p className="text-slate-500 text-sm mt-2 max-w-lg font-bold leading-relaxed italic uppercase tracking-tight">
+              "Gateway encryption active. All disbursements are routed through the National Settlement Interface with real-time MoMo integration."
             </p>
           </div>
         </div>
         <div className="relative z-10">
-          <div className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-2">Operational Status</div>
-          <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-5 py-2.5 rounded-xl flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-widest">Gateway Healthy</span>
+          <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-8 py-4 rounded-2xl flex flex-col gap-1 items-center justify-center min-w-[200px]">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Gateway Status</span>
+            </div>
+            <span className="text-xs font-black uppercase tracking-widest text-emerald-500">Operational</span>
           </div>
         </div>
         
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-emerald-500/20 transition-all duration-700" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-sky-500/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+        {/* Abstract FX */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-emerald-500/10 transition-all duration-1000" />
       </div>
 
       {/* Withdrawal Modal */}

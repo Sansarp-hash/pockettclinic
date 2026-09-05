@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   BookOpen, Search, ExternalLink, FileText, ShieldAlert, X, ChevronRight, 
   Stethoscope, Pill, Download, Globe, CheckCircle, Info, AlertTriangle, 
-  ShieldCheck, HeartPulse, Scale, User, HelpCircle
+  ShieldCheck, HeartPulse, Scale, User, HelpCircle, Loader2
 } from 'lucide-react';
 
 interface ConsultantGuidelinesDrawerProps {
@@ -107,96 +107,97 @@ export function ConsultantGuidelinesContent() {
   const embeddedViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(officialPdfUrl)}&embedded=true`;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-transparent text-slate-200 overflow-hidden" id="guidelines-content-container">
+    <div className="flex-1 flex flex-col h-full bg-slate-50/50 text-slate-900 overflow-hidden" id="guidelines-content-container">
       {/* 3 Universal Guidelines Tabs */}
-      <div className="flex items-center bg-transparent px-3 pt-2 gap-1 shrink-0 overflow-x-auto scrollbar-none" id="guidelines-tab-header">
-        <button
-          id="tab-sop"
-          onClick={() => setActiveTab('sop')}
-          className={`px-3 py-2 text-[11px] font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-            activeTab === 'sop'
-              ? 'border-slate-300 bg-transparent text-slate-200 font-black'
-              : 'border-transparent text-slate-300 hover:text-slate-300'
-          }`}
-        >
-          <Scale size={13} /> SOP & Platform Protocols
-        </button>
-        <button
-          id="tab-stg"
-          onClick={() => setActiveTab('stg')}
-          className={`px-3 py-2 text-[11px] font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-            activeTab === 'stg'
-              ? 'border-slate-300 bg-transparent text-slate-200 font-black'
-              : 'border-transparent text-slate-300 hover:text-slate-300'
-          }`}
-        >
-          <Stethoscope size={13} /> Standard Treatment (STG)
-        </button>
-        <button
-          id="tab-medical"
-          onClick={() => setActiveTab('medical')}
-          className={`px-3 py-2 text-[11px] font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-            activeTab === 'medical'
-              ? 'border-slate-300 bg-transparent text-slate-200 font-black'
-              : 'border-transparent text-slate-300 hover:text-slate-300'
-          }`}
-        >
-          <HeartPulse size={13} /> Medical Guidelines & Dosing
-        </button>
+      <div className="flex items-center bg-white px-6 pt-4 gap-2 shrink-0 overflow-x-auto no-scrollbar border-b border-slate-100" id="guidelines-tab-header">
+        {[
+          { id: 'sop', label: 'Platform SOPs', icon: Scale },
+          { id: 'stg', label: 'STG Guidelines', icon: Stethoscope },
+          { id: 'medical', label: 'Clinical Dosing', icon: HeartPulse },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`px-4 py-3 text-[10px] font-black rounded-t-2xl transition-all border-b-2 flex items-center gap-2 cursor-pointer whitespace-nowrap uppercase tracking-widest ${
+                isActive
+                  ? 'border-slate-950 bg-slate-50 text-slate-950'
+                  : 'border-transparent text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <Icon size={14} className={isActive ? 'text-slate-950' : 'text-slate-400'} />
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Main Tab View */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4" id="guidelines-body">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar" id="guidelines-body">
         
         {/* TAB 1: SOP & Platform Protocols */}
         {activeTab === 'sop' && (
-          <div className="space-y-4" id="sop-tab-panel">
-            <div className="p-3 bg-slate-900/80 border border-white/20 rounded-2xl">
-              <h4 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wider mb-1">
-                <ShieldCheck size={14} /> SOP.01: Telemedicine Consultant Readiness
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500" id="sop-tab-panel">
+            <div className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-xl shadow-slate-200/20">
+              <h4 className="text-[10px] font-black text-slate-950 flex items-center gap-2 uppercase tracking-[0.2em] mb-4">
+                <ShieldCheck size={16} className="text-emerald-600" />
+                SOP.01: Professional Environment
               </h4>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
-                Before activating a live audio/video session, consultants must ensure they are operating from a <strong>private, quiet, well-lit professional environment</strong>. Professional consultant framing and attire are required. Maintain eye contact and eliminate background audio distractions to uphold privacy standards.
+              <p className="text-[11px] text-slate-600 leading-relaxed font-bold">
+                Consultants must operate from a <span className="text-slate-950 underline decoration-emerald-200 underline-offset-4">private, quiet, well-lit professional environment</span>. Professional framing and attire are required. Maintain eye contact and eliminate background audio distractions.
               </p>
             </div>
 
-            <div className="p-3 bg-slate-900/60 border-white/10 rounded-2xl space-y-2">
-              <h4 className="text-xs font-bold text-slate-300 flex items-center gap-1.5 uppercase tracking-wider">
-                <User size={14} className="text-white" /> SOP.02: Mandatory Informed Consent
+            <div className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-xl shadow-slate-200/20 space-y-4">
+              <h4 className="text-[10px] font-black text-slate-950 flex items-center gap-2 uppercase tracking-[0.2em]">
+                <User size={16} className="text-indigo-600" />
+                SOP.02: Clinical Consent
               </h4>
-              <ul className="space-y-1.5 text-[11px] text-slate-300 list-disc pl-4">
-                <li>Explicitly state your name, prefix (Dr./Pharm./Mr.), and legal specialty.</li>
-                <li>Verify the patient's full identity and location in Ghana.</li>
-                <li>Obtain <strong>verbal informed consent</strong> to record summary vitals and conduct the consultation via digital medium.</li>
-                <li>Briefly explain that telemedicine holds technical limits and physical referral remains a standard secondary option.</li>
+              <ul className="space-y-3 text-[11px] text-slate-600 font-bold">
+                <li className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
+                  Explicitly state your name, prefix, and legal specialty.
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
+                  Verify patient identity and geographic location in Ghana.
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
+                  Obtain verbal informed consent for session recording.
+                </li>
               </ul>
             </div>
 
-            <div className="p-3 bg-amber-950/80 border border-amber-900/40 rounded-2xl">
-              <h4 className="text-xs font-bold text-amber-300 flex items-center gap-1.5 uppercase tracking-wider mb-1">
-                <AlertTriangle size={14} /> SOP.03: Audio-Video Connection Fallback
+            <div className="p-6 bg-amber-50 border border-amber-100 rounded-[2rem] shadow-xl shadow-amber-500/5">
+              <h4 className="text-[10px] font-black text-amber-900 flex items-center gap-2 uppercase tracking-[0.2em] mb-4">
+                <AlertTriangle size={16} />
+                SOP.03: Connection Fallback
               </h4>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
-                In cases of severe connection degradation or bandwidth falling below <strong>3G speeds</strong>:
+              <p className="text-[11px] text-amber-800 leading-relaxed font-bold">
+                If bandwidth falls below <span className="font-black">3G speeds (384kbps)</span>, prioritize voice fidelity:
               </p>
-              <div className="mt-2 grid grid-cols-2 gap-2 text-[10px]">
-                <div className="p-2 bg-slate-900/60 rounded-xl border border-white/10">
-                  <span className="font-bold text-white block mb-0.5">Step A</span>
-                  Toggle video track off to prioritize high-fidelity clinical audio and prevent voice clipping.
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="p-4 bg-white/60 rounded-2xl border border-amber-200/50">
+                  <span className="text-[9px] font-black text-amber-900 block mb-1 uppercase">Step A</span>
+                  <p className="text-[10px] text-amber-800 font-bold leading-tight">Disable video track to preserve audio packet integrity.</p>
                 </div>
-                <div className="p-2 bg-slate-900/60 rounded-xl border border-white/10">
-                  <span className="font-bold text-white block mb-0.5">Step B</span>
-                  Utilize secure consultant chat for medical documentation, prescribing details, and patient follow-ups.
+                <div className="p-4 bg-white/60 rounded-2xl border border-amber-200/50">
+                  <span className="text-[9px] font-black text-amber-900 block mb-1 uppercase">Step B</span>
+                  <p className="text-[10px] text-amber-800 font-bold leading-tight">Use secure consultant chat for clinical dispatches.</p>
                 </div>
               </div>
             </div>
 
-            <div className="p-3 bg-rose-950/80 border border-rose-500/30 rounded-2xl">
-              <h4 className="text-xs font-bold text-rose-300 flex items-center gap-1.5 uppercase tracking-wider mb-1">
-                <ShieldAlert size={14} /> SOP.04: Restricted Prescribing Limits
+            <div className="p-6 bg-rose-50 border border-rose-100 rounded-[2rem] shadow-xl shadow-rose-500/5">
+              <h4 className="text-[10px] font-black text-rose-900 flex items-center gap-2 uppercase tracking-[0.2em] mb-3">
+                <ShieldAlert size={16} />
+                SOP.04: Prescribing Limits
               </h4>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
-                PockettClinic strictly prohibits the tele-prescribing of <strong>narcotic analgesics, benzodiazepines, barbiturates, or abortifacients</strong>. Any clinical requirement for these controlled substances requires an immediate physical facility referral.
+              <p className="text-[11px] text-rose-800 leading-relaxed font-bold italic">
+                "Strict prohibition of tele-prescribing for narcotics, benzodiazepines, or abortifacients. Immediate physical referral required."
               </p>
             </div>
           </div>
@@ -204,54 +205,54 @@ export function ConsultantGuidelinesContent() {
 
         {/* TAB 2: Standard Treatment Guidelines (STG) */}
         {activeTab === 'stg' && (
-          <div className="space-y-3" id="stg-tab-panel">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500" id="stg-tab-panel">
             {/* Sub-tabs for STG: Quick Search or PDF Viewer */}
-            <div className="flex gap-2 p-1 bg-slate-900/60 rounded-xl border border-white/10">
+            <div className="flex gap-2 p-1.5 bg-white rounded-[2rem] border border-slate-100 shadow-sm">
               <button
                 type="button"
                 onClick={() => setStgSubTab('search')}
-                className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
-                  stgSubTab === 'search' ? 'bg-emerald-600 text-white font-black' : 'text-slate-300 hover:text-slate-300'
+                className={`flex-1 py-3 text-[9px] font-black rounded-full transition-all uppercase tracking-widest ${
+                  stgSubTab === 'search' ? 'bg-slate-950 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
-                Quick Guidelines Search
+                Protocol Search
               </button>
               <button
                 type="button"
                 onClick={() => setStgSubTab('pdf')}
-                className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
-                  stgSubTab === 'pdf' ? 'bg-emerald-600 text-white font-black' : 'text-slate-300 hover:text-slate-300'
+                className={`flex-1 py-3 text-[9px] font-black rounded-full transition-all uppercase tracking-widest ${
+                  stgSubTab === 'pdf' ? 'bg-slate-950 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
-                Official PDF Viewer
+                Official PDF
               </button>
             </div>
 
             {stgSubTab === 'search' ? (
-              <div className="space-y-3">
+              <div className="space-y-6">
                 {/* Search Inputs */}
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <div className="relative">
-                    <Search size={14} className="absolute left-3 top-3 text-slate-300" />
+                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Search condition, drug, STG protocol..."
+                      placeholder="Search protocol (e.g. Malaria, Asthma)..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 bg-slate-900/60 border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-slate-300"
+                      className="w-full pl-12 pr-6 py-4 bg-white border border-slate-100 rounded-2xl text-[11px] font-bold text-slate-950 placeholder:text-slate-400 placeholder:font-black placeholder:uppercase focus:outline-none focus:ring-2 focus:ring-slate-950/5"
                     />
                   </div>
 
                   {/* Category Filter Pills */}
-                  <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
+                  <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
                     {categories.map((cat) => (
                       <button
                         key={cat}
                         onClick={() => setSelectedCategory(cat)}
-                        className={`px-2.5 py-1 text-[10px] font-bold rounded-lg whitespace-nowrap transition-colors cursor-pointer ${
+                        className={`px-4 py-2 text-[9px] font-black rounded-xl whitespace-nowrap transition-all border uppercase tracking-wider ${
                           selectedCategory === cat
-                            ? 'bg-emerald-600 text-white font-black'
-                            : 'bg-transparent text-slate-300 hover:bg-transparent/10 hover:text-slate-300'
+                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                            : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200 hover:text-slate-600'
                         }`}
                       >
                         {cat}
@@ -261,51 +262,51 @@ export function ConsultantGuidelinesContent() {
                 </div>
 
                 {/* Protocols list */}
-                <div className="space-y-2.5">
+                <div className="space-y-4">
                   {filteredProtocols.length === 0 ? (
-                    <div className="p-6 text-center bg-slate-800/80 rounded-2xl border border-white/10">
-                      <ShieldAlert className="mx-auto text-amber-400 mb-2" size={24} />
-                      <p className="text-xs font-bold text-slate-300">No matching STG protocols found</p>
-                      <p className="text-[11px] text-white mt-1">Try another search or switch to the Official PDF viewer tab.</p>
+                    <div className="p-12 text-center bg-white rounded-[2.5rem] border border-slate-50 shadow-inner">
+                      <ShieldAlert className="mx-auto text-amber-400 mb-4" size={32} />
+                      <p className="text-[11px] font-black text-slate-950 uppercase tracking-[0.2em]">Zero Protocols Found</p>
+                      <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase">Try a different diagnostic keyword.</p>
                     </div>
                   ) : (
                     filteredProtocols.map((p) => (
-                      <div key={p.code} className="bg-slate-900/60 border-white/10 hover:border-white/10 rounded-2xl p-3 transition-all space-y-2">
-                        <div className="flex items-start justify-between gap-2">
+                      <div key={p.code} className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/30 space-y-6 group hover:border-emerald-200 transition-all duration-300">
+                        <div className="flex items-start justify-between gap-4">
                           <div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[9px] font-black text-white bg-slate-800/80 border border-white/20 px-1.5 py-0.5 rounded font-mono">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-[9px] font-black text-white bg-slate-950 px-2 py-0.5 rounded-lg font-mono tracking-tighter">
                                 {p.code}
                               </span>
-                              <span className="text-[9px] font-bold text-slate-300 uppercase tracking-wider">
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em]">
                                 {p.category}
                               </span>
                             </div>
-                            <h4 className="font-bold text-xs text-white mt-1">{p.condition}</h4>
+                            <h4 className="font-black text-lg text-slate-950 leading-tight uppercase tracking-tight group-hover:text-emerald-700 transition-colors">{p.condition}</h4>
                           </div>
                         </div>
 
-                        <div className="space-y-1.5 text-xs">
-                          <div className="bg-slate-900/60 p-2 rounded-xl border border-white/10">
-                            <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block mb-0.5">
-                              1st Line Treatment (Ghana STG)
+                        <div className="grid gap-4">
+                          <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100">
+                            <span className="text-[8px] font-black text-emerald-600 uppercase tracking-[0.25em] block mb-2">
+                              Primary Clinical Pathway (MOH Ghana)
                             </span>
-                            <p className="text-slate-300 leading-relaxed font-mono text-[10px]">{p.firstLine}</p>
+                            <p className="text-slate-900 leading-relaxed font-bold text-[11px]">{p.firstLine}</p>
                           </div>
 
                           {p.secondLine && (
-                            <div className="bg-slate-900/40 p-2 rounded-xl border border-white/10/60">
-                              <span className="text-[9px] font-black text-amber-400 uppercase tracking-widest block mb-0.5">
-                                2nd Line / Refractory
+                            <div className="bg-white p-5 rounded-3xl border border-slate-100">
+                              <span className="text-[8px] font-black text-amber-600 uppercase tracking-[0.25em] block mb-2">
+                                Secondary Refractory Pathway
                               </span>
-                              <p className="text-slate-300 leading-relaxed font-mono text-[10px]">{p.secondLine}</p>
+                              <p className="text-slate-600 leading-relaxed font-bold text-[11px] italic">{p.secondLine}</p>
                             </div>
                           )}
 
                           {p.specialNotes && (
-                            <div className="flex items-start gap-1.5 text-slate-300 text-[10px] pt-0.5">
-                              <AlertTriangle size={12} className="text-amber-400 shrink-0 mt-0.5" />
-                              <p><strong className="text-slate-300">Caution:</strong> {p.specialNotes}</p>
+                            <div className="flex items-start gap-3 p-4 bg-emerald-50/30 rounded-2xl border border-emerald-100/50">
+                              <Info size={14} className="text-emerald-600 shrink-0 mt-0.5" />
+                              <p className="text-[10px] text-emerald-900 font-bold leading-relaxed uppercase tracking-tight"><span className="font-black underline decoration-emerald-200 decoration-2">Clinical Note:</span> {p.specialNotes}</p>
                             </div>
                           )}
                         </div>
@@ -315,28 +316,32 @@ export function ConsultantGuidelinesContent() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-2 flex flex-col h-full">
-                <div className="p-2.5 bg-slate-900/60 rounded-xl border border-white/10 flex items-center justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-1.5 text-slate-300 text-[11px]">
-                    <Globe size={14} className="text-white shrink-0" />
-                    <span>MOH Republic of Ghana Guidelines (7th Ed)</span>
+              <div className="space-y-4 flex flex-col h-full animate-in fade-in duration-500">
+                <div className="p-4 bg-white rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 text-slate-950">
+                    <Globe size={16} className="text-emerald-600" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">STG 7th Edition (PDF)</span>
                   </div>
                   <a
                     href={officialPdfUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors inline-flex items-center gap-1 text-[11px] shrink-0"
+                    className="px-4 py-2 bg-slate-950 text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all flex items-center gap-2 shadow-lg shadow-slate-950/20"
                   >
-                    <Download size={11} /> Open PDF
+                    <Download size={12} /> External Download
                   </a>
                 </div>
 
-                <div className="flex-1 min-h-[350px] bg-slate-900/60 border-white/10 rounded-2xl overflow-hidden relative">
+                <div className="flex-1 min-h-[450px] bg-white border border-slate-100 rounded-[2.5rem] overflow-hidden shadow-2xl relative">
                   <iframe
                     src={embeddedViewerUrl}
                     title="Ghana Standard Treatment Guidelines 2017 PDF"
-                    className="w-full h-full min-h-[350px] border-0 bg-white"
+                    className="w-full h-full min-h-[450px] border-0"
                   />
+                  {/* Subtle Loading Overlay */}
+                  <div className="absolute inset-0 bg-slate-50/50 pointer-events-none flex items-center justify-center -z-10">
+                    <Loader2 size={32} className="animate-spin text-slate-200" />
+                  </div>
                 </div>
               </div>
             )}
@@ -345,84 +350,72 @@ export function ConsultantGuidelinesContent() {
 
         {/* TAB 3: Medical Guidelines & Dosing */}
         {activeTab === 'medical' && (
-          <div className="space-y-4" id="medical-tab-panel">
-            {/* Subsection 1: Paediatric weight formulas */}
-            <div className="p-4 bg-slate-900/60 border-white/10 rounded-2xl space-y-3">
-              <h4 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wider">
-                <Pill size={14} className="text-white" /> 1. Pediatric Dosing Standards
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500" id="medical-tab-panel">
+            <div className="p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-xl shadow-slate-200/20 space-y-6">
+              <h4 className="text-[11px] font-black text-slate-950 flex items-center gap-3 uppercase tracking-[0.2em]">
+                <Pill size={18} className="text-indigo-600" />
+                01. Paediatric Dosing Suite
               </h4>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
-                Always compute weight-based doses where weight is verified. In absence of active scaling, use weight estimation calculations:
+              <p className="text-[11px] text-slate-500 font-bold leading-relaxed italic border-l-4 border-slate-100 pl-4">
+                "Mandatory weight-based calculation required for all neonatal and pediatric prescriptions. Verify weight before initiating therapy."
               </p>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
-                <div className="p-3 bg-slate-900/60 rounded-xl border border-white/10 space-y-1">
-                  <span className="font-bold text-emerald-400 block">Weight Estimation (Age 1–9)</span>
-                  <p className="text-slate-300 font-mono">Weight (kg) = (Age in Years × 2) + 8</p>
+              <div className="grid gap-4">
+                <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100 group">
+                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em] block mb-2 group-hover:text-indigo-600 transition-colors">Weight Estimation (Age 1–9)</span>
+                  <p className="text-slate-950 font-black text-sm tracking-tight uppercase">Weight (kg) = (Age × 2) + 8</p>
                 </div>
-                <div className="p-3 bg-slate-900/60 rounded-xl border border-white/10 space-y-1">
-                  <span className="font-bold text-white block">Paediatric Paracetamol Dosing</span>
-                  <p className="text-slate-300 font-mono">15 mg/kg PO every 4 to 6 hours (Max 4 doses daily)</p>
-                </div>
-                <div className="p-3 bg-slate-900/60 rounded-xl border border-white/10 space-y-1 col-span-1 sm:col-span-2">
-                  <span className="font-bold text-amber-400 block">Paediatric Amoxicillin Dosing</span>
-                  <p className="text-slate-300 font-mono">40–90 mg/kg/day PO divided into 2 or 3 doses based on severity of community pneumonia</p>
+                <div className="p-5 bg-white rounded-3xl border border-slate-100 group">
+                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em] block mb-2 group-hover:text-emerald-600 transition-colors">Paracetamol Pediatric</span>
+                  <p className="text-slate-950 font-black text-sm tracking-tight uppercase">15 mg/kg PO q4–6h (Max 4/day)</p>
                 </div>
               </div>
             </div>
 
-            {/* Subsection 2: Red flags & specialist routing */}
-            <div className="p-4 bg-rose-950/80 border border-rose-500/30 rounded-2xl space-y-3">
-              <h4 className="text-xs font-bold text-rose-300 flex items-center gap-1.5 uppercase tracking-wider">
-                <ShieldAlert size={14} /> 2. Red Flags & Immediate Specialist Routing
+            <div className="p-8 bg-rose-50 border border-rose-100 rounded-[2.5rem] shadow-xl shadow-rose-500/5 space-y-6">
+              <h4 className="text-[11px] font-black text-rose-900 flex items-center gap-3 uppercase tracking-[0.2em]">
+                <ShieldAlert size={18} />
+                02. Emergency Referral Red Flags
               </h4>
-              <p className="text-[11px] text-slate-300">
-                Immediately trigger a physical referral or direct emergency routing if the patient demonstrates any of the following parameters:
+              <p className="text-[11px] text-rose-800 font-bold italic leading-relaxed">
+                Trigger immediate physical emergency protocol if any of these thresholds are breached:
               </p>
               
-              <div className="space-y-2 text-[10px]">
-                <div className="flex items-start gap-2 bg-slate-800/80 p-2.5 rounded-xl border border-white/10">
-                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
-                  <div>
-                    <strong className="text-white block">Hypertensive Emergency</strong>
-                    Systolic BP &gt; 180 mmHg OR Diastolic BP &gt; 120 mmHg in association with acute organ damage (chest pain, dyspnea, neurological signs).
+              <div className="space-y-3">
+                {[
+                  { label: 'Hypertensive Crisis', desc: 'BP > 180/120 + acute organ damage (chest pain, dyspnea).' },
+                  { label: 'Respiratory Failure', desc: 'RR > 30/min, SpO2 < 92% (Room Air), Cyanosis.' },
+                  { label: 'Sepsis (qSOFA)', desc: 'Altered mental state + SBP ≤ 100 + RR ≥ 22.' },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-4 bg-white/60 p-5 rounded-[2rem] border border-rose-200/50 group hover:border-rose-300 transition-all">
+                    <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-2 shrink-0 group-hover:scale-150 transition-transform" />
+                    <div>
+                      <strong className="text-[11px] font-black text-rose-950 uppercase tracking-tight block mb-1">{item.label}</strong>
+                      <p className="text-[10px] text-rose-800 font-bold leading-relaxed">{item.desc}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start gap-2 bg-slate-800/80 p-2.5 rounded-xl border border-white/10">
-                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
-                  <div>
-                    <strong className="text-white block">Acute Respiratory Distress</strong>
-                    Respiratory rate &gt; 30 breaths/minute, oxygen saturation &lt; 92% on room air, accessory muscle recruitment, or cyanosis.
-                  </div>
-                </div>
-                <div className="flex items-start gap-2 bg-slate-800/80 p-2.5 rounded-xl border border-white/10">
-                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
-                  <div>
-                    <strong className="text-white block">Suspected Sepsis</strong>
-                    Two or more qSOFA parameters (altered mental state, systolic BP &le; 100 mmHg, respiratory rate &ge; 22/min) with suspected source of infection.
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
-            {/* Subsection 3: Contraindications */}
-            <div className="p-4 bg-slate-900/60 border-white/10 rounded-2xl space-y-3">
-              <h4 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wider">
-                <Info size={14} className="text-white" /> 3. High-Alert Contraindications
+            <div className="p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-xl shadow-slate-200/20 space-y-6">
+              <h4 className="text-[11px] font-black text-slate-950 flex items-center gap-3 uppercase tracking-[0.2em]">
+                <Info size={18} className="text-slate-400" />
+                03. High-Risk Contraindications
               </h4>
-              <div className="space-y-2 text-[10px] text-slate-300">
-                <div className="flex justify-between items-start border-b border-white/10 pb-2">
-                  <span className="font-bold text-slate-300">Fluoroquinolones (e.g. Ciprofloxacin)</span>
-                  <span className="text-rose-400 text-right">Contraindicated in pregnancy, lactation, and pediatric populations under 18 (cartilage safety).</span>
-                </div>
-                <div className="flex justify-between items-start border-b border-white/10 pb-2">
-                  <span className="font-bold text-slate-300">NSAIDs (e.g. Diclofenac, Ibuprofen)</span>
-                  <span className="text-rose-400 text-right">Contraindicated in severe chronic kidney disease (CKD), active peptic ulcer disease, and 3rd-trimester pregnancy.</span>
-                </div>
-                <div className="flex justify-between items-start">
-                  <span className="font-bold text-slate-300">Beta Blockers (e.g. Propranolol)</span>
-                  <span className="text-rose-400 text-right">Strictly contraindicated in active asthma, severe COPD, or second/third-degree heart blocks.</span>
-                </div>
+              <div className="space-y-4">
+                {[
+                  { drug: 'Fluoroquinolones', note: 'Contraindicated in pregnancy, lactation, and pediatric (<18) users.' },
+                  { drug: 'NSAIDs (Diclofenac)', note: 'Contraindicated in severe CKD, PUD, and 3rd-trimester pregnancy.' },
+                  { drug: 'Beta Blockers', note: 'Strictly contraindicated in active Asthma, COPD, or heart blocks.' },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex justify-between items-start border-b border-slate-50 pb-4 group">
+                    <div className="space-y-1">
+                      <span className="text-[11px] font-black text-slate-950 uppercase tracking-tight group-hover:text-emerald-600 transition-colors">{item.drug}</span>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{item.note}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -444,32 +437,32 @@ export default function ConsultantGuidelinesDrawer({ isOpen, onClose }: Consulta
     >
       <div 
         onClick={(e) => e.stopPropagation()} 
-        className="w-full sm:w-[480px] bg-slate-900/80 backdrop-blur-2xl text-slate-200 shadow-2xl flex flex-col h-full border-l border-white/10 animate-in slide-in-from-right duration-200"
+        className="w-full sm:w-[520px] bg-white text-slate-950 shadow-2xl flex flex-col h-full border-l border-slate-100 animate-in slide-in-from-right duration-300"
         id="guidelines-drawer-container"
       >
         {/* Header */}
-        <div className="p-3 sm:p-4 bg-transparent flex items-center justify-between shrink-0" id="guidelines-drawer-header">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-emerald-600/20 text-white rounded-xl border border-slate-300/30">
-              <BookOpen size={18} />
+        <div className="p-6 sm:p-8 bg-white flex items-center justify-between shrink-0 border-b border-slate-50 relative z-10" id="guidelines-drawer-header">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-slate-950 text-white flex items-center justify-center shadow-2xl shadow-slate-950/30">
+              <BookOpen size={28} />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-white flex items-center gap-1.5">
-                Consultant Guidelines
-                <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-black text-lg text-slate-950 uppercase tracking-tight">Clinical Vault</h3>
+                <span className="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">
                   MOH Ghana
                 </span>
-              </h3>
-              <p className="text-[11px] text-slate-300">Ghana Standard Treatment Guidelines & Platform SOPs</p>
+              </div>
+              <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Standard Treatment Protocols & SOPs</p>
             </div>
           </div>
           <button
             id="close-guidelines-btn"
             onClick={onClose}
-            className="p-1.5 text-slate-300 hover:text-white hover:bg-transparent rounded-xl transition-colors cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-950 hover:bg-slate-50 rounded-full transition-all cursor-pointer border border-slate-100"
             title="Close"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 

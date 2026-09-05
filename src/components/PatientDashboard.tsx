@@ -182,13 +182,17 @@ export default function PatientDashboard({
     return () => clearInterval(interval);
   }, []);
   
-  const availableConsultants = (allUsers || []).filter(u => isConsultantRole(u.role)).filter((c: any) => {
+  const availableConsultants = (allUsers || []).filter(u => isConsultantRole(u.role) && u.isOnline).filter((c: any) => {
     if (!consultantSearch.trim()) return true;
     const term = consultantSearch.toLowerCase();
     const name = (c.fullName || c.displayName || '').toLowerCase();
     const spec = (c.specialty || c.cadre || '').toLowerCase();
     return name.includes(term) || spec.includes(term);
   });
+
+  const isCadreOnline = (cadre: string) => {
+    return (allUsers || []).some(u => isConsultantRole(u.role) && u.isOnline && normalizeCadre(u.cadre) === normalizeCadre(cadre));
+  };
 
 
   const effectiveUser = targetPatient || (searchParams.get('patientId') ? allPatients.find(p => (p.uid || p.id) === searchParams.get('patientId')) : null) || user;
@@ -229,6 +233,15 @@ export default function PatientDashboard({
   const handleConfirmConsultPay = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedConsultantForPay) return;
+
+    // Verify consultant is still online
+    const targetId = selectedConsultantForPay.id;
+    const latestConsultant = (allUsers || []).find(u => u.uid === targetId || u.id === targetId);
+    if (!latestConsultant || !latestConsultant.isOnline) {
+      showToast("This consultant has just gone offline. Please choose another online consultant.", "error");
+      setSelectedConsultantForPay(null);
+      return;
+    }
     
     // Require terms if not globally accepted
     if (!user?.hasAcceptedGlobalTerms && !agreedToSessionTerms) {
@@ -761,7 +774,9 @@ export default function PatientDashboard({
                 <p className="text-[11px] text-slate-500 font-medium mt-0.5">Medical Diagnosis & Advice</p>
                 <div className="mt-2.5 flex items-center justify-between">
                   <span className="text-[12px] font-black text-emerald-800">GHS {getSessionTierPricing('DOCTOR', 'VIDEO', systemConfig).grossFee}</span>
-                  <span className="text-[10px] font-extrabold uppercase bg-emerald-200/60 text-emerald-800 px-2 py-0.5 rounded-full">Instant</span>
+                  <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${isCadreOnline('DOCTOR') ? 'bg-emerald-200/60 text-emerald-800' : 'bg-slate-200 text-slate-500 opacity-60'}`}>
+                    {isCadreOnline('DOCTOR') ? 'Instant' : 'Offline'}
+                  </span>
                 </div>
               </div>
             </button>
@@ -778,7 +793,9 @@ export default function PatientDashboard({
                 <p className="text-[11px] text-slate-500 font-medium mt-0.5">Medication & Rx Guidance</p>
                 <div className="mt-2.5 flex items-center justify-between">
                   <span className="text-[12px] font-black text-purple-800">GHS {getSessionTierPricing('PHARMACIST', 'VIDEO', systemConfig).grossFee}</span>
-                  <span className="text-[10px] font-extrabold uppercase bg-purple-200/60 text-purple-800 px-2 py-0.5 rounded-full">Instant</span>
+                  <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${isCadreOnline('PHARMACIST') ? 'bg-purple-200/60 text-purple-800' : 'bg-slate-200 text-slate-500 opacity-60'}`}>
+                    {isCadreOnline('PHARMACIST') ? 'Instant' : 'Offline'}
+                  </span>
                 </div>
               </div>
             </button>
@@ -795,7 +812,9 @@ export default function PatientDashboard({
                 <p className="text-[11px] text-slate-500 font-medium mt-0.5">Refills & Stock Support</p>
                 <div className="mt-2.5 flex items-center justify-between">
                   <span className="text-[12px] font-black text-blue-800">GHS {getSessionTierPricing('PHARM_TECH', 'VIDEO', systemConfig).grossFee}</span>
-                  <span className="text-[10px] font-extrabold uppercase bg-blue-200/60 text-blue-800 px-2 py-0.5 rounded-full">Instant</span>
+                  <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${isCadreOnline('PHARM_TECH') ? 'bg-blue-200/60 text-blue-800' : 'bg-slate-200 text-slate-500 opacity-60'}`}>
+                    {isCadreOnline('PHARM_TECH') ? 'Instant' : 'Offline'}
+                  </span>
                 </div>
               </div>
             </button>
@@ -812,7 +831,9 @@ export default function PatientDashboard({
                 <p className="text-[11px] text-slate-500 font-medium mt-0.5">Primary Care Assessments</p>
                 <div className="mt-2.5 flex items-center justify-between">
                   <span className="text-[12px] font-black text-amber-800">GHS {getSessionTierPricing('PHYSICIAN_ASSISTANT', 'VIDEO', systemConfig).grossFee}</span>
-                  <span className="text-[10px] font-extrabold uppercase bg-amber-200/60 text-amber-800 px-2 py-0.5 rounded-full">Instant</span>
+                  <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${isCadreOnline('PHYSICIAN_ASSISTANT') ? 'bg-amber-200/60 text-amber-800' : 'bg-slate-200 text-slate-500 opacity-60'}`}>
+                    {isCadreOnline('PHYSICIAN_ASSISTANT') ? 'Instant' : 'Offline'}
+                  </span>
                 </div>
               </div>
             </button>
@@ -908,7 +929,7 @@ export default function PatientDashboard({
                     </div>
                     <div className="mt-3.5 space-y-1">
                       <p className="text-[14px] font-black text-emerald-800">
-                        GHS {getSessionTierPricing(normalizeCadre(c.cadre || 'UNASSIGNED'), 'VIDEO').grossFee}
+                        GHS {getSessionTierPricing(normalizeCadre(c.cadre || 'UNASSIGNED'), 'VIDEO', systemConfig).grossFee}
                       </p>
                       <div className="flex items-center gap-1 text-[11px] text-slate-600 font-bold">
                         <Star size={12} className="fill-amber-400 text-amber-400 stroke-none" />
@@ -923,7 +944,7 @@ export default function PatientDashboard({
                         ...c, 
                         id: c.uid || c.id, 
                         name: formatConsultantName(c.fullName || c.displayName, c.prefix), 
-                        fee: getSessionTierPricing(normalizeCadre(c.cadre || 'UNASSIGNED'), 'VIDEO').grossFee, 
+                        fee: getSessionTierPricing(normalizeCadre(c.cadre || 'UNASSIGNED'), 'VIDEO', systemConfig).grossFee, 
                         avatar: c.avatarUrl || c.profilePhotoUrl 
                       })}
                       className="w-full bg-[#0A3B24] hover:bg-emerald-900 text-white py-2 px-3 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all duration-250 shadow-sm hover:shadow flex items-center justify-center gap-1 cursor-pointer"
