@@ -717,7 +717,7 @@ function VideoStageWithHardwareStream({
                     <RichTextEditor 
                       value={rawNotes}
                       onChange={setRawNotes}
-                      placeholder="E.g. Patient complains of headache for 3 days, temp 38C, prescribed paracetamol..."
+                      placeholder="Summarize the patient's clinical outcome..."
                       minHeight="120px"
                       disabled={role === 'patient'}
                     />

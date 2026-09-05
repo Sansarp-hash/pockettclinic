@@ -114,7 +114,7 @@ export default function SoapAIWriter({ onSaveSoap, initialTranscript = "" }: Soa
           <textarea
             value={roughNotes}
             onChange={(e) => setRoughNotes(e.target.value)}
-            placeholder="Type or paste the transcript from the active consultation. E.g., 'Patient complains of chest tightness. Pain scale 4/10. Pulse is normal at 72. Recommending paracetamol.'"
+            placeholder="Type or paste the transcript from the active consultation..."
             className="w-full h-36 p-4 text-xs font-medium border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20/20 focus:border-slate-300 bg-white/50 resize-none leading-relaxed"
           />
         </div>

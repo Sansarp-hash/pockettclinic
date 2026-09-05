@@ -31,7 +31,7 @@ export default function ConsultantReviewSignatureModal({
   const [isSigned, setIsSigned] = useState(Boolean(consultation.isConsultantSigned));
   
   // Section states
-  const [chiefComplaint, setChiefComplaint] = useState(consultation.chiefComplaints || 'Mild fever and sore throat.');
+  const [chiefComplaint, setChiefComplaint] = useState(consultation.chiefComplaints || '');
   const [discussionHistory, setDiscussionHistory] = useState('');
   const [suggestedInterventions, setSuggestedInterventions] = useState('');
   const [nextSteps, setNextSteps] = useState('');
@@ -370,7 +370,7 @@ export default function ConsultantReviewSignatureModal({
                         <textarea
                           value={consultantFinalNotes}
                           onChange={(e) => setConsultantFinalNotes(e.target.value)}
-                          placeholder="E.g., Take 1 tab every 8 hours after meals. Avoid cold drinks. Call if fever persists."
+                          placeholder="Clinical instructions for the patient..."
                           rows={3}
                           className="w-full text-xs font-semibold p-4 bg-white border border-indigo-100/60 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all placeholder:text-slate-700"
                         />
@@ -389,14 +389,14 @@ export default function ConsultantReviewSignatureModal({
                                 onClick={stopRecording}
                                 className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-full flex items-center gap-2 text-xs font-bold transition-all animate-pulse cursor-pointer"
                               >
-                                <Square size={14} /> Stop Recording
+                                <Square size={14} /> Stop Dictating
                               </button>
                             ) : (
                               <button
                                 onClick={startRecording}
                                 className="bg-slate-950 hover:bg-slate-900 text-white px-4 py-2 rounded-full flex items-center gap-2 text-xs font-bold transition-all shadow-sm cursor-pointer"
                               >
-                                <Mic size={14} /> Record Audio
+                                <Mic size={14} /> Dictate
                               </button>
                             )
                           ) : (
