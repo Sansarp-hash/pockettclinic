@@ -612,37 +612,37 @@ export default function ConsultantOnboarding() {
   const prefixRule = getPrefixOptions(cadre as CadreType, pharmacistDegreeTrack as PharmacistDegreeTrack, degreeVerified);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-900 text-slate-100 py-4 px-4 sm:px-6 lg:px-8">
       {/* Header Banner */}
-      <div className="max-w-4xl mx-auto text-center space-y-3 mb-8">
-        <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full text-emerald-400 text-xs font-black uppercase tracking-widest">
-          <ShieldCheck size={14} /> Universal Consultant Onboarding Profile
+      <div className="max-w-3xl mx-auto text-center space-y-1.5 mb-5">
+        <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full text-emerald-400 text-[9px] font-black uppercase tracking-widest">
+          <ShieldCheck size={10} /> Universal Consultant Onboarding Profile
         </div>
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">
+        <h1 className="text-lg md:text-xl font-black tracking-tight text-white">
           PockettClinic Professional Registration
         </h1>
-        <p className="text-sm text-slate-400 max-w-xl mx-auto font-medium">
+        <p className="text-[10px] text-slate-400 max-w-lg mx-auto font-medium">
           Complete your verified clinical credentials to offer consultations, e-prescriptions, and specialist care on the platform.
         </p>
       </div>
 
       {/* Progress Wizard Indicator */}
-      <div className="max-w-4xl mx-auto mb-10">
-        <div className="grid grid-cols-4 gap-2 bg-slate-800/80 p-2 rounded-2xl border border-slate-700/80">
+      <div className="max-w-3xl mx-auto mb-5">
+        <div className="grid grid-cols-4 gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/80">
           {[
-            { stepNum: 0, label: '0. Profession Cadre' },
-            { stepNum: 1, label: '1. Identity & Credentials' },
-            { stepNum: 2, label: '2. Practice & Compliance' },
-            { stepNum: 3, label: '3. Legal & Consent' }
+            { stepNum: 0, label: '0. Cadre' },
+            { stepNum: 1, label: '1. Identity' },
+            { stepNum: 2, label: '2. Practice' },
+            { stepNum: 3, label: '3. Legal' }
           ].map((s) => (
             <button
               key={s.stepNum}
               type="button"
               disabled={s.stepNum > step}
               onClick={() => setStep(s.stepNum as any)}
-              className={`py-3 px-2 rounded-xl text-center text-xs font-black uppercase tracking-wider transition-all flex flex-col items-center justify-center gap-1 ${
+              className={`py-1.5 px-1 rounded-lg text-center text-[9px] font-black uppercase tracking-wider transition-all flex flex-col items-center justify-center gap-0.5 ${
                 step === s.stepNum
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
+                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/30'
                   : step > s.stepNum
                   ? 'bg-slate-700/60 text-emerald-400 hover:bg-slate-700'
                   : 'text-slate-500 opacity-60 cursor-not-allowed'
@@ -655,25 +655,25 @@ export default function ConsultantOnboarding() {
       </div>
 
       {/* Main Form Container */}
-      <div className="max-w-4xl mx-auto bg-slate-800/90 border border-slate-700/80 rounded-3xl p-6 md:p-10 shadow-2xl backdrop-blur-md">
+      <div className="max-w-3xl mx-auto bg-slate-800/90 border border-slate-700/80 rounded-xl p-4 md:p-5 shadow-xl backdrop-blur-sm">
         
         {/* STEP 0: PROFESSION SELECTION */}
         {step === 0 && (
-          <div className="space-y-8 animate-in fade-in duration-300">
-            <div className="border-b border-slate-700 pb-4">
-              <span className="text-xs font-black text-emerald-400 uppercase tracking-widest block">Step 0 — Explicit Cadre Selection</span>
-              <h2 className="text-xl font-bold text-white mt-1">Select Your Professional Practice Cadre</h2>
-              <p className="text-xs text-slate-400 mt-1">
-                This choice governs your licensing council verification, allowable credentials, title options, and scope of practice.
+          <div className="space-y-5 animate-in fade-in duration-300">
+            <div className="border-b border-slate-700 pb-2">
+              <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block">Step 0 — Cadre Selection</span>
+              <h2 className="text-sm font-bold text-white mt-0.5">Select Your Professional Practice Cadre</h2>
+              <p className="text-[10px] text-slate-400 mt-0.5">
+                Governance for licensing, credentials, title, and scope.
               </p>
             </div>
 
-            <div className="space-y-4">
-              <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
+            <div className="space-y-2.5">
+              <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
                 Primary Profession Cadre <span className="text-rose-400">*</span>
               </label>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {(Object.keys(CADRE_CONFIGS) as CadreType[]).filter((k) => k !== 'UNASSIGNED').map((cKey) => {
                   const cfg = CADRE_CONFIGS[cKey];
                   const isSelected = cadre === cKey;
@@ -682,29 +682,29 @@ export default function ConsultantOnboarding() {
                       key={cKey}
                       type="button"
                       onClick={() => handleCadreChange(cKey)}
-                      className={`p-5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between space-y-2 ${
                         isSelected
-                          ? 'bg-emerald-950/60 border-emerald-500 ring-2 ring-emerald-500/50 shadow-lg shadow-emerald-950/50'
+                          ? 'bg-emerald-950/60 border-emerald-500 ring-1 ring-emerald-500/50 shadow-md shadow-emerald-950/50'
                           : 'bg-slate-900/60 border-slate-700 text-slate-300 hover:bg-slate-750 hover:border-slate-600'
                       }`}
                     >
-                      <div className="space-y-1">
+                      <div className="space-y-0.5">
                         <div className="flex items-center justify-between">
-                          <span className={`text-xs font-black uppercase tracking-wider ${isSelected ? 'text-emerald-400' : 'text-slate-200'}`}>
+                          <span className={`text-[9px] font-black uppercase tracking-wider ${isSelected ? 'text-emerald-400' : 'text-slate-200'}`}>
                             {getSessionTierPricing(cKey, 'VIDEO', systemConfig).tier.title}
                           </span>
-                          {isSelected && <CheckCircle2 size={16} className="text-emerald-400" />}
+                          {isSelected && <CheckCircle2 size={10} className="text-emerald-400" />}
                         </div>
-                        <p className="text-[10px] text-slate-400 font-medium leading-tight">
+                        <p className="text-[8px] text-slate-400 font-medium leading-tight">
                           {getSessionTierPricing(cKey, 'VIDEO', systemConfig).tier.focus}
                         </p>
-                        <p className="text-[10px] text-slate-400 font-medium">
+                        <p className="text-[8px] text-slate-400 font-medium">
                           Council: {cfg.governingCouncil}
                         </p>
                       </div>
 
-                      <div className="text-[9px] bg-slate-800/80 px-2.5 py-1 rounded-lg text-slate-400 border border-slate-700 font-mono">
-                        PIN Format: {cfg.pinFormatExample}
+                      <div className="text-[7px] bg-slate-800/80 px-1.5 py-0.5 rounded-md text-slate-400 border border-slate-700 font-mono">
+                        PIN: {cfg.pinFormatExample}
                       </div>
                     </button>
                   );
@@ -714,66 +714,66 @@ export default function ConsultantOnboarding() {
 
             {/* PHARMACIST DEGREE TRACK FOLLOW-UP */}
             {cadre === 'PHARMACIST' && (
-              <div className="bg-emerald-950/40 border border-emerald-800/50 p-6 rounded-2xl space-y-4 animate-in fade-in duration-300">
-                <div className="flex items-center gap-2 text-emerald-400 border-b border-emerald-800/40 pb-3">
-                  <Award size={18} />
-                  <h3 className="text-sm font-black uppercase tracking-wider">Pharmacist Qualification & Degree Track Verification</h3>
+              <div className="bg-emerald-950/40 border border-emerald-800/50 p-3.5 rounded-xl space-y-2.5 animate-in fade-in duration-300">
+                <div className="flex items-center gap-1.5 text-emerald-400 border-b border-emerald-800/40 pb-1.5">
+                  <Award size={12} />
+                  <h3 className="text-[10px] font-black uppercase tracking-wider">Pharmacy Degree Verification</h3>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Select Your Specific Pharmacy Degree Track <span className="text-rose-400">*</span>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Degree Track <span className="text-rose-400">*</span>
                   </label>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <button
                       type="button"
                       onClick={() => handlePharmacistDegreeTrackChange('PHARM_D')}
-                      className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+                      className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
                         pharmacistDegreeTrack === 'PHARM_D'
                           ? 'bg-emerald-600 border-emerald-500 text-white'
                           : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-600'
                       }`}
                     >
-                      <span className="text-xs font-black uppercase tracking-wider block">Doctor of Pharmacy (PharmD)</span>
-                      <span className="text-[10px] opacity-80 mt-1 block">Requires Pharmacy Council verification or degree upload for "Dr." title entitlement.</span>
+                      <span className="text-[10px] font-black uppercase tracking-wider block">Doctor of Pharmacy (PharmD)</span>
+                      <span className="text-[8px] opacity-85 mt-0.5 block">Requires Council verification for "Dr." title.</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handlePharmacistDegreeTrackChange('B_PHARM')}
-                      className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+                      className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
                         pharmacistDegreeTrack === 'B_PHARM'
                           ? 'bg-emerald-600 border-emerald-500 text-white'
                           : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-600'
                       }`}
                     >
-                      <span className="text-xs font-black uppercase tracking-wider block">Bachelor of Pharmacy (BPharm)</span>
-                      <span className="text-[10px] opacity-80 mt-1 block">Title entitlement: "Pharm."</span>
+                      <span className="text-[10px] font-black uppercase tracking-wider block">Bachelor of Pharmacy (BPharm)</span>
+                      <span className="text-[8px] opacity-85 mt-0.5 block">Title entitlement: "Pharm."</span>
                     </button>
                   </div>
                 </div>
 
                 {/* DEGREE VERIFICATION STATUS NOTICE */}
                 {pharmacistDegreeTrack === 'PHARM_D' && (
-                  <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-2">
-                    <div className="flex items-center gap-2">
-                      {degreeVerificationStatus === 'verifying' && <Loader2 className="animate-spin text-emerald-400" size={16} />}
-                      {degreeVerificationStatus === 'verified_pharmd' && <CheckCircle2 className="text-emerald-400" size={16} />}
-                      {degreeVerificationStatus === 'pending_manual_review' && <AlertCircle className="text-amber-400" size={16} />}
-                      <span className="text-xs font-black text-slate-200 uppercase tracking-wider">
-                        {degreeVerificationStatus === 'verifying' && 'Checking Pharmacy Council Registry...'}
-                        {degreeVerificationStatus === 'verified_pharmd' && 'PharmD Degree Verified via Council Registry'}
-                        {degreeVerificationStatus === 'pending_manual_review' && 'PharmD Pending Manual Admin Degree Verification'}
+                  <div className="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700 space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      {degreeVerificationStatus === 'verifying' && <Loader2 className="animate-spin text-emerald-400" size={12} />}
+                      {degreeVerificationStatus === 'verified_pharmd' && <CheckCircle2 className="text-emerald-400" size={12} />}
+                      {degreeVerificationStatus === 'pending_manual_review' && <AlertCircle className="text-amber-400" size={12} />}
+                      <span className="text-[10px] font-black text-slate-200 uppercase tracking-wider">
+                        {degreeVerificationStatus === 'verifying' && 'Checking Council Registry...'}
+                        {degreeVerificationStatus === 'verified_pharmd' && 'PharmD Degree Verified'}
+                        {degreeVerificationStatus === 'pending_manual_review' && 'Pending Manual Review'}
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-400 leading-relaxed">
+                    <p className="text-[9px] text-slate-400 leading-relaxed">
                       {degreeVerificationStatus === 'verified_pharmd' && (
-                        'Your PharmD degree status is verified. In Section A, you may choose either "Dr." or "Pharm." as your professional title.'
+                        'Your PharmD status is verified. You may use "Dr." or "Pharm."'
                       )}
                       {degreeVerificationStatus === 'pending_manual_review' && (
-                        'Automated registry match could not confirm PharmD. Please upload your degree certificate in Section B for manual admin review. Until verified, your prefix defaults safely to "Pharm."'
+                        'Upload degree in Section B. Prefix defaults to "Pharm."'
                       )}
                     </p>
                   </div>
@@ -781,18 +781,18 @@ export default function ConsultantOnboarding() {
               </div>
             )}
 
-            <div className="flex justify-end pt-4 border-t border-slate-700">
+            <div className="flex justify-end pt-2.5 border-t border-slate-700">
               <button
                 type="button"
                 disabled={!canProceedStep0}
                 onClick={() => setStep(1)}
-                className={`px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${
                   canProceedStep0
-                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/50 cursor-pointer'
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/50 cursor-pointer'
                     : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                 }`}
               >
-                Proceed to Identity & Credentials <ChevronRight size={16} />
+                Proceed to Identity <ChevronRight size={12} />
               </button>
             </div>
           </div>
@@ -800,21 +800,21 @@ export default function ConsultantOnboarding() {
 
         {/* STEP 1: IDENTITY (SECTION A) & CREDENTIALS (SECTION B) */}
         {step === 1 && (
-          <div className="space-y-10 animate-in fade-in duration-300">
+          <div className="space-y-5 animate-in fade-in duration-300">
             
             {/* SECTION A — Identity & Contact */}
-            <div className="space-y-6">
-              <div className="border-b border-slate-700 pb-3 flex items-center justify-between">
+            <div className="space-y-3.5">
+              <div className="border-b border-slate-700 pb-2 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-black text-emerald-400 uppercase tracking-widest block">Section A</span>
-                  <h2 className="text-lg font-bold text-white">Identity & Contact Details</h2>
+                  <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block">Section A</span>
+                  <h2 className="text-xs font-bold text-white">Identity & Contact Details</h2>
                 </div>
-                <span className="text-[10px] bg-slate-700 text-slate-300 px-3 py-1 rounded-full font-mono">Universal Fields</span>
+                <span className="text-[8px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded-full font-mono uppercase">Universal</span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
                     Full Legal Name <span className="text-rose-400">*</span>
                   </label>
                   <input
@@ -822,56 +822,51 @@ export default function ConsultantOnboarding() {
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
                     placeholder="e.g. Kwame Mensah Appiah"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Professional Title / Prefix <span className="text-rose-400">*</span>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Professional Title <span className="text-rose-400">*</span>
                   </label>
 
                   {prefixRule.options.length > 1 ? (
                     <select
                       value={prefix}
                       onChange={(e) => setPrefix(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
                     >
-                      <option value="">-- Select Preferred Title --</option>
+                      <option value="">-- Select Title --</option>
                       {prefixRule.options.map((opt) => (
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
                   ) : (
-                    <div className="w-full bg-slate-900/60 border border-slate-700 rounded-xl px-4 py-3 text-sm font-bold text-emerald-400 flex items-center justify-between">
+                    <div className="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-emerald-400 flex items-center justify-between">
                       <span>{prefix || prefixRule.defaultPrefix}</span>
-                      <span className="text-[10px] text-slate-500 uppercase tracking-widest font-mono">Fixed by Cadre</span>
+                      <span className="text-[8px] text-slate-500 uppercase tracking-widest font-mono">Fixed</span>
                     </div>
                   )}
-                  <p className="text-[10px] text-slate-400">
-                    {cadre === 'PHARMACIST' && degreeVerified
-                      ? 'Verified PharmD graduate: You may select either "Dr." or "Pharm." based on your personal preference.'
-                      : 'Prefix option is strictly mapped to your verified cadre status.'}
-                  </p>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Phone Number (WhatsApp Active) <span className="text-rose-400">*</span>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Phone (WhatsApp) <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="tel"
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
-                    placeholder="e.g. +233 24 123 4567"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
+                    placeholder="+233..."
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
                     Email Address <span className="text-rose-400">*</span>
                   </label>
                   <input
@@ -879,14 +874,14 @@ export default function ConsultantOnboarding() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
                     placeholder="doctor@example.com"
                   />
                 </div>
 
                 {!currentUser && (
-                  <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
                       Account Password <span className="text-rose-400">*</span>
                     </label>
                     <div className="relative">
@@ -895,38 +890,38 @@ export default function ConsultantOnboarding() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none pr-10"
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none pr-8"
                         placeholder="Min 6 characters"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3.5 text-slate-400 hover:text-white"
+                        className="absolute right-2 top-2 text-slate-400 hover:text-white"
                       >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {showPassword ? <EyeOff size={12} /> : <Eye size={12} />}
                       </button>
                     </div>
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
                     Profile Photo <span className="text-rose-400">*</span>
                   </label>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2.5">
                     {profilePhoto ? (
-                      <img src={profilePhoto} alt="Profile" className="w-14 h-14 rounded-full object-cover border-2 border-emerald-500" />
+                      <img src={profilePhoto} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2 border-emerald-500" />
                     ) : (
-                      <div className="w-14 h-14 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 border border-slate-600">
-                        <UserCircle size={28} />
+                      <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 border border-slate-600">
+                        <UserCircle size={18} />
                       </div>
                     )}
                     <button
                       type="button"
                       onClick={() => profilePhotoInputRef.current?.click()}
-                      className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-black uppercase tracking-wider rounded-xl text-white transition-colors flex items-center gap-2"
+                      className="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 text-[9px] font-black uppercase tracking-wider rounded-lg text-white transition-colors flex items-center gap-1.5"
                     >
-                      <Upload size={14} /> Upload Photo
+                      <Upload size={10} /> Upload Photo
                     </button>
                     <input
                       ref={profilePhotoInputRef}
@@ -938,11 +933,11 @@ export default function ConsultantOnboarding() {
                   </div>
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
                     Languages Spoken <span className="text-rose-400">*</span>
                   </label>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     {ALL_LANGUAGES.map((lang) => {
                       const isSelected = languages.includes(lang);
                       return (
@@ -950,7 +945,7 @@ export default function ConsultantOnboarding() {
                           key={lang}
                           type="button"
                           onClick={() => toggleLanguage(lang)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
+                          className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border ${
                             isSelected
                               ? 'bg-emerald-600 border-emerald-500 text-white'
                               : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600'
@@ -966,63 +961,63 @@ export default function ConsultantOnboarding() {
             </div>
 
             {/* SECTION B — Professional Credentials */}
-            <div className="space-y-6 pt-6 border-t border-slate-700">
-              <div className="border-b border-slate-700 pb-3 flex items-center justify-between">
+            <div className="space-y-3.5 pt-4 border-t border-slate-700">
+              <div className="border-b border-slate-700 pb-2 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-black text-emerald-400 uppercase tracking-widest block">Section B</span>
-                  <h2 className="text-lg font-bold text-white">Professional Council Credentials</h2>
+                  <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block">Section B</span>
+                  <h2 className="text-xs font-bold text-white">Council Credentials</h2>
                 </div>
-                <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full font-mono">
-                  {cadre ? CADRE_CONFIGS[cadre as CadreType].governingCouncil : 'Council Verification'}
+                <span className="text-[8px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-1.5 py-0.5 rounded-full font-mono uppercase">
+                  {cadre ? CADRE_CONFIGS[cadre as CadreType].governingCouncil : 'Verification'}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <div className="space-y-1 md:col-span-2">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
                     Regulatory PIN / Registration Number <span className="text-rose-400">*</span>
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5">
                     <input
                       type="text"
                       required
                       value={pin}
                       onChange={(e) => setPin(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none font-mono"
-                      placeholder={cadre ? CADRE_CONFIGS[cadre as CadreType].pinFormatExample : 'e.g. MDC/RN/2026/001'}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none font-mono"
+                      placeholder={cadre ? CADRE_CONFIGS[cadre as CadreType].pinFormatExample : 'MDC/RN/...'}
                     />
                     <button
                       type="button"
                       disabled={isVerifyingPin}
                       onClick={triggerPinVerification}
-                      className="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 whitespace-nowrap"
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] font-black uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap"
                     >
-                      {isVerifyingPin ? <Loader2 className="animate-spin" size={16} /> : <ShieldCheck size={16} />}
-                      Verify PIN
+                      {isVerifyingPin ? <Loader2 className="animate-spin" size={10} /> : <ShieldCheck size={10} />}
+                      Verify
                     </button>
                   </div>
 
                   {pinAutofillSuccess && (
-                    <p className="text-xs text-emerald-400 bg-emerald-950/40 p-3 rounded-xl border border-emerald-800/40 mt-2 font-medium">
+                    <p className="text-[9px] text-emerald-400 bg-emerald-950/40 p-2 rounded-lg border border-emerald-800/40 mt-1.5 font-medium">
                       {pinAutofillSuccess}
                     </p>
                   )}
 
                   {pinLookupError && (
-                    <p className="text-xs text-amber-400 bg-amber-950/40 p-3 rounded-xl border border-amber-800/40 mt-2 font-medium">
+                    <p className="text-[9px] text-amber-400 bg-amber-950/40 p-2 rounded-lg border border-amber-800/40 mt-1.5 font-medium">
                       {pinLookupError}
                     </p>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
                     Highest Qualification <span className="text-rose-400">*</span>
                   </label>
                   <select
                     value={qualification}
                     onChange={(e) => setQualification(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
                   >
                     {cadre && CADRE_CONFIGS[cadre as CadreType].qualificationOptions.map((q) => (
                       <option key={q} value={q}>{q}</option>
@@ -1030,17 +1025,17 @@ export default function ConsultantOnboarding() {
                   </select>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Degree Certificate PDF / Scan <span className="text-rose-400">*</span>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Degree Certificate <span className="text-rose-400">*</span>
                   </label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => degreeCertInputRef.current?.click()}
-                      className="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-xs font-black uppercase tracking-wider rounded-xl text-white transition-colors flex items-center gap-2 w-full justify-center"
+                      className="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-[9px] font-black uppercase tracking-wider rounded-lg text-white transition-colors flex items-center gap-1.5 w-full justify-center"
                     >
-                      <Upload size={14} /> {degreeCertificateFileName || 'Upload Degree Certificate'}
+                      <Upload size={10} /> <span className="truncate max-w-[120px]">{degreeCertificateFileName || 'Upload'}</span>
                     </button>
                     <input
                       ref={degreeCertInputRef}
@@ -1052,42 +1047,42 @@ export default function ConsultantOnboarding() {
                   </div>
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Education & Professional Training History <span className="text-rose-400">*</span>
+                <div className="space-y-1 md:col-span-2">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Education & Training History <span className="text-rose-400">*</span>
                   </label>
                   <textarea
-                    rows={3}
+                    rows={2}
                     required
                     value={educationHistory}
                     onChange={(e) => setEducationHistory(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
-                    placeholder="Provide your university, residency, or clinical attachment milestones..."
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
+                    placeholder="Milestones..."
                   />
                 </div>
               </div>
             </div>
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between pt-6 border-t border-slate-700">
+            <div className="flex justify-between pt-3 border-t border-slate-700">
               <button
                 type="button"
                 onClick={() => setStep(0)}
-                className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all"
+                className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-[9px] font-black uppercase tracking-wider rounded-lg transition-all"
               >
-                Back to Cadre Selection
+                Back to Cadre
               </button>
               <button
                 type="button"
                 disabled={!canProceedStep1}
                 onClick={() => setStep(2)}
-                className={`px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${
                   canProceedStep1
-                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/50 cursor-pointer'
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/50 cursor-pointer'
                     : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                 }`}
               >
-                Proceed to Practice & Compliance <ChevronRight size={16} />
+                Proceed to Practice <ChevronRight size={12} />
               </button>
             </div>
           </div>
@@ -1095,30 +1090,30 @@ export default function ConsultantOnboarding() {
 
         {/* STEP 2: PRACTICE DETAILS (SECTION C) & COMPLIANCE/INSURANCE (SECTION D) */}
         {step === 2 && (
-          <div className="space-y-10 animate-in fade-in duration-300">
+          <div className="space-y-5 animate-in fade-in duration-300">
             
             {/* SECTION C — Practice Details */}
-            <div className="space-y-6">
-              <div className="border-b border-slate-700 pb-3 flex items-center justify-between">
+            <div className="space-y-3.5">
+              <div className="border-b border-slate-700 pb-2 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-black text-emerald-400 uppercase tracking-widest block">Section C</span>
-                  <h2 className="text-lg font-bold text-white">Practice Details & Supervision</h2>
+                  <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block">Section C</span>
+                  <h2 className="text-xs font-bold text-white">Practice & Supervision</h2>
                 </div>
-                <span className="text-[10px] bg-slate-700 text-slate-300 px-3 py-1 rounded-full font-mono">Cadre-Conditional Fields</span>
+                <span className="text-[8px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded-full font-mono uppercase">Conditional</span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 
                 {/* Specialty (SPECIALIST only) */}
                 {cadre === 'SPECIALIST' && (
-                  <div className="space-y-2 md:col-span-2 bg-emerald-950/40 p-4 rounded-xl border border-emerald-800/40">
-                    <label className="text-xs font-black text-emerald-400 uppercase tracking-wider block">
+                  <div className="space-y-1 md:col-span-2 bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-800/40">
+                    <label className="text-[9px] font-black text-emerald-400 uppercase tracking-wider block">
                       Medical Specialty <span className="text-rose-400">*</span>
                     </label>
                     <select
                       value={specialty}
                       onChange={(e) => setSpecialty(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
                     >
                       <option value="">-- Select Specialty --</option>
                       {SPECIALTY_OPTIONS.map((spec) => (
@@ -1130,16 +1125,16 @@ export default function ConsultantOnboarding() {
 
                 {/* Supervising Physician (PHYSICIAN_ASSISTANT only) */}
                 {cadre === 'PHYSICIAN_ASSISTANT' && (
-                  <div className="space-y-2 md:col-span-2 bg-emerald-950/40 p-4 rounded-xl border border-emerald-800/40">
-                    <label className="text-xs font-black text-emerald-400 uppercase tracking-wider block">
+                  <div className="space-y-1 md:col-span-2 bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-800/40">
+                    <label className="text-[9px] font-black text-emerald-400 uppercase tracking-wider block">
                       Supervising Doctor <span className="text-rose-400">*</span>
                     </label>
                     <select
                       value={supervisingPhysician}
                       onChange={(e) => setSupervisingPhysician(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
                     >
-                      <option value="">-- Select Verified Supervising Physician --</option>
+                      <option value="">-- Select Supervising Physician --</option>
                       {verifiedDoctors.map((doc) => (
                         <option key={doc.uid} value={doc.fullName}>
                           {doc.prefix} {doc.fullName} ({doc.pin})
@@ -1152,16 +1147,16 @@ export default function ConsultantOnboarding() {
 
                 {/* Supervising Pharmacist (PHARM_TECH only) */}
                 {cadre === 'PHARM_TECH' && (
-                  <div className="space-y-2 md:col-span-2 bg-emerald-950/40 p-4 rounded-xl border border-emerald-800/40">
-                    <label className="text-xs font-black text-emerald-400 uppercase tracking-wider block">
+                  <div className="space-y-1 md:col-span-2 bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-800/40">
+                    <label className="text-[9px] font-black text-emerald-400 uppercase tracking-wider block">
                       Supervising Pharmacist <span className="text-rose-400">*</span>
                     </label>
                     <select
                       value={supervisingPharmacist}
                       onChange={(e) => setSupervisingPharmacist(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
                     >
-                      <option value="">-- Select Verified Supervising Pharmacist --</option>
+                      <option value="">-- Select Supervising Pharmacist --</option>
                       {verifiedPharmacists.map((pharm) => (
                         <option key={pharm.uid} value={pharm.fullName}>
                           {pharm.prefix} {pharm.fullName} ({pharm.pin})
@@ -1172,8 +1167,8 @@ export default function ConsultantOnboarding() {
                   </div>
                 )}
 
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
+                <div className="space-y-1 md:col-span-2">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
                     {cadre ? CADRE_CONFIGS[cadre as CadreType].institutionLabel : 'Institution / Affiliation'} <span className="text-rose-400">*</span>
                   </label>
                   <input
@@ -1181,16 +1176,16 @@ export default function ConsultantOnboarding() {
                     required
                     value={institution}
                     onChange={(e) => setInstitution(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
-                    placeholder="e.g. Korle-Bu Teaching Hospital / TopCare Pharmacy"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
+                    placeholder="e.g. Korle-Bu / TopCare"
                   />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Scope of Services Offered <span className="text-rose-400">*</span>
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Scope of Services <span className="text-rose-400">*</span>
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {cadre && CADRE_CONFIGS[cadre as CadreType].scopeOfServices.map((scope) => {
                       const isSelected = scopeOfServices.includes(scope);
                       return (
@@ -1198,14 +1193,14 @@ export default function ConsultantOnboarding() {
                           key={scope}
                           type="button"
                           onClick={() => toggleScope(scope)}
-                          className={`p-3 rounded-xl border text-left text-xs font-black uppercase tracking-wider transition-all flex items-center justify-between ${
+                          className={`p-2 rounded-lg border text-left text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-between ${
                             isSelected
                               ? 'bg-emerald-600 border-emerald-500 text-white'
                               : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600'
                           }`}
                         >
                           <span>{scope}</span>
-                          {isSelected && <CheckCircle2 size={14} />}
+                          {isSelected && <CheckCircle2 size={10} />}
                         </button>
                       );
                     })}
@@ -1215,45 +1210,45 @@ export default function ConsultantOnboarding() {
             </div>
 
             {/* SECTION D — Compliance & Insurance */}
-            <div className="space-y-6 pt-6 border-t border-slate-700">
-              <div className="border-b border-slate-700 pb-3 flex items-center justify-between">
+            <div className="space-y-3.5 pt-4 border-t border-slate-700">
+              <div className="border-b border-slate-700 pb-2 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-black text-emerald-400 uppercase tracking-widest block">Section D</span>
-                  <h2 className="text-lg font-bold text-white">Compliance & Professional Indemnity Insurance</h2>
+                  <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block">Section D</span>
+                  <h2 className="text-xs font-bold text-white">Compliance & Indemnity Insurance</h2>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Ghana Card Identification Number <span className="text-rose-400">*</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Ghana Card ID <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={ghanaCardNo}
                     onChange={(e) => setGhanaCardNo(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none font-mono"
-                    placeholder="GHA-000000000-0"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none font-mono"
+                    placeholder="GHA-..."
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Indemnity Policy Number <span className="text-rose-400">*</span>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Policy Number <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={indemnityPolicyNo}
                     onChange={(e) => setIndemnityPolicyNo(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none font-mono"
-                    placeholder="IND-2026-XXXX"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none font-mono"
+                    placeholder="IND-..."
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
                     Insurance Provider <span className="text-rose-400">*</span>
                   </label>
                   <input
@@ -1261,51 +1256,51 @@ export default function ConsultantOnboarding() {
                     required
                     value={insuranceProvider}
                     onChange={(e) => setInsuranceProvider(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
-                    placeholder="Star Assurance Ghana"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
+                    placeholder="Star Assurance"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Policy Expiry Date <span className="text-rose-400">*</span>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Expiry Date <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="date"
                     required
                     value={expiryDate}
                     onChange={(e) => setExpiryDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
                   />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Indemnity Certificate Upload / Deferred Waiver
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Indemnity Certificate / Waiver
                   </label>
                   
                   {!provideLater ? (
                     <button
                       type="button"
                       onClick={() => indemnityInputRef.current?.click()}
-                      className="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-xs font-black uppercase tracking-wider rounded-xl text-white transition-colors flex items-center justify-center gap-2 w-full"
+                      className="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-[9px] font-black uppercase tracking-wider rounded-lg text-white transition-colors flex items-center justify-center gap-1.5 w-full"
                     >
-                      <Upload size={14} /> {indemnityDocName || 'Upload Indemnity Policy Certificate'}
+                      <Upload size={10} /> <span className="truncate max-w-[200px]">{indemnityDocName || 'Upload Indemnity Policy'}</span>
                     </button>
                   ) : (
-                    <div className="bg-amber-950/40 border border-amber-800/50 p-4 rounded-xl space-y-3">
-                      <p className="text-xs text-amber-300 font-medium leading-relaxed">
-                        You have chosen to provide your formal indemnity certificate later. To proceed, you must accept full personal legal liability for all clinical advice and e-prescriptions issued prior to document upload.
+                    <div className="bg-amber-950/40 border border-amber-800/50 p-2.5 rounded-lg space-y-2">
+                      <p className="text-[10px] text-amber-300 font-medium leading-relaxed">
+                        Deferred upload requires accepting full personal liability.
                       </p>
-                      <label className="flex items-center gap-3 cursor-pointer">
+                      <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={acceptFullPersonalLiability}
                           onChange={(e) => setAcceptFullPersonalLiability(e.target.checked)}
-                          className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                          className="w-3 h-3 rounded text-emerald-600 focus:ring-emerald-500"
                         />
-                        <span className="text-xs font-bold text-slate-200">
-                          I assume full personal legal liability until indemnity certificate is uploaded.
+                        <span className="text-[10px] font-bold text-slate-200">
+                          I assume full personal legal liability.
                         </span>
                       </label>
                     </div>
@@ -1319,15 +1314,15 @@ export default function ConsultantOnboarding() {
                     className="hidden"
                   />
 
-                  <div className="pt-2">
-                    <label className="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-slate-300 text-xs font-medium">
+                  <div className="pt-0.5">
+                    <label className="flex items-center gap-1.5 cursor-pointer text-slate-400 hover:text-slate-300 text-[10px] font-medium">
                       <input
                         type="checkbox"
                         checked={provideLater}
                         onChange={(e) => setProvideLater(e.target.checked)}
-                        className="w-3.5 h-3.5 rounded text-emerald-600"
+                        className="w-3 h-3 rounded text-emerald-600"
                       />
-                      <span>Provide indemnity certificate later (requires personal liability waiver above)</span>
+                      <span>Provide indemnity later (requires waiver)</span>
                     </label>
                   </div>
                 </div>
@@ -1335,25 +1330,25 @@ export default function ConsultantOnboarding() {
             </div>
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between pt-6 border-t border-slate-700">
+            <div className="flex justify-between pt-3 border-t border-slate-700">
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all"
+                className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-[9px] font-black uppercase tracking-wider rounded-lg transition-all"
               >
-                Back to Identity & Credentials
+                Back to Identity
               </button>
               <button
                 type="button"
                 disabled={!canProceedStep2}
                 onClick={() => setStep(3)}
-                className={`px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${
                   canProceedStep2
-                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/50 cursor-pointer'
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/50 cursor-pointer'
                     : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                 }`}
               >
-                Proceed to Legal & Consent <ChevronRight size={16} />
+                Proceed to Legal <ChevronRight size={12} />
               </button>
             </div>
           </div>
@@ -1361,136 +1356,136 @@ export default function ConsultantOnboarding() {
 
         {/* STEP 3: LEGAL CONSENT (SECTION E) & AVAILABILITY (SECTION F) */}
         {step === 3 && (
-          <form onSubmit={handleFinalSubmit} className="space-y-10 animate-in fade-in duration-300">
+          <form onSubmit={handleFinalSubmit} className="space-y-5 animate-in fade-in duration-300">
             
             {/* SECTION E — Legal Consent */}
-            <div className="space-y-6">
-              <div className="border-b border-slate-700 pb-3 flex items-center justify-between">
+            <div className="space-y-3.5">
+              <div className="border-b border-slate-700 pb-2 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-black text-emerald-400 uppercase tracking-widest block">Section E</span>
-                  <h2 className="text-lg font-bold text-white">Legal Consent & Affirmations</h2>
+                  <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block">Section E</span>
+                  <h2 className="text-xs font-bold text-white">Legal Consent & Affirmations</h2>
                 </div>
-                <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full font-mono">Mandatory Affirmations</span>
+                <span className="text-[8px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-1.5 py-0.5 rounded-full font-mono uppercase">Mandatory</span>
               </div>
 
-              <div className="space-y-3 bg-slate-900/80 p-5 rounded-2xl border border-slate-700">
+              <div className="space-y-1.5 bg-slate-900/80 p-3 rounded-xl border border-slate-700">
                 {[
-                  { state: certifyCredentials, setState: setCertifyCredentials, label: 'I certify that all professional credentials, PIN numbers, and uploaded certificates are complete, accurate, and valid.' },
-                  { state: assumeLiability, setState: setAssumeLiability, label: 'I assume full professional and legal liability for all clinical evaluations, SOAP notes, and e-prescriptions generated under my profile.' },
-                  { state: indemnifyPlatform, setState: setIndemnifyPlatform, label: 'I agree to indemnify and hold harmless PockettClinic and its operating entities from any claims arising out of clinical practice negligence.' },
-                  { state: affirmIndependentContractor, setState: setAffirmIndependentContractor, label: 'I affirm my status as an independent consultant rendering professional services under council regulation.' },
+                  { state: certifyCredentials, setState: setCertifyCredentials, label: 'I certify that all credentials and PINs are valid.' },
+                  { state: assumeLiability, setState: setAssumeLiability, label: 'I assume full legal liability for evaluations and e-prescriptions.' },
+                  { state: indemnifyPlatform, setState: setIndemnifyPlatform, label: 'I agree to indemnify PockettClinic from any negligence claims.' },
+                  { state: affirmIndependentContractor, setState: setAffirmIndependentContractor, label: 'I affirm my status as an independent consultant.' },
                   { 
                     state: acceptedPlatformTerms, 
                     setState: setAcceptedPlatformTerms, 
-                    label: 'I accept the PockettClinic Platform Terms of Service',
+                    label: 'I accept the Platform Terms of Service',
                     link: () => { setLegalModalTab('tos'); setLegalModalOpen(true); }
                   },
                   { 
                     state: acceptedPrivacyPolicy, 
                     setState: setAcceptedPrivacyPolicy, 
-                    label: 'I accept the PockettClinic Professional Privacy Policy',
+                    label: 'I accept the Professional Privacy Policy',
                     link: () => { setLegalModalTab('privacy'); setLegalModalOpen(true); }
                   }
                 ].map((item, idx) => (
-                  <label key={idx} className="flex items-start gap-3 cursor-pointer p-2 rounded-xl hover:bg-slate-800/60 transition-colors">
+                  <label key={idx} className="flex items-start gap-2.5 cursor-pointer p-1 rounded-lg hover:bg-slate-800/60 transition-colors">
                     <input
                       type="checkbox"
                       checked={item.state}
                       onChange={(e) => item.setState(e.target.checked)}
-                      className="w-4 h-4 mt-0.5 rounded text-emerald-600 focus:ring-emerald-500"
+                      className="w-3 h-3 mt-0.5 rounded text-emerald-600 focus:ring-emerald-500"
                     />
-                    <span className="text-xs text-slate-300 font-medium leading-relaxed">
+                    <span className="text-[10px] text-slate-300 font-medium leading-relaxed">
                       {item.label}{' '}
                       {item.link && (
                         <button
                           type="button"
                           onClick={item.link}
-                          className="text-emerald-400 hover:underline font-bold inline-block ml-1"
+                          className="text-emerald-400 hover:underline font-bold inline-block ml-0.5"
                         >
-                          [Read Document]
+                          [Read]
                         </button>
                       )}
                     </span>
                   </label>
                 ))}
 
-                <div className="pt-4 border-t border-slate-700 space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Typed Legal Signature (Must match "{fullName || 'Full Legal Name'}") <span className="text-rose-400">*</span>
+                <div className="pt-2.5 border-t border-slate-700 space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Legal Signature (Must match "{fullName || 'Full Legal Name'}") <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={typedLegalSignature}
                     onChange={(e) => setTypedLegalSignature(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm font-mono text-emerald-400 focus:ring-2 focus:ring-emerald-500 outline-none"
-                    placeholder={`Type "${fullName || 'Full Legal Name'}" exactly`}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] font-mono text-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none"
+                    placeholder="Type name exactly"
                   />
                 </div>
               </div>
             </div>
 
             {/* SECTION F — Availability & Account Setup */}
-            <div className="space-y-6 pt-6 border-t border-slate-700">
-              <div className="border-b border-slate-700 pb-3 flex items-center justify-between">
+            <div className="space-y-3.5 pt-4 border-t border-slate-700">
+              <div className="border-b border-slate-700 pb-2 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-black text-emerald-400 uppercase tracking-widest block">Section F</span>
-                  <h2 className="text-lg font-bold text-white">Availability & Account Setup</h2>
+                  <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block">Section F</span>
+                  <h2 className="text-xs font-bold text-white">Availability & Setup</h2>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Standard Availability Days <span className="text-rose-400">*</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Availability Days <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={availabilityDays}
                     onChange={(e) => setAvailabilityDays(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
-                    placeholder="e.g. Monday - Friday, Weekends"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
+                    placeholder="e.g. Mon - Fri"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider block">
-                    Standard Availability Hours <span className="text-rose-400">*</span>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-300 uppercase tracking-wider block">
+                    Availability Hours <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={availabilityHours}
                     onChange={(e) => setAvailabilityHours(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none"
-                    placeholder="e.g. 9:00 AM - 5:00 PM GMT"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:ring-1 focus:ring-emerald-500 outline-none"
+                    placeholder="e.g. 9AM - 5PM"
                   />
                 </div>
               </div>
             </div>
 
             {/* Final Submission Button */}
-            <div className="flex justify-between pt-6 border-t border-slate-700">
+            <div className="flex justify-between pt-3 border-t border-slate-700">
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all"
+                className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-[9px] font-black uppercase tracking-wider rounded-lg transition-all"
               >
-                Back to Practice & Compliance
+                Back to Practice
               </button>
 
               <button
                 type="submit"
                 disabled={!canSubmitFinalStep || isSubmitting}
-                className={`px-10 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3 ${
+                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${
                   canSubmitFinalStep && !isSubmitting
-                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl shadow-emerald-950/60 cursor-pointer'
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/60 cursor-pointer'
                     : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                 }`}
               >
-                {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <ShieldCheck size={18} />}
-                Submit Verified Profile
+                {isSubmitting ? <Loader2 className="animate-spin" size={12} /> : <ShieldCheck size={12} />}
+                Submit Profile
               </button>
             </div>
           </form>

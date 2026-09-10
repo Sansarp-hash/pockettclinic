@@ -38,27 +38,27 @@ export const ConsultantSidebar: React.FC<ConsultantSidebarProps> = ({
   ];
 
   return (
-    <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 flex-col shrink-0 h-full">
-      <div className="p-6 border-b border-slate-100 flex flex-col gap-4">
-        <div className="flex items-center gap-3">
+    <aside className="hidden md:flex w-52 bg-white border-r border-slate-200 flex-col shrink-0 h-full">
+      <div className="p-3 border-b border-slate-100 flex flex-col gap-3">
+        <div className="flex items-center gap-2">
           {globalLogoUrl ? (
-            <img src={globalLogoUrl} alt="PockettClinic" className="w-[44px] h-[44px] rounded-[14px] object-cover bg-white p-0.5 shrink-0 shadow-sm border border-slate-200" />
+            <img src={globalLogoUrl} alt="PockettClinic" className="w-[32px] h-[32px] rounded-lg object-cover bg-white p-0.5 shrink-0 shadow-sm border border-slate-200" />
           ) : (
-            <div className="w-[44px] h-[44px] rounded-[14px] bg-[#C8E6C9] p-1 flex items-center justify-center shrink-0 shadow-sm border border-emerald-100">
+            <div className="w-[32px] h-[32px] rounded-lg bg-[#C8E6C9] p-1 flex items-center justify-center shrink-0 shadow-sm border border-emerald-100">
               <img src="/logo.svg" alt="PockettClinic Logo" className="w-full h-full object-contain" />
             </div>
           )}
-          <div>
-            <h1 className="text-sm font-black text-slate-800 tracking-tight leading-none">
+          <div className="min-w-0">
+            <h1 className="text-[10px] font-black text-slate-900 tracking-tight leading-none truncate">
               {globalTitle || "PockettClinic"}
             </h1>
-            <span className="text-[10px] text-emerald-600 font-bold tracking-wider uppercase block mt-1">
-              {globalSlogan || "Your Digital Hospital Anywhere"}
+            <span className="text-[7px] text-emerald-600 font-bold tracking-wider uppercase block mt-0.5 truncate">
+              {globalSlogan || "Digital Hospital"}
             </span>
           </div>
         </div>
       </div>
-      <nav className="p-4 space-y-1.5 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
+      <nav className="p-2 space-y-0.5 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeDashboardTab === tab.id;
@@ -66,16 +66,16 @@ export const ConsultantSidebar: React.FC<ConsultantSidebarProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveDashboardTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer relative ${
+              className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-bold transition-all cursor-pointer relative ${
                 isActive 
-                   ? 'bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100/50' 
+                   ? 'bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100/30' 
                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
               }`}
             >
-              <Icon size={18} className={isActive ? 'text-emerald-600' : 'text-slate-400'} /> 
-              <span>{tab.label}</span>
+              <Icon size={14} className={isActive ? 'text-emerald-600' : 'text-slate-400'} /> 
+              <span className="truncate">{tab.label}</span>
               {tab.id === 'notifications' && unreadCount > 0 && (
-                <span className="absolute right-4 w-5 h-5 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full shadow-sm">
+                <span className="absolute right-2.5 w-3.5 h-3.5 bg-red-500 text-white text-[7px] font-black flex items-center justify-center rounded-full shadow-sm">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
@@ -83,12 +83,12 @@ export const ConsultantSidebar: React.FC<ConsultantSidebarProps> = ({
           );
         })}
         
-        <div className="pt-4 border-t border-slate-100 space-y-1.5 mt-4">
+        <div className="pt-2 border-t border-slate-100 space-y-0.5 mt-2">
           <button
             onClick={onOpenSettings}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent"
+            className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-bold transition-all cursor-pointer text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent"
           >
-            <Settings size={18} className="text-slate-400" />
+            <Settings size={14} className="text-slate-400" />
             <span>Settings</span>
           </button>
           <button
@@ -99,9 +99,9 @@ export const ConsultantSidebar: React.FC<ConsultantSidebarProps> = ({
                 });
               }
             }}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer text-slate-500 hover:bg-rose-50 hover:text-rose-600 border border-transparent"
+            className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-bold transition-all cursor-pointer text-slate-500 hover:bg-rose-50 hover:text-rose-600 border border-transparent"
           >
-            <LogOut size={18} className="text-slate-400" />
+            <LogOut size={14} className="text-slate-400" />
             <span>Sign Out</span>
           </button>
         </div>

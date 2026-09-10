@@ -53,79 +53,78 @@ export const NotificationsCenter: React.FC<NotificationsCenterProps> = ({
   };
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
-        <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-white relative z-10">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-slate-950 text-white flex items-center justify-center shadow-2xl shadow-slate-950/20">
-              <Bell size={24} />
+    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="bg-white rounded-xl border border-slate-100 shadow-xs overflow-hidden">
+        <div className="p-3 border-b border-slate-100 flex items-center justify-between bg-white relative z-10">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-slate-950 text-white flex items-center justify-center shadow-md">
+              <Bell size={16} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-950 uppercase tracking-tight">Clinical Dispatch</h3>
-              <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Real-time system alerts & patient logs</p>
+              <h3 className="text-xs font-black text-slate-950 uppercase tracking-tight">Clinical Dispatch</h3>
+              <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Alerts & dispatches</p>
             </div>
           </div>
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
-              className="px-5 py-2 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest border border-emerald-100 hover:bg-emerald-100 transition-all active:scale-95 cursor-pointer"
+              className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 text-[8px] font-black uppercase tracking-wider border border-emerald-100 hover:bg-emerald-100 transition-all active:scale-95 cursor-pointer"
             >
               Clear All Read
             </button>
           )}
         </div>
         
-        <div className="p-8 space-y-4 max-h-[70vh] overflow-y-auto no-scrollbar relative z-10">
+        <div className="p-3 space-y-2 max-h-[60vh] overflow-y-auto no-scrollbar relative z-10">
           {loadingNotifs ? (
-            <div className="p-24 text-center">
-              <div className="w-12 h-12 border-4 border-slate-100 border-t-slate-950 rounded-full animate-spin mx-auto mb-6" />
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Polling Secure Dispatch...</p>
+            <div className="p-10 text-center">
+              <div className="w-8 h-8 border-2 border-slate-100 border-t-slate-950 rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Polling Secure Dispatch...</p>
             </div>
           ) : notifications.length === 0 ? (
-            <div className="p-24 text-center">
-              <div className="w-20 h-20 rounded-[28px] bg-slate-50 flex items-center justify-center mx-auto text-slate-200 mb-6 border border-slate-50 shadow-inner">
-                <Bell size={40} className="stroke-[1.5]" />
+            <div className="p-10 text-center">
+              <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center mx-auto text-slate-300 mb-3 border border-slate-100">
+                <Bell size={24} className="stroke-[1.5]" />
               </div>
-              <h4 className="text-[13px] font-black text-slate-950 uppercase tracking-[0.2em]">All Systems Clear</h4>
-              <p className="text-[11px] text-slate-400 mt-2 font-bold uppercase tracking-tight italic">"No active clinical alerts or system dispatches detected at this time."</p>
+              <h4 className="text-[10px] font-black text-slate-950 uppercase tracking-widest">All Systems Clear</h4>
+              <p className="text-[9px] text-slate-400 mt-1 font-bold uppercase tracking-tight italic">"No active clinical alerts detected."</p>
             </div>
           ) : (
             notifications.map(n => (
               <div
                 key={n.id}
                 onClick={() => handleNotificationClick(n)}
-                className={`p-6 rounded-[2rem] border transition-all duration-300 cursor-pointer relative group overflow-hidden ${
+                className={`p-3 rounded-lg border transition-all duration-200 cursor-pointer relative group overflow-hidden ${
                   n.read
-                    ? 'bg-white border-slate-50 text-slate-400 grayscale'
-                    : 'bg-white border-emerald-100 text-slate-900 shadow-lg shadow-emerald-500/5 scale-[1.01]'
+                    ? 'bg-slate-50/50 border-slate-100 text-slate-400'
+                    : 'bg-white border-emerald-100 text-slate-900 shadow-xs'
                 }`}
               >
-                <div className="flex items-start justify-between gap-6 relative z-10">
-                  <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-3">
+                <div className="flex items-start justify-between gap-4 relative z-10 text-left">
+                  <div className="space-y-1 flex-1">
+                    <div className="flex items-center gap-1.5">
                       {!n.read && (
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)] animate-pulse shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse shrink-0" />
                       )}
-                      <h5 className={`font-black text-sm tracking-tight uppercase group-hover:text-emerald-600 transition-colors ${n.read ? 'text-slate-500' : 'text-slate-950'}`}>
+                      <h5 className={`font-black text-[10px] tracking-tight uppercase group-hover:text-emerald-700 transition-colors ${n.read ? 'text-slate-500' : 'text-slate-950'}`}>
                         {n.title}
                       </h5>
                     </div>
                     {n.message && (
-                      <p className={`text-[11px] font-bold leading-relaxed ${n.read ? 'text-slate-400' : 'text-slate-600'}`}>
+                      <p className={`text-[9px] font-bold leading-normal uppercase tracking-tight ${n.read ? 'text-slate-400' : 'text-slate-600'}`}>
                         {n.message}
                       </p>
                     )}
-                    <div className="pt-2 flex items-center gap-2">
-                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                    <div className="pt-1 flex items-center gap-1.5">
+                      <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-widest">
                         {n.createdAt ? new Date(n.createdAt.seconds ? n.createdAt.seconds * 1000 : n.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just Now'}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Hover FX */}
                 {!n.read && (
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 rounded-full blur-xl -translate-y-1/2 translate-x-1/2" />
                 )}
               </div>
             ))

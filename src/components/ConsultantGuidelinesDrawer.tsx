@@ -107,9 +107,9 @@ export function ConsultantGuidelinesContent() {
   const embeddedViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(officialPdfUrl)}&embedded=true`;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-slate-50/50 text-slate-900 overflow-hidden" id="guidelines-content-container">
-      {/* 3 Universal Guidelines Tabs */}
-      <div className="flex items-center bg-white px-6 pt-4 gap-2 shrink-0 overflow-x-auto no-scrollbar border-b border-slate-100" id="guidelines-tab-header">
+    <div className="flex-1 flex flex-col h-full bg-slate-50 text-slate-900 overflow-hidden" id="guidelines-content-container">
+      {/* Universal Guidelines Tabs */}
+      <div className="flex items-center bg-white px-3 pt-2 gap-1.5 shrink-0 overflow-x-auto no-scrollbar border-b border-slate-100" id="guidelines-tab-header">
         {[
           { id: 'sop', label: 'Platform SOPs', icon: Scale },
           { id: 'stg', label: 'STG Guidelines', icon: Stethoscope },
@@ -121,13 +121,13 @@ export function ConsultantGuidelinesContent() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-3 text-[10px] font-black rounded-t-2xl transition-all border-b-2 flex items-center gap-2 cursor-pointer whitespace-nowrap uppercase tracking-widest ${
+              className={`px-3 py-2 text-[8px] font-black rounded-t-lg transition-all border-b-2 flex items-center gap-1.5 cursor-pointer whitespace-nowrap uppercase tracking-widest ${
                 isActive
                   ? 'border-slate-950 bg-slate-50 text-slate-950'
                   : 'border-transparent text-slate-400 hover:text-slate-600'
               }`}
             >
-              <Icon size={14} className={isActive ? 'text-slate-950' : 'text-slate-400'} />
+              <Icon size={11} className={isActive ? 'text-slate-950' : 'text-slate-400'} />
               {tab.label}
             </button>
           );
@@ -135,68 +135,68 @@ export function ConsultantGuidelinesContent() {
       </div>
 
       {/* Main Tab View */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar" id="guidelines-body">
+      <div className="flex-1 overflow-y-auto p-3 space-y-3 no-scrollbar" id="guidelines-body">
         
         {/* TAB 1: SOP & Platform Protocols */}
         {activeTab === 'sop' && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500" id="sop-tab-panel">
-            <div className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-xl shadow-slate-200/20">
-              <h4 className="text-[10px] font-black text-slate-950 flex items-center gap-2 uppercase tracking-[0.2em] mb-4">
-                <ShieldCheck size={16} className="text-emerald-600" />
+          <div className="space-y-2.5 animate-in fade-in duration-300" id="sop-tab-panel">
+            <div className="p-3 bg-white border border-slate-100 rounded-lg shadow-xs">
+              <h4 className="text-[8px] font-black text-slate-950 flex items-center gap-1.5 uppercase tracking-widest mb-1.5">
+                <ShieldCheck size={12} className="text-emerald-600" />
                 SOP.01: Professional Environment
               </h4>
-              <p className="text-[11px] text-slate-600 leading-relaxed font-bold">
+              <p className="text-[10px] text-slate-600 leading-normal font-bold uppercase tracking-tight">
                 Consultants must operate from a <span className="text-slate-950 underline decoration-emerald-200 underline-offset-4">private, quiet, well-lit professional environment</span>. Professional framing and attire are required. Maintain eye contact and eliminate background audio distractions.
               </p>
             </div>
 
-            <div className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-xl shadow-slate-200/20 space-y-4">
-              <h4 className="text-[10px] font-black text-slate-950 flex items-center gap-2 uppercase tracking-[0.2em]">
-                <User size={16} className="text-indigo-600" />
+            <div className="p-3 bg-white border border-slate-100 rounded-lg shadow-xs space-y-2">
+              <h4 className="text-[8px] font-black text-slate-950 flex items-center gap-1.5 uppercase tracking-widest">
+                <User size={12} className="text-indigo-600" />
                 SOP.02: Clinical Consent
               </h4>
-              <ul className="space-y-3 text-[11px] text-slate-600 font-bold">
-                <li className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
+              <ul className="space-y-1.5 text-[9px] text-slate-600 font-bold uppercase tracking-tight">
+                <li className="flex items-start gap-2">
+                  <div className="w-1 h-1 rounded-full bg-slate-300 mt-1 shrink-0" />
                   Explicitly state your name, prefix, and legal specialty.
                 </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
+                <li className="flex items-start gap-2">
+                  <div className="w-1 h-1 rounded-full bg-slate-300 mt-1 shrink-0" />
                   Verify patient identity and geographic location in Ghana.
                 </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
+                <li className="flex items-start gap-2">
+                  <div className="w-1 h-1 rounded-full bg-slate-300 mt-1 shrink-0" />
                   Obtain verbal informed consent for session recording.
                 </li>
               </ul>
             </div>
 
-            <div className="p-6 bg-amber-50 border border-amber-100 rounded-[2rem] shadow-xl shadow-amber-500/5">
-              <h4 className="text-[10px] font-black text-amber-900 flex items-center gap-2 uppercase tracking-[0.2em] mb-4">
-                <AlertTriangle size={16} />
+            <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg shadow-xs">
+              <h4 className="text-[8px] font-black text-amber-900 flex items-center gap-1.5 uppercase tracking-widest mb-2">
+                <AlertTriangle size={12} />
                 SOP.03: Connection Fallback
               </h4>
-              <p className="text-[11px] text-amber-800 leading-relaxed font-bold">
+              <p className="text-[9px] text-amber-800 leading-normal font-bold uppercase tracking-tight">
                 If bandwidth falls below <span className="font-black">3G speeds (384kbps)</span>, prioritize voice fidelity:
               </p>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="p-4 bg-white/60 rounded-2xl border border-amber-200/50">
-                  <span className="text-[9px] font-black text-amber-900 block mb-1 uppercase">Step A</span>
-                  <p className="text-[10px] text-amber-800 font-bold leading-tight">Disable video track to preserve audio packet integrity.</p>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <div className="p-2 bg-white/60 rounded-md border border-amber-100">
+                  <span className="text-[7px] font-black text-amber-900 block mb-0.5 uppercase">Step A</span>
+                  <p className="text-[8px] text-amber-800 font-bold leading-tight uppercase tracking-tight">Disable video track to preserve audio packets.</p>
                 </div>
-                <div className="p-4 bg-white/60 rounded-2xl border border-amber-200/50">
-                  <span className="text-[9px] font-black text-amber-900 block mb-1 uppercase">Step B</span>
-                  <p className="text-[10px] text-amber-800 font-bold leading-tight">Use secure consultant chat for clinical dispatches.</p>
+                <div className="p-2 bg-white/60 rounded-md border border-amber-100">
+                  <span className="text-[7px] font-black text-amber-900 block mb-0.5 uppercase">Step B</span>
+                  <p className="text-[8px] text-amber-800 font-bold leading-tight uppercase tracking-tight">Use secure consultant chat for clinical dispatches.</p>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 bg-rose-50 border border-rose-100 rounded-[2rem] shadow-xl shadow-rose-500/5">
-              <h4 className="text-[10px] font-black text-rose-900 flex items-center gap-2 uppercase tracking-[0.2em] mb-3">
-                <ShieldAlert size={16} />
+            <div className="p-3 bg-rose-50 border border-rose-100 rounded-lg shadow-xs">
+              <h4 className="text-[8px] font-black text-rose-900 flex items-center gap-1.5 uppercase tracking-widest mb-1.5">
+                <ShieldAlert size={12} />
                 SOP.04: Prescribing Limits
               </h4>
-              <p className="text-[11px] text-rose-800 leading-relaxed font-bold italic">
+              <p className="text-[9px] text-rose-800 leading-normal font-bold italic uppercase tracking-tight">
                 "Strict prohibition of tele-prescribing for narcotics, benzodiazepines, or abortifacients. Immediate physical referral required."
               </p>
             </div>
@@ -205,14 +205,14 @@ export function ConsultantGuidelinesContent() {
 
         {/* TAB 2: Standard Treatment Guidelines (STG) */}
         {activeTab === 'stg' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500" id="stg-tab-panel">
+          <div className="space-y-3.5 animate-in fade-in duration-300" id="stg-tab-panel">
             {/* Sub-tabs for STG: Quick Search or PDF Viewer */}
-            <div className="flex gap-2 p-1.5 bg-white rounded-[2rem] border border-slate-100 shadow-sm">
+            <div className="flex gap-1.5 p-1 bg-white rounded-lg border border-slate-100 shadow-xs">
               <button
                 type="button"
                 onClick={() => setStgSubTab('search')}
-                className={`flex-1 py-3 text-[9px] font-black rounded-full transition-all uppercase tracking-widest ${
-                  stgSubTab === 'search' ? 'bg-slate-950 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'
+                className={`flex-1 py-1.5 text-[8px] font-black rounded-md transition-all uppercase tracking-widest ${
+                  stgSubTab === 'search' ? 'bg-slate-950 text-white' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
                 Protocol Search
@@ -220,8 +220,8 @@ export function ConsultantGuidelinesContent() {
               <button
                 type="button"
                 onClick={() => setStgSubTab('pdf')}
-                className={`flex-1 py-3 text-[9px] font-black rounded-full transition-all uppercase tracking-widest ${
-                  stgSubTab === 'pdf' ? 'bg-slate-950 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'
+                className={`flex-1 py-1.5 text-[8px] font-black rounded-md transition-all uppercase tracking-widest ${
+                  stgSubTab === 'pdf' ? 'bg-slate-950 text-white' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
                 Official PDF
@@ -229,30 +229,30 @@ export function ConsultantGuidelinesContent() {
             </div>
 
             {stgSubTab === 'search' ? (
-              <div className="space-y-6">
+              <div className="space-y-3.5">
                 {/* Search Inputs */}
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <div className="relative">
-                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
                       placeholder="Search protocol (e.g. Malaria, Asthma)..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-12 pr-6 py-4 bg-white border border-slate-100 rounded-2xl text-[11px] font-bold text-slate-950 placeholder:text-slate-400 placeholder:font-black placeholder:uppercase focus:outline-none focus:ring-2 focus:ring-slate-950/5"
+                      className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-[9px] font-bold text-slate-950 placeholder:text-slate-400 placeholder:font-black placeholder:uppercase focus:outline-none"
                     />
                   </div>
 
                   {/* Category Filter Pills */}
-                  <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+                  <div className="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar">
                     {categories.map((cat) => (
                       <button
                         key={cat}
                         onClick={() => setSelectedCategory(cat)}
-                        className={`px-4 py-2 text-[9px] font-black rounded-xl whitespace-nowrap transition-all border uppercase tracking-wider ${
+                        className={`px-2.5 py-1 text-[7.5px] font-black rounded-full whitespace-nowrap transition-all border uppercase tracking-wider ${
                           selectedCategory === cat
-                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                            : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200 hover:text-slate-600'
+                            ? 'bg-emerald-600 border-emerald-600 text-white'
+                            : 'bg-white border-slate-150 text-slate-400 hover:border-slate-300'
                         }`}
                       >
                         {cat}
@@ -262,51 +262,51 @@ export function ConsultantGuidelinesContent() {
                 </div>
 
                 {/* Protocols list */}
-                <div className="space-y-4">
+                <div className="space-y-2.5">
                   {filteredProtocols.length === 0 ? (
-                    <div className="p-12 text-center bg-white rounded-[2.5rem] border border-slate-50 shadow-inner">
-                      <ShieldAlert className="mx-auto text-amber-400 mb-4" size={32} />
-                      <p className="text-[11px] font-black text-slate-950 uppercase tracking-[0.2em]">Zero Protocols Found</p>
-                      <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase">Try a different diagnostic keyword.</p>
+                    <div className="p-6 text-center bg-white rounded-lg border border-slate-100 shadow-inner">
+                      <ShieldAlert className="mx-auto text-amber-400 mb-2" size={20} />
+                      <p className="text-[9px] font-black text-slate-950 uppercase tracking-widest">Zero Protocols Found</p>
+                      <p className="text-[8px] text-slate-400 mt-1 font-bold uppercase">Try a different keyword.</p>
                     </div>
                   ) : (
                     filteredProtocols.map((p) => (
-                      <div key={p.code} className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/30 space-y-6 group hover:border-emerald-200 transition-all duration-300">
-                        <div className="flex items-start justify-between gap-4">
+                      <div key={p.code} className="bg-white border border-slate-100 rounded-lg p-3 shadow-xs space-y-2.5 group hover:border-emerald-200 transition-all duration-300 text-left">
+                        <div className="flex items-start justify-between gap-3">
                           <div>
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="text-[9px] font-black text-white bg-slate-950 px-2 py-0.5 rounded-lg font-mono tracking-tighter">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className="text-[7.5px] font-black text-white bg-slate-950 px-1.5 py-0.5 rounded font-mono tracking-tighter">
                                 {p.code}
                               </span>
-                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em]">
+                              <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-widest">
                                 {p.category}
                               </span>
                             </div>
-                            <h4 className="font-black text-lg text-slate-950 leading-tight uppercase tracking-tight group-hover:text-emerald-700 transition-colors">{p.condition}</h4>
+                            <h4 className="font-black text-[10px] text-slate-950 leading-tight uppercase tracking-tight group-hover:text-emerald-700 transition-colors">{p.condition}</h4>
                           </div>
                         </div>
 
-                        <div className="grid gap-4">
-                          <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100">
-                            <span className="text-[8px] font-black text-emerald-600 uppercase tracking-[0.25em] block mb-2">
+                        <div className="grid gap-2">
+                          <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                            <span className="text-[7px] font-black text-emerald-600 uppercase tracking-widest block mb-1">
                               Primary Clinical Pathway (MOH Ghana)
                             </span>
-                            <p className="text-slate-900 leading-relaxed font-bold text-[11px]">{p.firstLine}</p>
+                            <p className="text-slate-900 leading-normal font-bold text-[9px] uppercase tracking-tight">{p.firstLine}</p>
                           </div>
 
                           {p.secondLine && (
-                            <div className="bg-white p-5 rounded-3xl border border-slate-100">
-                              <span className="text-[8px] font-black text-amber-600 uppercase tracking-[0.25em] block mb-2">
+                            <div className="bg-white p-2.5 rounded-lg border border-slate-100">
+                              <span className="text-[7px] font-black text-amber-600 uppercase tracking-widest block mb-1">
                                 Secondary Refractory Pathway
                               </span>
-                              <p className="text-slate-600 leading-relaxed font-bold text-[11px] italic">{p.secondLine}</p>
+                              <p className="text-slate-600 leading-normal font-bold text-[9px] italic uppercase tracking-tight">{p.secondLine}</p>
                             </div>
                           )}
 
                           {p.specialNotes && (
-                            <div className="flex items-start gap-3 p-4 bg-emerald-50/30 rounded-2xl border border-emerald-100/50">
-                              <Info size={14} className="text-emerald-600 shrink-0 mt-0.5" />
-                              <p className="text-[10px] text-emerald-900 font-bold leading-relaxed uppercase tracking-tight"><span className="font-black underline decoration-emerald-200 decoration-2">Clinical Note:</span> {p.specialNotes}</p>
+                            <div className="flex items-start gap-1.5 p-2 bg-emerald-50/30 rounded-md border border-emerald-100/50">
+                              <Info size={11} className="text-emerald-600 shrink-0 mt-0.5" />
+                              <p className="text-[8.5px] text-emerald-900 font-bold leading-normal uppercase tracking-tight"><span className="font-black underline decoration-emerald-200 decoration-2">Clinical Note:</span> {p.specialNotes}</p>
                             </div>
                           )}
                         </div>
@@ -316,31 +316,30 @@ export function ConsultantGuidelinesContent() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-4 flex flex-col h-full animate-in fade-in duration-500">
-                <div className="p-4 bg-white rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 text-slate-950">
-                    <Globe size={16} className="text-emerald-600" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">STG 7th Edition (PDF)</span>
+              <div className="space-y-2.5 flex flex-col h-full animate-in fade-in duration-300">
+                <div className="p-2.5 bg-white rounded-lg border border-slate-100 shadow-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 text-slate-950">
+                    <Globe size={12} className="text-emerald-600" />
+                    <span className="text-[8px] font-black uppercase tracking-widest">STG 7th Edition (PDF)</span>
                   </div>
                   <a
                     href={officialPdfUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-4 py-2 bg-slate-950 text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all flex items-center gap-2 shadow-lg shadow-slate-950/20"
+                    className="px-2.5 py-1 bg-slate-950 text-white text-[8px] font-black uppercase tracking-widest rounded-md hover:bg-slate-800 transition-all flex items-center gap-1"
                   >
-                    <Download size={12} /> External Download
+                    <Download size={10} /> External Download
                   </a>
                 </div>
 
-                <div className="flex-1 min-h-[450px] bg-white border border-slate-100 rounded-[2.5rem] overflow-hidden shadow-2xl relative">
+                <div className="flex-1 min-h-[350px] bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm relative">
                   <iframe
                     src={embeddedViewerUrl}
                     title="Ghana Standard Treatment Guidelines 2017 PDF"
-                    className="w-full h-full min-h-[450px] border-0"
+                    className="w-full h-full min-h-[350px] border-0"
                   />
-                  {/* Subtle Loading Overlay */}
                   <div className="absolute inset-0 bg-slate-50/50 pointer-events-none flex items-center justify-center -z-10">
-                    <Loader2 size={32} className="animate-spin text-slate-200" />
+                    <Loader2 size={24} className="animate-spin text-slate-200" />
                   </div>
                 </div>
               </div>
@@ -350,69 +349,69 @@ export function ConsultantGuidelinesContent() {
 
         {/* TAB 3: Medical Guidelines & Dosing */}
         {activeTab === 'medical' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500" id="medical-tab-panel">
-            <div className="p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-xl shadow-slate-200/20 space-y-6">
-              <h4 className="text-[11px] font-black text-slate-950 flex items-center gap-3 uppercase tracking-[0.2em]">
-                <Pill size={18} className="text-indigo-600" />
+          <div className="space-y-3.5 animate-in fade-in duration-300" id="medical-tab-panel">
+            <div className="p-3 bg-white border border-slate-100 rounded-lg shadow-xs space-y-3 text-left">
+              <h4 className="text-[8px] font-black text-slate-950 flex items-center gap-1.5 uppercase tracking-widest">
+                <Pill size={12} className="text-indigo-600" />
                 01. Paediatric Dosing Suite
               </h4>
-              <p className="text-[11px] text-slate-500 font-bold leading-relaxed italic border-l-4 border-slate-100 pl-4">
+              <p className="text-[9px] text-slate-500 font-bold leading-normal italic border-l-2 border-slate-200 pl-2 uppercase tracking-tight">
                 "Mandatory weight-based calculation required for all neonatal and pediatric prescriptions. Verify weight before initiating therapy."
               </p>
               
-              <div className="grid gap-4">
-                <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100 group">
-                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em] block mb-2 group-hover:text-indigo-600 transition-colors">Weight Estimation (Age 1–9)</span>
-                  <p className="text-slate-950 font-black text-sm tracking-tight uppercase">Weight (kg) = (Age × 2) + 8</p>
+              <div className="grid gap-2">
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100 group">
+                  <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest block mb-1 group-hover:text-indigo-600">Weight Estimation (Age 1–9)</span>
+                  <p className="text-slate-950 font-black text-[10px] tracking-tight uppercase">Weight (kg) = (Age × 2) + 8</p>
                 </div>
-                <div className="p-5 bg-white rounded-3xl border border-slate-100 group">
-                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em] block mb-2 group-hover:text-emerald-600 transition-colors">Paracetamol Pediatric</span>
-                  <p className="text-slate-950 font-black text-sm tracking-tight uppercase">15 mg/kg PO q4–6h (Max 4/day)</p>
+                <div className="p-2.5 bg-white rounded-lg border border-slate-100 group">
+                  <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest block mb-1 group-hover:text-emerald-600">Paracetamol Pediatric</span>
+                  <p className="text-slate-950 font-black text-[10px] tracking-tight uppercase">15 mg/kg PO q4–6h (Max 4/day)</p>
                 </div>
               </div>
             </div>
 
-            <div className="p-8 bg-rose-50 border border-rose-100 rounded-[2.5rem] shadow-xl shadow-rose-500/5 space-y-6">
-              <h4 className="text-[11px] font-black text-rose-900 flex items-center gap-3 uppercase tracking-[0.2em]">
-                <ShieldAlert size={18} />
+            <div className="p-3 bg-rose-50 border border-rose-100 rounded-lg shadow-xs space-y-3 text-left">
+              <h4 className="text-[8px] font-black text-rose-900 flex items-center gap-1.5 uppercase tracking-widest">
+                <ShieldAlert size={12} />
                 02. Emergency Referral Red Flags
               </h4>
-              <p className="text-[11px] text-rose-800 font-bold italic leading-relaxed">
+              <p className="text-[9px] text-rose-800 font-bold italic leading-normal uppercase tracking-tight">
                 Trigger immediate physical emergency protocol if any of these thresholds are breached:
               </p>
               
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {[
                   { label: 'Hypertensive Crisis', desc: 'BP > 180/120 + acute organ damage (chest pain, dyspnea).' },
                   { label: 'Respiratory Failure', desc: 'RR > 30/min, SpO2 < 92% (Room Air), Cyanosis.' },
                   { label: 'Sepsis (qSOFA)', desc: 'Altered mental state + SBP ≤ 100 + RR ≥ 22.' },
                 ].map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-4 bg-white/60 p-5 rounded-[2rem] border border-rose-200/50 group hover:border-rose-300 transition-all">
-                    <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-2 shrink-0 group-hover:scale-150 transition-transform" />
+                  <div key={idx} className="flex items-start gap-2 bg-white/60 p-2.5 rounded-md border border-rose-250/50 group hover:border-rose-300">
+                    <div className="w-1 h-1 rounded-full bg-rose-500 mt-1.5 shrink-0" />
                     <div>
-                      <strong className="text-[11px] font-black text-rose-950 uppercase tracking-tight block mb-1">{item.label}</strong>
-                      <p className="text-[10px] text-rose-800 font-bold leading-relaxed">{item.desc}</p>
+                      <strong className="text-[9px] font-black text-rose-950 uppercase tracking-tight block mb-0.5">{item.label}</strong>
+                      <p className="text-[8.5px] text-rose-800 font-bold leading-normal uppercase tracking-tight">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-xl shadow-slate-200/20 space-y-6">
-              <h4 className="text-[11px] font-black text-slate-950 flex items-center gap-3 uppercase tracking-[0.2em]">
-                <Info size={18} className="text-slate-400" />
+            <div className="p-3 bg-white border border-slate-100 rounded-lg shadow-xs space-y-3 text-left">
+              <h4 className="text-[8px] font-black text-slate-950 flex items-center gap-1.5 uppercase tracking-widest">
+                <Info size={12} className="text-slate-400" />
                 03. High-Risk Contraindications
               </h4>
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {[
                   { drug: 'Fluoroquinolones', note: 'Contraindicated in pregnancy, lactation, and pediatric (<18) users.' },
                   { drug: 'NSAIDs (Diclofenac)', note: 'Contraindicated in severe CKD, PUD, and 3rd-trimester pregnancy.' },
                   { drug: 'Beta Blockers', note: 'Strictly contraindicated in active Asthma, COPD, or heart blocks.' },
                 ].map((item, idx) => (
-                  <div key={idx} className="flex justify-between items-start border-b border-slate-50 pb-4 group">
-                    <div className="space-y-1">
-                      <span className="text-[11px] font-black text-slate-950 uppercase tracking-tight group-hover:text-emerald-600 transition-colors">{item.drug}</span>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{item.note}</p>
+                  <div key={idx} className="flex justify-between items-start border-b border-slate-50 pb-2 last:border-0 last:pb-0">
+                    <div className="space-y-0.5">
+                      <span className="text-[9px] font-black text-slate-950 uppercase tracking-tight block">{item.drug}</span>
+                      <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">{item.note}</p>
                     </div>
                   </div>
                 ))}
@@ -437,32 +436,32 @@ export default function ConsultantGuidelinesDrawer({ isOpen, onClose }: Consulta
     >
       <div 
         onClick={(e) => e.stopPropagation()} 
-        className="w-full sm:w-[520px] bg-white text-slate-950 shadow-2xl flex flex-col h-full border-l border-slate-100 animate-in slide-in-from-right duration-300"
+        className="w-full sm:w-[420px] bg-white text-slate-950 shadow-2xl flex flex-col h-full border-l border-slate-100 animate-in slide-in-from-right duration-200"
         id="guidelines-drawer-container"
       >
         {/* Header */}
-        <div className="p-6 sm:p-8 bg-white flex items-center justify-between shrink-0 border-b border-slate-50 relative z-10" id="guidelines-drawer-header">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-slate-950 text-white flex items-center justify-center shadow-2xl shadow-slate-950/30">
-              <BookOpen size={28} />
+        <div className="p-3 bg-white flex items-center justify-between shrink-0 border-b border-slate-100 relative z-10" id="guidelines-drawer-header">
+          <div className="flex items-center gap-2.5 text-left">
+            <div className="w-8 h-8 rounded-lg bg-slate-950 text-white flex items-center justify-center shadow-md">
+              <BookOpen size={16} />
             </div>
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-black text-lg text-slate-950 uppercase tracking-tight">Clinical Vault</h3>
-                <span className="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <h3 className="font-black text-xs text-slate-950 uppercase tracking-tight">Clinical Vault</h3>
+                <span className="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[6px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-widest">
                   MOH Ghana
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Standard Treatment Protocols & SOPs</p>
+              <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest">Standard Treatment Guidelines</p>
             </div>
           </div>
           <button
             id="close-guidelines-btn"
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-950 hover:bg-slate-50 rounded-full transition-all cursor-pointer border border-slate-100"
+            className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-950 hover:bg-slate-50 rounded-full transition-all cursor-pointer border border-slate-100"
             title="Close"
           >
-            <X size={20} />
+            <X size={14} />
           </button>
         </div>
 

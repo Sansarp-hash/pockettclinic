@@ -458,37 +458,37 @@ export default function IncomingCallModal() {
       <motion.div 
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="bg-white dark:bg-slate-900 border-2 border-indigo-500/30 rounded-[32px] shadow-2xl max-w-lg w-full overflow-hidden flex flex-col relative"
+        className="bg-white dark:bg-slate-900 border border-indigo-500/30 rounded-2xl shadow-xl max-w-md w-full overflow-hidden flex flex-col relative"
       >
-        <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white p-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="absolute -inset-2 bg-emerald-400 rounded-full animate-ping opacity-75"></div>
-              <div className="w-14 h-14 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-lg relative z-10">
-                <PhoneCall size={28} className="animate-bounce" />
+              <div className="absolute -inset-1.5 bg-emerald-400 rounded-full animate-ping opacity-75"></div>
+              <div className="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-md relative z-10 animate-pulse">
+                <PhoneCall size={18} />
               </div>
             </div>
             <div>
-              <span className="inline-block px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-widest rounded-full mb-1">
+              <span className="inline-block px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[7px] font-black uppercase tracking-widest rounded-full mb-0.5">
                 Incoming Dispatch
               </span>
-              <h2 className="text-xl font-black text-white tracking-tight">Consultation Request</h2>
+              <h2 className="text-sm font-black text-white tracking-tight">Consultation Request</h2>
             </div>
           </div>
 
           <button
             onClick={handleToggleMute}
-            className={`p-3 rounded-2xl transition-colors border ${
+            className={`p-2 rounded-xl transition-colors border ${
               isMuted 
                 ? 'bg-rose-500/20 text-rose-200 border-rose-400/30' 
                 : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
             }`}
           >
-            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} className="animate-pulse" />}
+            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} className="animate-pulse" />}
           </button>
         </div>
 
-        <div className="w-full bg-slate-100 dark:bg-slate-800 h-2">
+        <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5">
           <div 
             className={`h-full transition-all duration-1000 ${
               timeLeft < 30 ? 'bg-rose-500' : 'bg-emerald-500'
@@ -497,17 +497,17 @@ export default function IncomingCallModal() {
           />
         </div>
 
-        <div className="p-6 md:p-8 space-y-6">
-          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/60">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center">
-                <User size={24} />
+        <div className="p-4 space-y-4">
+          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700/60">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center justify-center shadow-sm">
+                <User size={16} />
               </div>
               <div>
-                <h3 className="font-black text-slate-900 dark:text-white text-base uppercase tracking-tight">
+                <h3 className="font-black text-slate-900 dark:text-white text-xs uppercase tracking-tight">
                   {activeRequest.patientName || 'Anonymous Patient'}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">
+                <p className="text-[8px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-widest">
                   {activeRequest.patientAge ? `${activeRequest.patientAge} Yrs` : 'Adult'} 
                   {activeRequest.patientGender ? ` • ${activeRequest.patientGender}` : ''}
                 </p>
@@ -515,68 +515,68 @@ export default function IncomingCallModal() {
             </div>
 
             <div className="text-right">
-              <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest block">Duration</span>
-              <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1 rounded-lg border border-indigo-200 dark:border-indigo-800/50 inline-block mt-0.5">
+              <span className="text-[7px] text-slate-400 uppercase font-black tracking-widest block">Duration</span>
+              <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-lg border border-indigo-200 dark:border-indigo-800/50 inline-block mt-0.5">
                 {activeRequest.tierDurationMinutes || 15} M {activeRequest.sessionType === 'VIDEO' ? 'VIDEO' : 'AUDIO'}
               </span>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-              <Activity size={14} className="text-indigo-500" />
+          <div className="space-y-1.5">
+            <label className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1">
+              <Activity size={12} className="text-indigo-500" />
               Symptoms & Chief Complaints
             </label>
-            <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/50 text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed">
+            <div className="bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50 text-[11px] font-bold text-slate-700 dark:text-slate-300 leading-relaxed max-h-24 overflow-y-auto">
               {activeRequest.chiefComplaints || 'General medical consultation request regarding clinical evaluation.'}
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[10px] px-1 font-black uppercase tracking-widest">
-            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-              <Clock size={16} className={timeLeft < 30 ? 'text-rose-500 animate-spin' : 'text-indigo-500'} />
-              <span>Forwarding in: <strong className={timeLeft < 30 ? 'text-rose-600 text-sm' : 'text-slate-900 dark:text-white'}>{timeLeft}s</strong></span>
+          <div className="flex items-center justify-between text-[8px] px-0.5 font-black uppercase tracking-widest">
+            <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
+              <Clock size={12} className={timeLeft < 30 ? 'text-rose-500 animate-spin' : 'text-indigo-500'} />
+              <span>Forwarding in: <strong className={timeLeft < 30 ? 'text-rose-600 text-[11px]' : 'text-slate-900 dark:text-white'}>{timeLeft}s</strong></span>
             </div>
             
             <div className="flex items-center gap-1 text-slate-400">
-              <ShieldAlert size={14} />
+              <ShieldAlert size={12} />
               <span>PockettClinic Dispatch v2</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="flex flex-col gap-1.5">
               <button
                 onClick={handleAccept}
                 disabled={isProcessing}
-                className={`w-full py-4 px-6 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] ${
+                className={`w-full py-2.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-[0.98] ${
                   hasReachedLimit 
                     ? 'bg-slate-300 text-slate-500 cursor-not-allowed' 
-                    : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/10'
                 }`}
               >
-                <CheckCircle size={20} />
+                <CheckCircle size={16} />
                 <span>Accept Call</span>
               </button>
               {hasReachedLimit && (
-                <p className="text-[9px] text-rose-600 font-black uppercase text-center leading-tight">
+                <p className="text-[8px] text-rose-600 font-black uppercase text-center leading-tight">
                   Daily limit reached ({sessionsToday}/{dailyLimit})<br/>
                   Upgrade to Pro for 25 calls/day
                 </p>
               )}
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               <button
                 onClick={handleDeclineForward}
                 disabled={isProcessing}
-                className="w-full bg-slate-100 hover:bg-rose-50 hover:text-rose-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 py-4 px-6 rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+                className="w-full bg-slate-100 hover:bg-rose-50 hover:text-rose-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 py-2.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]"
               >
-                <ArrowRightLeft size={18} className="text-slate-500" />
+                <ArrowRightLeft size={14} className="text-slate-500" />
                 <span>Decline</span>
               </button>
               {hasReachedLimit && (
-                <p className="text-[9px] text-slate-400 font-black uppercase text-center leading-tight">
+                <p className="text-[8px] text-slate-400 font-black uppercase text-center leading-tight">
                   Reroute to next consultant
                 </p>
               )}

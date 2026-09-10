@@ -72,31 +72,31 @@ export default function ConsultantAvailabilityScheduler() {
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black border border-indigo-100 shrink-0">
-            <Calendar size={24} />
+    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-black border border-indigo-100 shrink-0">
+            <Calendar size={18} />
           </div>
           <div>
-            <h3 className="text-lg font-black text-slate-800">Weekly Shift & Telehealth Availability Planner</h3>
-            <p className="text-xs text-slate-500">Configure your recurring consultation hours for automated patient queue routing.</p>
+            <h3 className="text-sm font-black text-slate-900 leading-tight uppercase tracking-tight">Shift & Availability Planner</h3>
+            <p className="text-[10px] text-slate-500 font-medium">Configure recurring hours for automated patient routing.</p>
           </div>
         </div>
 
         <button
           onClick={handleSaveSchedule}
           disabled={isSaving}
-          className="w-full sm:w-auto px-5 py-3 min-h-[44px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-2xl transition-all flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20 cursor-pointer"
+          className="w-full sm:w-auto px-4 py-2 min-h-[36px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] uppercase tracking-widest rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer active:scale-95"
         >
-          {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          Save Weekly Shift Hours
+          {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+          Save Shift Hours
         </button>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {schedule.map((item, idx) => (
-          <div key={item.day} className={`p-3.5 sm:p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+          <div key={item.day} className={`p-3 rounded-lg border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
             item.enabled ? 'bg-slate-50 border-slate-200' : 'bg-slate-100/50 border-slate-200/60 opacity-60'
           }`}>
             <div className="flex items-center gap-3">
@@ -104,35 +104,35 @@ export default function ConsultantAvailabilityScheduler() {
                 type="checkbox"
                 checked={item.enabled}
                 onChange={() => handleToggleDay(idx)}
-                className="w-5 h-5 rounded-lg text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500/20 cursor-pointer"
               />
-              <span className="font-bold text-sm text-slate-800 w-28">{item.day}</span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+              <span className="font-bold text-xs text-slate-900 w-20">{item.day}</span>
+              <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider ${
                 item.enabled ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
               }`}>
-                {item.enabled ? 'Active On-Duty' : 'Off-Duty'}
+                {item.enabled ? 'On-Duty' : 'Off-Duty'}
               </span>
             </div>
 
             {item.enabled && (
-              <div className="flex items-center gap-2 text-xs">
-                <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 border border-slate-200 rounded-xl">
-                  <Clock size={14} className="text-slate-400" />
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 bg-white px-2.5 py-1.5 border border-slate-200 rounded-lg shadow-sm">
+                  <Clock size={12} className="text-slate-400" />
                   <input
                     type="time"
                     value={item.startTime}
                     onChange={e => handleTimeChange(idx, 'startTime', e.target.value)}
-                    className="font-bold text-slate-800 outline-none"
+                    className="font-bold text-[11px] text-slate-900 outline-none bg-transparent"
                   />
                 </div>
-                <span className="font-bold text-slate-400">to</span>
-                <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 border border-slate-200 rounded-xl">
-                  <Clock size={14} className="text-slate-400" />
+                <span className="font-bold text-slate-300 text-[10px] uppercase">to</span>
+                <div className="flex items-center gap-1.5 bg-white px-2.5 py-1.5 border border-slate-200 rounded-lg shadow-sm">
+                  <Clock size={12} className="text-slate-400" />
                   <input
                     type="time"
                     value={item.endTime}
                     onChange={e => handleTimeChange(idx, 'endTime', e.target.value)}
-                    className="font-bold text-slate-800 outline-none"
+                    className="font-bold text-[11px] text-slate-900 outline-none bg-transparent"
                   />
                 </div>
               </div>

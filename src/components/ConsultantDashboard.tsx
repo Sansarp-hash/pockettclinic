@@ -532,16 +532,16 @@ export default function ConsultantDashboard({
           
           <div className="flex-1 flex flex-col min-w-0 h-screen md:h-auto overflow-hidden relative">
             <div className="flex-1 overflow-y-auto no-scrollbar pb-24 md:pb-0">
-              <main className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+              <main className="w-full max-w-7xl mx-auto p-3 sm:p-4 lg:p-5 space-y-4">
                 
                 {/* Mobile Sub-page Back Button */}
                 {!['appointments', 'queue', 'chat', 'payout-hub', 'notifications', 'more'].includes(activeDashboardTab) && (
-                  <div className="md:hidden flex items-center mb-2">
+                  <div className="md:hidden flex items-center mb-1.5">
                     <button
                       onClick={() => setActiveDashboardTab('more')}
-                      className="flex items-center gap-2 text-slate-500 font-black uppercase tracking-widest text-[9px] active:scale-95 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm"
+                      className="flex items-center gap-2 text-slate-500 font-black uppercase tracking-widest text-[8px] active:scale-95 bg-white px-2.5 py-1 rounded-full border border-slate-200 shadow-sm"
                     >
-                      <ArrowLeft size={12} />
+                      <ArrowLeft size={10} />
                       Back to Hub
                     </button>
                   </div>
@@ -592,14 +592,14 @@ export default function ConsultantDashboard({
 
             {/* Pending Review Banner */}
             {isPendingReview && (
-              <div className="bg-amber-600 text-white rounded-xl p-3 mb-5 shadow-sm relative overflow-hidden">
+              <div className="bg-amber-600 text-white rounded-xl p-2.5 mb-4 shadow-sm relative overflow-hidden">
                 <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <ShieldCheck size={16} className="text-amber-200" />
-                    <h3 className="text-[10px] font-black uppercase tracking-tight">Review In Progress</h3>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <ShieldCheck size={14} className="text-amber-200" />
+                    <h3 className="text-[9px] font-black uppercase tracking-tight">Review In Progress</h3>
                   </div>
-                  <p className="text-amber-50 text-[9px] leading-relaxed max-w-2xl font-bold uppercase tracking-tight">
-                    Your account is under medical directorate review. Consultation access will unlock after credential verification.
+                  <p className="text-amber-50 text-[8px] leading-relaxed max-w-2xl font-bold uppercase tracking-tight">
+                    Your account is under medical directorate review. Consultation access will unlock after verification.
                   </p>
                 </div>
               </div>
@@ -607,73 +607,73 @@ export default function ConsultantDashboard({
 
             {/* Face-to-Face Compliance Review Banner */}
             {user?.reviewScheduledAt && (
-              <div className="bg-sky-50 border border-sky-100 rounded-2xl p-4 md:p-6 mb-6 shadow-sm">
-                <div className="flex items-center gap-2.5 mb-3">
-                  <Video size={24} className="text-sky-600" />
-                  <h3 className="text-sm font-black text-sky-900 uppercase tracking-tight">Compliance Review</h3>
+              <div className="bg-sky-50 border border-sky-100 rounded-xl p-3 md:p-4 mb-4 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <Video size={18} className="text-sky-600" />
+                  <h3 className="text-xs font-black text-sky-900 uppercase tracking-tight">Compliance Review</h3>
                 </div>
-                <p className="text-sky-800 text-[11px] leading-relaxed mb-4 font-bold uppercase tracking-tight">
-                  Scheduled for <span className="underline">{new Date(user.reviewScheduledAt).toLocaleString()}</span>.
+                <p className="text-sky-800 text-[10px] leading-relaxed mb-3 font-bold uppercase tracking-tight">
+                  Scheduled: <span className="underline">{new Date(user.reviewScheduledAt).toLocaleString()}</span>.
                 </p>
 
                 {!user.reviewTermsAcceptedAt ? (
-                  <div className="bg-white p-4 rounded-xl border border-sky-100 shadow-sm">
-                    <h4 className="font-black text-slate-950 mb-2.5 text-[10px] uppercase tracking-widest">Agreement</h4>
-                    <ul className="text-[9px] text-slate-800 space-y-1.5 mb-5 list-disc list-inside font-bold uppercase tracking-tight">
+                  <div className="bg-white p-3 rounded-lg border border-sky-100 shadow-sm">
+                    <h4 className="font-black text-slate-950 mb-1.5 text-[9px] uppercase tracking-widest">Agreement</h4>
+                    <ul className="text-[8px] text-slate-800 space-y-1 mb-3 list-disc list-inside font-bold uppercase tracking-tight">
                       <li>I confirm documents are authentic.</li>
                       <li>I assume clinical liability.</li>
                       <li>I agree to the Code of Conduct.</li>
                       <li>I consent to recording.</li>
                     </ul>
                     
-                    <label className="flex items-start gap-3 mb-6 cursor-pointer">
+                    <label className="flex items-start gap-2.5 mb-4 cursor-pointer">
                       <input 
                         type="checkbox" 
                         checked={reviewTermsChecked}
                         onChange={(e) => setReviewTermsChecked(e.target.checked)}
-                        className="mt-1 w-4 h-4 text-sky-600 border-slate-300 rounded focus:ring-sky-500"
+                        className="mt-0.5 w-3.5 h-3.5 text-sky-600 border-slate-300 rounded focus:ring-sky-500"
                       />
-                      <span className="text-sm font-bold text-slate-900">I have read, understood, and accept these compliance terms.</span>
+                      <span className="text-[11px] font-bold text-slate-900 leading-tight">I have read, understood, and accept these compliance terms.</span>
                     </label>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-col sm:flex-row gap-2.5">
                       <button
                         onClick={handleAcceptReviewTerms}
                         disabled={!reviewTermsChecked || isAcceptingReviewTerms}
-                        className="bg-sky-600 hover:bg-sky-700 disabled:bg-slate-300 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                        className="bg-sky-600 hover:bg-sky-700 disabled:bg-slate-300 text-white font-black text-[9px] uppercase tracking-widest py-2 px-4 rounded-lg transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
                       >
-                        {isAcceptingReviewTerms ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
-                        Accept Terms & Unlock Video Link
+                        {isAcceptingReviewTerms ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
+                        Accept Terms
                       </button>
                       <button
                         disabled
-                        className="bg-slate-100 text-slate-600 font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed border border-slate-200"
+                        className="bg-slate-100 text-slate-600 font-black text-[9px] uppercase tracking-widest py-2 px-4 rounded-lg flex items-center justify-center gap-1.5 cursor-not-allowed border border-slate-200"
                       >
-                        <Video size={18} />
-                        Video Link Locked
+                        <Video size={12} />
+                        Link Locked
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white p-6 rounded-2xl border border-emerald-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
-                        <CheckCircle2 size={24} className="text-emerald-600" />
+                  <div className="bg-white p-3.5 rounded-xl border border-emerald-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center shrink-0">
+                        <CheckCircle2 size={16} className="text-emerald-600" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-950 text-sm">Terms Accepted</h4>
-                        <p className="text-xs text-slate-700 mt-1">You agreed to the compliance terms on {new Date(user.reviewTermsAcceptedAt).toLocaleString()}.</p>
-                        <p className="text-xs text-slate-900 font-semibold mt-2">Meeting Time: <span className="font-bold">{new Date(user.reviewScheduledAt).toLocaleString()}</span></p>
+                        <h4 className="font-black text-slate-950 text-[11px] uppercase">Terms Accepted</h4>
+                        <p className="text-[10px] text-slate-600 mt-0.5">Agreed: {new Date(user.reviewTermsAcceptedAt).toLocaleString()}.</p>
+                        <p className="text-[10px] text-slate-900 font-black mt-1 uppercase tracking-tight">Meeting: {new Date(user.reviewScheduledAt).toLocaleString()}</p>
                       </div>
                     </div>
                     <a 
                       href={user.reviewLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[9px] uppercase tracking-widest py-2 px-4 rounded-lg transition-all shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap"
                     >
-                      <Video size={18} />
-                      Join Native Video Room
+                      <Video size={12} />
+                      Join Video Room
                     </a>
                   </div>
                 )}
@@ -681,18 +681,18 @@ export default function ConsultantDashboard({
             )}
 
             {/* Mobile Header: Deep Emerald Banner */}
-            <div className="md:hidden bg-[#0A3B24] -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 mb-6 pt-6 pb-6 px-6 rounded-b-[40px] shadow-2xl relative overflow-hidden">
+            <div className="md:hidden bg-[#0A3B24] -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 mb-4 pt-4 pb-4 px-4 rounded-b-xl shadow-md relative overflow-hidden">
               {/* Branding and Action Row */}
-              <div className="relative z-20 flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center p-2 border border-white/10 shadow-inner">
-                    <Activity size={20} className="text-emerald-400" />
+              <div className="relative z-20 flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-md flex items-center justify-center p-1.5 border border-white/10 shadow-inner">
+                    <Activity size={16} className="text-emerald-400" />
                   </div>
                   <div>
-                    <h1 className="text-lg font-black text-white tracking-tight leading-none uppercase">
+                    <h1 className="text-sm font-black text-white tracking-tight leading-none uppercase">
                       PockettClinic
                     </h1>
-                    <p className="text-[8px] font-bold text-emerald-400 uppercase tracking-[0.15em] mt-1">
+                    <p className="text-[7px] font-bold text-emerald-400 uppercase tracking-[0.12em] mt-0.5">
                       Your Digital Health Anywhere
                     </p>
                   </div>
@@ -783,17 +783,17 @@ export default function ConsultantDashboard({
             </div>
 
             {/* Desktop Header */}
-            <div className={`hidden md:flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 ${isPendingReview ? 'opacity-50 pointer-events-none hidden' : ''}`}>
+            <div className={`hidden md:flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5 ${isPendingReview ? 'opacity-50 pointer-events-none hidden' : ''}`}>
               <div className="flex items-center gap-3 flex-wrap">
-                <h2 className="text-xl md:text-2xl font-black text-slate-950 tracking-tight whitespace-nowrap">
+                <h2 className="text-lg md:text-xl font-black text-slate-950 tracking-tight whitespace-nowrap uppercase">
                   {user?.fullName?.split(' ')[0] || 'Consultant'} Workspace
                 </h2>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md shadow-xs whitespace-nowrap">
+                  <span className="font-mono text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded shadow-xs whitespace-nowrap">
                     ID: {formatMemberId(user)}
                   </span>
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-emerald-50 text-emerald-700 border-emerald-200 whitespace-nowrap`}>
-                    <CheckCircle2 size={12} className="text-emerald-500" />
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border bg-emerald-50 text-emerald-700 border-emerald-200 whitespace-nowrap`}>
+                    <CheckCircle2 size={10} className="text-emerald-500" />
                     Verified
                   </span>
                   <button
@@ -819,13 +819,13 @@ export default function ConsultantDashboard({
                         showToast("Failed to update status. Please try again.", "error");
                       }
                     }}
-                    className={`px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 border shadow-sm cursor-pointer whitespace-nowrap ${
+                    className={`px-3 py-1.5 rounded-lg font-black text-[9px] uppercase tracking-widest transition-all flex items-center gap-1.5 border shadow-sm cursor-pointer whitespace-nowrap ${
                       isOnline
                         ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-600'
                         : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600'
                     }`}
                   >
-                    {isOnline ? <Wifi size={16} /> : <WifiOff size={16} />}
+                    {isOnline ? <Wifi size={12} /> : <WifiOff size={12} />}
                     <span>{isOnline ? 'Go Offline' : 'Go Online'}</span>
                   </button>
                 </div>
@@ -834,21 +834,21 @@ export default function ConsultantDashboard({
 
             {/* Indemnity Warning */}
             {user?.indemnityStatus === 'deferred_pending' && (
-              <div className="bg-amber-50 border-2 border-amber-300 rounded-3xl p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm animate-pulse-subtle">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 shrink-0">
-                    <ShieldAlert size={24} />
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 shrink-0">
+                    <ShieldAlert size={18} />
                   </div>
                   <div>
-                    <h4 className="text-xs font-black text-amber-900 uppercase tracking-widest">Compliance Action Required</h4>
-                    <p className="text-sm text-amber-800 mt-1 font-semibold leading-relaxed">
-                      You are currently operating under a Personal Liability Agreement. Please upload your Professional Indemnity (PI) certificate to normalize your clinical status.
+                    <h4 className="text-[9px] font-black text-amber-900 uppercase tracking-widest">Compliance Required</h4>
+                    <p className="text-[11px] text-amber-800 mt-0.5 font-bold leading-tight uppercase">
+                      Operating under waiver. Please upload your PI certificate.
                     </p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setIsIndemnityModalOpen(true)} 
-                  className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 whitespace-nowrap transition-all cursor-pointer"
+                  className="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-md whitespace-nowrap transition-all cursor-pointer"
                 >
                   Upload Certificate
                 </button>
@@ -871,39 +871,39 @@ export default function ConsultantDashboard({
                     animate={{ y: 0 }}
                     exit={{ y: '100%' }}
                     transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                    className="md:hidden fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] z-[46] shadow-[0_-20px_50px_rgba(0,0,0,0.2)] max-h-[85vh] overflow-y-auto no-scrollbar border-t border-slate-100 pb-32"
+                    className="md:hidden fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-[46] shadow-[0_-10px_30px_rgba(0,0,0,0.1)] max-h-[80vh] overflow-y-auto no-scrollbar border-t border-slate-100 pb-24"
                   >
-                    <div className="sticky top-0 bg-white/80 backdrop-blur-md px-10 py-8 border-b border-slate-50 flex items-center justify-between z-10">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-950 text-white flex items-center justify-center shadow-2xl shadow-slate-950/20">
-                          <Settings size={24} />
+                    <div className="sticky top-0 bg-white/80 backdrop-blur-md px-5 py-4 border-b border-slate-50 flex items-center justify-between z-10">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-slate-950 text-white flex items-center justify-center shadow-lg">
+                          <Settings size={16} />
                         </div>
                         <div>
-                          <h3 className="text-xl font-black text-slate-950 tracking-tight uppercase">Feature Hub</h3>
-                          <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Professional Suite</p>
+                          <h3 className="text-sm font-black text-slate-950 tracking-tight uppercase">Professional Hub</h3>
+                          <p className="text-[8px] text-slate-400 font-black uppercase tracking-[0.2em] mt-0.5">Clinical Suite</p>
                         </div>
                       </div>
                       <button 
                         onClick={() => setIsMoreMenuOpen(false)}
-                        className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors border border-slate-100"
+                        className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors border border-slate-100"
                       >
-                        <LogOut size={16} className="rotate-90" />
+                        <LogOut size={14} className="rotate-90" />
                       </button>
                     </div>
 
-                    <div className="p-8 grid grid-cols-2 gap-4 pb-48">
+                    <div className="p-4 grid grid-cols-2 gap-2.5">
                       {[
                         { id: 'notifications', label: 'Dispatch', icon: Bell, desc: 'Alerts & News' },
-                        { id: 'stg-reference', label: 'STG Guides', icon: BookOpen, desc: 'Ghana Clinical STG' },
-                        { id: 'soap', label: 'SOAP Notes', icon: FileText, desc: 'Voice Documentation' },
-                        { id: 'drug-safety', label: 'Safety Check', icon: ShieldAlert, desc: 'Drug Interaction' },
-                        { id: 'referrals', label: 'Referrals', icon: Share2, desc: 'Specialist Network' },
-                        { id: 'follow-ups', label: 'Scheduler', icon: CalendarCheck, desc: 'Patient Recall' },
-                        { id: 'schedule', label: 'Availability', icon: Clock, desc: 'Consulting Hours' },
-                        { id: 'portfolio', label: 'Portfolio', icon: UserCircle, desc: 'Profile & Credentials' },
-                        { id: 'feedback', label: 'Feedback', icon: Star, desc: 'Patient Ratings' },
-                        { id: 'subscription', label: 'Account', icon: ShieldCheck, desc: 'Tier & Membership' },
-                        { id: 'signout', label: 'Exit Vault', icon: LogOut, desc: 'Secure Sign Out', color: 'bg-rose-50 border-rose-100 text-rose-600' },
+                        { id: 'stg-reference', label: 'STG Guides', icon: BookOpen, desc: 'Ghana STG' },
+                        { id: 'soap', label: 'SOAP Notes', icon: FileText, desc: 'Voice Docs' },
+                        { id: 'drug-safety', label: 'Safety Check', icon: ShieldAlert, desc: 'Interactions' },
+                        { id: 'referrals', label: 'Referrals', icon: Share2, desc: 'Network' },
+                        { id: 'schedule', label: 'Schedule', icon: CalendarCheck, desc: 'Availability' },
+                        { id: 'payout-hub', label: 'Payout Hub', icon: Landmark, desc: 'Earnings' },
+                        { id: 'portfolio', label: 'My Portfolio', icon: UserCircle, desc: 'Credentials' },
+                        { id: 'feedback', label: 'Reviews', icon: Star, desc: 'Ratings' },
+                        { id: 'subscription', label: 'Account', icon: ShieldCheck, desc: 'Membership' },
+                        { id: 'signout', label: 'Exit', icon: LogOut, desc: 'Sign Out', color: 'bg-rose-50 border-rose-100 text-rose-600' },
                       ].map((item) => {
                         const Icon = item.icon;
                         return (
@@ -919,21 +919,19 @@ export default function ConsultantDashboard({
                                 setIsMoreMenuOpen(false);
                               }
                             }}
-                            className={`flex flex-col items-start p-6 rounded-[2rem] border transition-all active:scale-95 text-left h-full group ${
-                              item.color || 'bg-white border-slate-100 shadow-xl shadow-slate-200/20'
+                            className={`flex flex-col items-start gap-2 p-3 rounded-xl border transition-all active:scale-[0.97] text-left h-full ${
+                              item.color || 'bg-slate-50 border-slate-100 hover:bg-slate-100'
                             }`}
                           >
-                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${
-                              item.color ? 'bg-rose-100' : 'bg-slate-50 group-hover:bg-slate-950 group-hover:text-white'
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-sm border ${
+                              item.color ? 'bg-rose-100 border-rose-200' : 'bg-white border-slate-100 text-[#0A3B24]'
                             }`}>
-                              <Icon size={20} className={item.color ? 'text-rose-600' : 'text-slate-500 group-hover:text-white'} />
+                              <Icon size={14} />
                             </div>
-                            <span className="text-[11px] font-black text-slate-950 uppercase tracking-tight leading-none mb-1 group-hover:text-emerald-600 transition-colors">
-                              {item.label}
-                            </span>
-                            <span className="text-[9px] text-slate-400 font-bold leading-tight line-clamp-1 uppercase tracking-tighter">
-                              {item.desc}
-                            </span>
+                            <div className="text-left">
+                              <div className="text-[10px] font-black text-slate-900 uppercase tracking-tight">{item.label}</div>
+                              <div className="text-[8px] text-slate-400 font-bold uppercase tracking-tight leading-none mt-0.5">{item.desc}</div>
+                            </div>
                           </button>
                         );
                       })}
@@ -1122,78 +1120,78 @@ export default function ConsultantDashboard({
             className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
           />
           
-          <div className="bg-white rounded-[2.5rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 md:p-10 shadow-2xl border border-white/20 animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 relative z-10 flex flex-col scrollbar-thin">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-md">
-                <Scale size={24} />
+          <div className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 md:p-6 shadow-2xl border border-white/20 animate-in zoom-in-95 slide-in-from-bottom-5 duration-300 relative z-10 flex flex-col scrollbar-thin">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-md">
+                <Scale size={18} />
               </div>
               <div>
-                <h4 className="text-xl font-black text-slate-900 tracking-tight">Independent Contractor Agreement</h4>
-                <p className="text-xs text-slate-500 font-medium">Mandatory clinical affirmation & platform sign-off</p>
+                <h4 className="text-sm font-black text-slate-900 tracking-tight uppercase">Independent Contractor Agreement</h4>
+                <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Mandatory Clinical Affirmation</p>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-6 pr-1 my-4 text-slate-600 text-sm leading-relaxed border-y border-slate-100 py-6">
-              <p className="font-semibold text-slate-800">
-                Please review and accept the following clinical terms of practice to enable active consultation status (Go Online):
+            <div className="flex-1 overflow-y-auto space-y-3 pr-1 my-3 text-slate-600 text-xs leading-relaxed border-y border-slate-100 py-4">
+              <p className="font-bold text-slate-800 uppercase tracking-tight text-[10px]">
+                Review and accept terms to enable active status:
               </p>
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-2.5">
                 {[
-                  { id: 'credentials', label: 'Professional Verification', text: 'I certify that all professional credentials, license PIN numbers, and certificates uploaded are valid, complete, and fully active with our regulatory council.' },
-                  { id: 'liability', label: 'Clinical Indemnity & Liability', text: 'I assume sole professional and legal liability for all medical advice, SOAP notes, and electronic prescriptions generated during my session on this platform.' },
-                  { id: 'negligence', label: 'Zero-Platform Negligence Hold', text: 'I agree to indemnify, defend, and hold harmless PockettClinic and its operating affiliates from any claims arising out of clinical decision-making or negligence.' },
-                  { id: 'status', label: 'Independent Practice Affirmation', text: 'I affirm that I am an independent contractor rendering tele-health consultation services, and that no employment relationship is created hereby.' }
+                  { id: 'credentials', label: 'Verification', text: 'I certify credentials and certificates are valid and active.' },
+                  { id: 'liability', label: 'Clinical Liability', text: 'I assume sole professional liability for all clinical advice and Rx.' },
+                  { id: 'negligence', label: 'Platform Indemnity', text: 'I agree to indemnify PockettClinic from practice negligence claims.' },
+                  { id: 'status', label: 'Independent Practice', text: 'I affirm status as an independent contractor rendering services.' }
                 ].map((item, index) => (
-                  <div key={item.id} className="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors">
-                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black flex items-center justify-center shrink-0">
+                  <div key={item.id} className="flex gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                    <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-black flex items-center justify-center shrink-0">
                       {index + 1}
                     </span>
                     <div>
-                      <h5 className="font-bold text-slate-800 text-sm mb-1">{item.label}</h5>
-                      <p className="text-xs text-slate-500 font-medium leading-relaxed">{item.text}</p>
+                      <h5 className="font-black text-slate-800 text-[10px] uppercase tracking-tight">{item.label}</h5>
+                      <p className="text-[9px] text-slate-500 font-medium leading-relaxed">{item.text}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-100 text-amber-800 text-xs flex gap-3">
-                <AlertCircle size={18} className="shrink-0 mt-0.5 text-amber-600" />
-                <p className="font-medium leading-relaxed">
-                  By signing, you digitally lock your clinical profile to "Active". This legal binding is recorded permanently for compliance.
+              <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-100 text-amber-800 text-[10px] flex gap-2">
+                <AlertCircle size={14} className="shrink-0 mt-0.5 text-amber-600" />
+                <p className="font-bold leading-relaxed uppercase tracking-tight">
+                  By signing, you digitally lock your clinical profile to "Active". Permanent legal record.
                 </p>
               </div>
             </div>
 
-            <div className="pt-2 pb-4 space-y-3 border-t border-slate-100 mt-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block ml-1 mt-4">
-                Type Full Legal Name to Sign (Must match exactly: "{effectiveUser?.fullName || effectiveUser?.displayName || 'Your Name'}")
+            <div className="pt-1 pb-3 space-y-2">
+              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block ml-1">
+                Type name to sign (Must match: "{effectiveUser?.fullName || effectiveUser?.displayName || 'Your Name'}")
               </label>
               <div className="relative">
                 <input
                   type="text"
                   required
-                  placeholder={`Type "${effectiveUser?.fullName || effectiveUser?.displayName || 'Your Name'}"`}
+                  placeholder="Type name exactly"
                   value={typedSignature}
                   onChange={(e) => setTypedSignature(e.target.value)}
-                  className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-300"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-slate-300 font-mono"
                 />
                 {typedSignature.trim().toLowerCase() === (effectiveUser?.fullName || effectiveUser?.displayName || '').trim().toLowerCase() && (
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-600">
-                    <ShieldCheck size={20} />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600">
+                    <ShieldCheck size={16} />
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="pt-4 flex flex-col sm:flex-row gap-3">
+            <div className="pt-3 flex gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setIsAffirmationModalOpen(false);
-                  showToast("You must affirm the agreement to toggle online status.", "info");
+                  showToast("Affirmation required for online status.", "info");
                 }}
-                className="w-full sm:w-1/3 py-4 text-slate-400 hover:text-slate-600 font-black text-[10px] uppercase tracking-[0.2em] transition-colors text-center border border-slate-100 rounded-2xl hover:bg-slate-50 cursor-pointer"
+                className="flex-1 py-2 text-slate-400 hover:text-slate-600 font-black text-[9px] uppercase tracking-widest transition-colors text-center border border-slate-100 rounded-lg hover:bg-slate-50 cursor-pointer"
               >
                 Cancel
               </button>
@@ -1201,15 +1199,15 @@ export default function ConsultantDashboard({
                 type="button"
                 disabled={isSubmittingAffirmation || typedSignature.trim().toLowerCase() !== (effectiveUser?.fullName || effectiveUser?.displayName || '').trim().toLowerCase()}
                 onClick={handleAffirmStatus}
-                className="w-full sm:w-2/3 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-black rounded-2xl shadow-xl shadow-emerald-100 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer"
+                className="flex-[2] py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-black rounded-lg shadow-md transition-all text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isSubmittingAffirmation ? (
                   <>
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader2 size={12} className="animate-spin" />
                     <span>Signing...</span>
                   </>
                 ) : (
-                  'Digitally Sign & Affirm'
+                  'Sign & Affirm'
                 )}
               </button>
             </div>

@@ -143,106 +143,98 @@ export default function ConsultantPayoutHub({
   };
 
   return (
-    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-white p-8 md:p-12 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden group">
-        <div className="flex items-start gap-6 relative z-10">
-          <div className="w-16 h-16 rounded-[24px] bg-slate-900 text-white flex items-center justify-center shadow-2xl shadow-slate-900/20 shrink-0 group-hover:scale-110 transition-transform duration-500">
-            <Landmark size={32} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm relative overflow-hidden group">
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-105 transition-transform">
+            <Landmark size={18} />
           </div>
           <div>
-            <div className="flex items-center gap-4">
-              <h3 className="text-2xl font-black text-slate-950 uppercase tracking-tight">
+            <div className="flex items-center gap-2">
+              <h3 className="text-xs font-black text-slate-950 uppercase tracking-tight">
                 Earnings & Settlements
               </h3>
-              <div className="hidden sm:flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-100">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Revenue Hub</span>
+              <div className="flex items-center gap-1 bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-full border border-emerald-100">
+                <span className="text-[7px] font-black uppercase tracking-widest">Hub</span>
               </div>
             </div>
-            <p className="text-[13px] text-slate-500 mt-2 max-w-xl font-bold leading-relaxed uppercase tracking-tight italic">
-              "Clinical practice revenue management with real-time Mobile Money and commercial bank settlement gateway."
-            </p>
           </div>
         </div>
 
         <button
           onClick={() => setIsWithdrawModalOpen(true)}
           disabled={availableBalanceGHS <= 0}
-          className="relative z-10 group flex items-center justify-center gap-3 bg-slate-950 hover:bg-slate-800 disabled:bg-slate-200 disabled:cursor-not-allowed text-white px-10 py-5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-slate-950/20 transition-all active:scale-95 shrink-0"
+          className="relative z-10 group flex items-center justify-center gap-1.5 bg-slate-950 hover:bg-slate-800 disabled:bg-slate-200 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 shrink-0"
         >
-          <ArrowUpRight size={20} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           <span>Initiate Payout</span>
         </button>
-
-        {/* Decorative Background */}
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-slate-50 rounded-full blur-3xl opacity-50 group-hover:bg-emerald-50 transition-all duration-700" />
       </div>
 
       {/* Financial Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 group hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
-          <div className="flex items-center justify-between mb-8">
-            <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-slate-950 group-hover:text-white transition-all duration-300">
-              <RefreshCw size={24} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm group hover:border-emerald-200 transition-all relative overflow-hidden">
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-7 h-7 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-slate-950 group-hover:text-white transition-all">
+              <RefreshCw size={14} />
             </div>
-            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[8px] font-black uppercase tracking-widest ${
+            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full border text-[7px] font-black uppercase tracking-widest ${
               windowStatus.isOpen ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-100'
             }`}>
-              <div className={`w-1 h-1 rounded-full ${windowStatus.isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
-              {windowStatus.isOpen ? 'Live Gateway' : 'Syncing'}
+              {windowStatus.isOpen ? 'Live' : 'Sync'}
             </div>
           </div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Gross Billing</p>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-xs font-black text-slate-400">GHS</span>
-            <span className="text-3xl font-black text-slate-950 tracking-tighter">
+          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Gross Billing</p>
+          <div className="flex items-baseline gap-1">
+            <span className="text-[9px] font-black text-slate-400">GHS</span>
+            <span className="text-lg font-black text-slate-950 tracking-tighter">
               {totalGrossGHS.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </span>
           </div>
         </div>
 
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 group hover:border-emerald-200 transition-all duration-300">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-8">
-            <TrendingUp size={24} />
+        <div className="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm group hover:border-emerald-200 transition-all">
+          <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+            <TrendingUp size={14} />
           </div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Earnings</p>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-xs font-black text-emerald-600">GHS</span>
-            <span className="text-3xl font-black text-slate-950 tracking-tighter">
+          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Total Earnings</p>
+          <div className="flex items-baseline gap-1">
+            <span className="text-[9px] font-black text-emerald-600">GHS</span>
+            <span className="text-lg font-black text-slate-950 tracking-tighter">
               {consultant70Earnings.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </span>
           </div>
-          <div className="mt-3 flex items-center gap-1.5 text-[8px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 self-start inline-flex">
-            <ShieldCheck size={10} /> 70% Share Verified
+          <div className="mt-1.5 flex items-center gap-1 text-[7px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 self-start inline-flex">
+            70% Share
           </div>
         </div>
 
-        <div className="bg-slate-950 p-8 rounded-[2.5rem] border border-slate-900 shadow-2xl shadow-slate-950/20 group relative overflow-hidden transform hover:scale-[1.02] transition-all duration-500">
-          <div className="w-12 h-12 rounded-2xl bg-white/10 text-emerald-400 flex items-center justify-center mb-8 border border-white/5">
-            <Wallet size={24} />
+        <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-900 shadow-lg group relative overflow-hidden transition-all">
+          <div className="w-7 h-7 rounded-lg bg-white/10 text-emerald-400 flex items-center justify-center mb-3 border border-white/5">
+            <Wallet size={14} />
           </div>
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Current Balance</p>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-xs font-black text-emerald-500">GHS</span>
-            <span className="text-4xl font-black text-white tracking-tighter">
+          <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Current Balance</p>
+          <div className="flex items-baseline gap-1">
+            <span className="text-[9px] font-black text-emerald-500">GHS</span>
+            <span className="text-xl font-black text-white tracking-tighter">
               {availableBalanceGHS.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </span>
           </div>
-          <div className="mt-4 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Liquid Asset</span>
+          <div className="mt-1.5 flex items-center gap-1">
+            <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[7px] font-black text-emerald-400 uppercase tracking-widest">Liquid</span>
           </div>
         </div>
 
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 group">
-          <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mb-8 group-hover:bg-slate-950 group-hover:text-white transition-all duration-300">
-            <CheckCircle2 size={24} />
+        <div className="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm group">
+          <div className="w-7 h-7 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center mb-3 group-hover:bg-slate-950 group-hover:text-white transition-all">
+            <CheckCircle2 size={14} />
           </div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Payouts</p>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-xs font-black text-slate-400">GHS</span>
-            <span className="text-3xl font-black text-slate-950 tracking-tighter">
+          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Total Payouts</p>
+          <div className="flex items-baseline gap-1">
+            <span className="text-[9px] font-black text-slate-400">GHS</span>
+            <span className="text-lg font-black text-slate-950 tracking-tighter">
               {completedPayoutsSum.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </span>
           </div>
@@ -250,89 +242,81 @@ export default function ConsultantPayoutHub({
       </div>
 
       {/* History Table Section */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
-        <div className="p-8 md:p-10 border-b border-slate-50 flex items-center justify-between bg-white">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-950 border border-slate-100 shadow-sm">
-              <Clock size={24} />
+      <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="p-3 border-b border-slate-50 flex items-center justify-between bg-white">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-slate-950 border border-slate-100 shadow-sm">
+              <Clock size={14} />
             </div>
             <div>
-              <h4 className="text-xl font-black text-slate-950 uppercase tracking-tight">Ledger History</h4>
-              <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">{payouts.length} Transactions Documented</p>
+              <h4 className="text-xs font-black text-slate-950 uppercase tracking-tight">Ledger</h4>
+              <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest">{payouts.length} Transactions</p>
             </div>
           </div>
-          <button className="hidden sm:flex px-6 py-3 rounded-xl bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest items-center gap-2 hover:bg-slate-800 transition-all active:scale-95 shadow-xl shadow-slate-900/10">
-            <Download size={14} />
-            Export Audit
+          <button className="flex px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-[8px] font-black uppercase tracking-widest items-center gap-1.5 hover:bg-slate-800 transition-all active:scale-95 shadow-sm">
+            <Download size={10} />
+            Export
           </button>
         </div>
 
         {isLoading ? (
-          <div className="p-24 text-center">
-            <div className="w-12 h-12 border-4 border-slate-100 border-t-slate-950 rounded-full animate-spin mx-auto mb-6" />
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Decrypting Ledger...</p>
+          <div className="p-12 text-center">
+            <div className="w-8 h-8 border-2 border-slate-100 border-t-slate-950 rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Loading Ledger...</p>
           </div>
         ) : payouts.length === 0 ? (
-          <div className="p-24 text-center">
-            <div className="w-16 h-16 bg-slate-50 rounded-[20px] flex items-center justify-center text-slate-300 mx-auto mb-6 border border-slate-100 shadow-sm">
-              <RefreshCw size={32} />
+          <div className="p-12 text-center">
+            <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 mx-auto mb-4 border border-slate-100">
+              <RefreshCw size={20} />
             </div>
-            <h5 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Vault is Empty</h5>
-            <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-tight max-w-xs mx-auto italic">Disbursement records will populate here upon your first successful settlement.</p>
+            <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Empty Ledger</h5>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50/50">
-                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Audit Reference</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Disbursement Point</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Amount</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Status</th>
+                  <th className="px-6 py-3 text-[8px] font-black text-slate-400 uppercase tracking-widest">Reference</th>
+                  <th className="px-6 py-3 text-[8px] font-black text-slate-400 uppercase tracking-widest">Channel</th>
+                  <th className="px-6 py-3 text-[8px] font-black text-slate-400 uppercase tracking-widest">Amount</th>
+                  <th className="px-6 py-3 text-[8px] font-black text-slate-400 uppercase tracking-widest text-right">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {payouts.map(p => (
-                  <tr key={p.requestId} className="group hover:bg-slate-50/50 transition-all duration-300">
-                    <td className="px-10 py-8">
-                      <div className="font-black text-slate-950 text-sm tracking-tight uppercase">{p.requestId}</div>
-                      <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1.5 flex items-center gap-2">
-                        <Calendar size={12} className="text-slate-300" />
-                        {new Date(p.requestedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  <tr key={p.requestId} className="group hover:bg-slate-50/50 transition-all">
+                    <td className="px-6 py-4">
+                      <div className="font-black text-slate-950 text-xs tracking-tight uppercase truncate max-w-[120px]">{p.requestId}</div>
+                      <div className="text-[8px] text-slate-400 font-black uppercase tracking-widest mt-1 flex items-center gap-1">
+                        {new Date(p.requestedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
                       </div>
                     </td>
-                    <td className="px-10 py-8">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-slate-400 border border-slate-100 shadow-sm group-hover:bg-slate-950 group-hover:text-white transition-all">
-                          {p.channelType === 'mobile_money' ? <Phone size={18} /> : <Landmark size={18} />}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-slate-400 border border-slate-100 shadow-sm group-hover:bg-slate-950 group-hover:text-white transition-all">
+                          {p.channelType === 'mobile_money' ? <Phone size={14} /> : <Landmark size={14} />}
                         </div>
                         <div>
-                          <div className="font-black text-slate-950 text-[11px] uppercase tracking-widest">
+                          <div className="font-black text-slate-950 text-[9px] uppercase tracking-widest">
                             {p.channelType === 'mobile_money' ? `${p.networkProvider} MoMo` : p.bankName}
                           </div>
-                          <div className="text-[10px] text-slate-400 font-black tracking-widest mt-1 opacity-70">{p.accountNumber}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-10 py-8">
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-[10px] font-black text-slate-400">GHS</span>
-                        <span className="text-xl font-black text-slate-950 tracking-tighter">{p.amountGHS.toFixed(2)}</span>
+                    <td className="px-6 py-4">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-[8px] font-black text-slate-400">GHS</span>
+                        <span className="text-sm font-black text-slate-950 tracking-tighter">{p.amountGHS.toFixed(2)}</span>
                       </div>
                     </td>
-                    <td className="px-10 py-8 text-right">
-                      <span className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+                    <td className="px-6 py-4 text-right">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${
                         p.status === 'completed' || p.status === 'processed'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100 shadow-sm' 
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
                           : p.status === 'rejected' || p.status === 'failed'
-                          ? 'bg-rose-50 text-rose-700 border-rose-100 shadow-sm'
-                          : 'bg-amber-50 text-amber-700 border-amber-100 shadow-sm'
+                          ? 'bg-rose-50 text-rose-700 border-rose-100'
+                          : 'bg-amber-50 text-amber-700 border-amber-100'
                       }`}>
-                        {p.status === 'completed' || p.status === 'processed' ? (
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        ) : (
-                          <RefreshCw size={10} className="animate-spin" />
-                        )}
                         {p.status}
                       </span>
                     </td>
@@ -344,26 +328,23 @@ export default function ConsultantPayoutHub({
         )}
       </div>
 
-      {/* Compliance / Security Note */}
-      <div className="bg-slate-950 rounded-[3rem] p-10 text-white flex flex-col md:flex-row items-center justify-between gap-10 overflow-hidden relative group border border-white/5 shadow-2xl shadow-slate-950/40">
-        <div className="relative z-10 flex items-start gap-6">
-          <div className="w-16 h-16 rounded-[24px] bg-white/10 backdrop-blur-xl flex items-center justify-center text-emerald-400 shrink-0 border border-white/10 shadow-2xl">
-            <ShieldCheck size={32} />
+      {/* Security Note */}
+      <div className="bg-slate-950 rounded-xl p-4 text-white flex flex-col sm:flex-row items-center justify-between gap-4 overflow-hidden relative group border border-white/5 shadow-xl">
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-white/10 backdrop-blur-xl flex items-center justify-center text-emerald-400 shrink-0 border border-white/10">
+            <ShieldCheck size={18} />
           </div>
           <div>
-            <h4 className="text-xl font-black uppercase tracking-tight">Security Protocol</h4>
-            <p className="text-slate-500 text-sm mt-2 max-w-lg font-bold leading-relaxed italic uppercase tracking-tight">
-              "Gateway encryption active. All disbursements are routed through the National Settlement Interface with real-time MoMo integration."
+            <h4 className="text-xs font-black uppercase tracking-tight">Secured</h4>
+            <p className="text-slate-500 text-[8px] font-bold uppercase tracking-tight">
+              Gateway encryption active.
             </p>
           </div>
         </div>
         <div className="relative z-10">
-          <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-8 py-4 rounded-2xl flex flex-col gap-1 items-center justify-center min-w-[200px]">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Gateway Status</span>
-            </div>
-            <span className="text-xs font-black uppercase tracking-widest text-emerald-500">Operational</span>
+          <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+            <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500">Operational</span>
           </div>
         </div>
         
@@ -379,36 +360,36 @@ export default function ConsultantPayoutHub({
             onClick={() => setIsWithdrawModalOpen(false)}
           />
           
-          <div className="bg-white rounded-[2.5rem] max-w-lg w-full p-8 md:p-10 shadow-2xl border border-white/20 animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 relative z-10">
-            <div className="flex items-center gap-5 mb-8">
-              <div className="w-16 h-16 rounded-[1.25rem] bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-200">
-                <Wallet size={32} />
+          <div className="bg-white rounded-xl max-w-sm w-full p-4 shadow-xl border border-slate-100 animate-in zoom-in-95 slide-in-from-bottom-2 duration-300 relative z-10">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+                <Wallet size={16} />
               </div>
               <div>
-                <h4 className="text-xl font-black text-slate-900 tracking-tight">Request Payout</h4>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Available</span>
-                  <span className="text-sm font-black text-emerald-600 tracking-tight">GHS {availableBalanceGHS.toFixed(2)}</span>
+                <h4 className="text-xs font-black text-slate-900 tracking-tight uppercase">Request Payout</h4>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Available</span>
+                  <span className="text-xs font-black text-emerald-600 tracking-tight">GHS {availableBalanceGHS.toFixed(2)}</span>
                 </div>
               </div>
             </div>
 
             {successMessage ? (
-              <div className="bg-emerald-50 border border-emerald-100 p-8 rounded-[2rem] text-center animate-in zoom-in-95 duration-500">
-                <div className="w-20 h-20 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-200">
-                  <ShieldCheck size={40} />
+              <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-lg text-center animate-in zoom-in-95 duration-300">
+                <div className="w-10 h-10 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-md">
+                  <ShieldCheck size={20} />
                 </div>
-                <h5 className="text-lg font-black text-slate-900 mb-2">Request Successful</h5>
-                <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                <h5 className="text-xs font-black text-slate-900 mb-0.5 uppercase tracking-tight">Request Successful</h5>
+                <p className="text-[9px] text-slate-600 font-bold leading-normal uppercase">
                   {successMessage}
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleRequestPayout} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Withdrawal Amount</label>
+              <form onSubmit={handleRequestPayout} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Withdrawal Amount</label>
                   <div className="relative group">
-                    <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-slate-300 group-focus-within:text-emerald-600 transition-colors">GHS</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-300 group-focus-within:text-emerald-600 transition-colors">GHS</span>
                     <input
                       type="number"
                       required
@@ -417,50 +398,50 @@ export default function ConsultantPayoutHub({
                       placeholder="0.00"
                       value={amountGHS}
                       onChange={(e) => setAmountGHS(e.target.value ? Number(e.target.value) : '')}
-                      className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-xl font-black text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-200"
+                      className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-lg font-black text-slate-900 focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-200"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Payout Method</label>
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Payout Method</label>
+                  <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={() => setChannelType('mobile_money')}
-                      className={`flex items-center justify-center gap-2 p-4 rounded-2xl font-black text-sm tracking-tight border-2 transition-all ${
+                      className={`flex items-center justify-center gap-1.5 p-3 rounded-xl font-black text-[10px] uppercase tracking-tight border-2 transition-all ${
                         channelType === 'mobile_money'
-                          ? 'bg-slate-900 border-slate-900 text-white shadow-xl scale-[1.02]'
+                          ? 'bg-slate-900 border-slate-900 text-white shadow-lg'
                           : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
                       }`}
                     >
-                      <Phone size={18} />
+                      <Phone size={14} />
                       Mobile Wallet
                     </button>
                     <button
                       type="button"
                       onClick={() => setChannelType('bank_transfer')}
-                      className={`flex items-center justify-center gap-2 p-4 rounded-2xl font-black text-sm tracking-tight border-2 transition-all ${
+                      className={`flex items-center justify-center gap-1.5 p-3 rounded-xl font-black text-[10px] uppercase tracking-tight border-2 transition-all ${
                         channelType === 'bank_transfer'
-                          ? 'bg-slate-900 border-slate-900 text-white shadow-xl scale-[1.02]'
+                          ? 'bg-slate-900 border-slate-900 text-white shadow-lg'
                           : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
                       }`}
                     >
-                      <Landmark size={18} />
+                      <Landmark size={14} />
                       Bank Transfer
                     </button>
                   </div>
                 </div>
 
                 {channelType === 'mobile_money' ? (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="grid grid-cols-3 gap-1.5">
                       {(['MTN', 'TELECEL', 'AT'] as const).map(net => (
                         <button
                           key={net}
                           type="button"
                           onClick={() => setNetworkProvider(net)}
-                          className={`py-3 rounded-xl font-black text-xs border-2 transition-all ${
+                          className={`py-2 rounded-lg font-black text-[8px] uppercase border-2 transition-all ${
                             networkProvider === net
                               ? 'bg-emerald-50 border-emerald-600 text-emerald-700'
                               : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
@@ -470,78 +451,78 @@ export default function ConsultantPayoutHub({
                         </button>
                       ))}
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Wallet Number</label>
+                    <div className="space-y-1.5">
+                      <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Wallet Number</label>
                       <input
                         type="tel"
                         required
                         placeholder="024 XXX XXXX"
                         value={payoutNumber}
                         onChange={(e) => setPayoutNumber(e.target.value)}
-                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Bank Name</label>
+                  <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="space-y-1.5">
+                      <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Bank Name</label>
                       <input
                         type="text"
                         required
                         placeholder="e.g. GCB Bank"
                         value={bankName}
                         onChange={(e) => setBankName(e.target.value)}
-                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Account Number</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Account Number</label>
                         <input
                           type="text"
                           required
                           placeholder="Account No."
                           value={bankAccountNumber}
                           onChange={(e) => setBankAccountNumber(e.target.value)}
-                          className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Branch Code</label>
+                      <div className="space-y-1.5">
+                        <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Branch Code</label>
                         <input
                           type="text"
                           placeholder="Optional"
                           value={branchCode}
                           onChange={(e) => setBranchCode(e.target.value)}
-                          className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all"
                         />
                       </div>
                     </div>
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Beneficiary Name</label>
+                <div className="space-y-1.5">
+                  <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Beneficiary Name</label>
                   <input
                     type="text"
                     required
                     placeholder="Exact registered name"
                     value={accountName}
                     onChange={(e) => setAccountName(e.target.value)}
-                    className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-900 focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all"
                   />
                 </div>
 
-                <div className="pt-6 flex flex-col gap-3">
+                <div className="pt-4 flex flex-col gap-2">
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-black rounded-2xl shadow-xl shadow-emerald-100 transition-all active:scale-95 text-sm uppercase tracking-widest"
+                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-black rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95 text-[10px] uppercase tracking-widest"
                   >
                     {isSubmitting ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <RefreshCw size={18} className="animate-spin" />
+                      <div className="flex items-center justify-center gap-1.5">
+                        <RefreshCw size={14} className="animate-spin" />
                         <span>Processing...</span>
                       </div>
                     ) : (
@@ -551,7 +532,7 @@ export default function ConsultantPayoutHub({
                   <button
                     type="button"
                     onClick={() => setIsWithdrawModalOpen(false)}
-                    className="w-full py-4 text-slate-400 hover:text-slate-600 font-black text-[10px] uppercase tracking-[0.2em] transition-colors"
+                    className="w-full py-2 text-slate-400 hover:text-slate-600 font-black text-[9px] uppercase tracking-[0.2em] transition-colors"
                   >
                     Dismiss Request
                   </button>

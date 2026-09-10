@@ -57,50 +57,50 @@ export default function ConsultantInconclusiveModal({ consultationId, onClose, o
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          className="bg-white rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"
+          className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col max-h-[90vh]"
         >
           {/* Header */}
-          <div className="p-6 border-b border-slate-100 flex items-center justify-between shrink-0 bg-amber-50">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shadow-inner">
-                <AlertTriangle size={24} className="stroke-[2.5]" />
+          <div className="p-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-amber-50">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shadow-inner">
+                <AlertTriangle size={14} className="stroke-[2.5]" />
               </div>
               <div>
-                <h2 className="text-xl font-black text-slate-800 tracking-tight">Inconclusive Wrap-up</h2>
-                <p className="text-amber-700 text-xs font-bold uppercase tracking-wider mt-0.5">Session Add-up Sheet</p>
+                <h2 className="text-xs font-black text-slate-800 tracking-tight uppercase">Inconclusive Wrap-up</h2>
+                <p className="text-amber-700 text-[8px] font-black uppercase tracking-widest mt-0.5">Session Add-up Sheet</p>
               </div>
             </div>
             <button 
               onClick={onClose}
-              className="p-2 bg-white/50 text-slate-400 hover:text-slate-600 rounded-full transition-colors"
+              className="p-1 text-slate-400 hover:text-slate-600 rounded-full transition-colors"
             >
-              <X size={20} />
+              <X size={14} />
             </button>
           </div>
 
           {/* Body */}
-          <div className="p-6 overflow-y-auto space-y-6">
-            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3 text-blue-800 text-sm">
-              <FileText size={20} className="shrink-0 mt-0.5 text-blue-600" />
-              <p className="font-medium leading-relaxed">
-                Use this form to document the preliminary findings from the current session. This ensures the patient's progress is saved when they book a higher-tier consultant.
+          <div className="p-3 overflow-y-auto space-y-3">
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-2 flex gap-2 text-blue-800 text-[10px]">
+              <FileText size={14} className="shrink-0 mt-0.5 text-blue-600" />
+              <p className="font-bold leading-relaxed">
+                Document preliminary findings to ensure the patient's progress is saved for escalated care.
               </p>
             </div>
 
             {error && (
-              <div className="bg-rose-50 text-rose-600 p-3 rounded-xl text-sm font-bold border border-rose-100 flex items-center gap-2">
-                <AlertTriangle size={16} /> {error}
+              <div className="bg-rose-50 text-rose-600 p-2 rounded-lg text-[10px] font-bold border border-rose-100 flex items-center gap-1.5">
+                <AlertTriangle size={12} /> {error}
               </div>
             )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-extrabold text-slate-700 block tracking-tight">
-                Reason for Inconclusive Status
+            <div className="space-y-1">
+              <label className="text-[9px] font-black text-slate-500 block tracking-wider uppercase">
+                Reason for Status
               </label>
               <select
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] font-bold text-slate-700 focus:ring-1 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all"
               >
                 {predefinedReasons.map(r => (
                   <option key={r} value={r}>{r}</option>
@@ -108,43 +108,43 @@ export default function ConsultantInconclusiveModal({ consultationId, onClose, o
               </select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-extrabold text-slate-700 block tracking-tight flex items-center justify-between">
-                <span>Clinical Context & Findings So Far</span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded-full">Required</span>
+            <div className="space-y-1">
+              <label className="text-[9px] font-black text-slate-500 block tracking-wider uppercase flex items-center justify-between">
+                <span>Clinical Context</span>
+                <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 px-1 py-0.5 rounded-full">Required</span>
               </label>
               <textarea
                 value={clinicalContext}
                 onChange={(e) => setClinicalContext(e.target.value)}
-                placeholder="Briefly document the symptoms discussed, patient history gathered, and any preliminary observations before the session was escalated or ended..."
-                className="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all resize-none leading-relaxed placeholder:text-slate-400"
+                placeholder="Briefly document symptoms, history, and observations..."
+                className="w-full h-20 bg-slate-50 border border-slate-200 rounded-lg p-2 text-[11px] font-medium text-slate-700 focus:ring-1 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all resize-none leading-relaxed placeholder:text-slate-400"
               />
             </div>
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t border-slate-100 bg-slate-50 flex gap-3 shrink-0">
+          <div className="p-2.5 border-t border-slate-100 bg-slate-50 flex gap-2 shrink-0">
             <button 
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-4 rounded-xl font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors disabled:opacity-50"
+              className="flex-1 px-3 py-1.5 rounded-lg font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 text-[10px] transition-colors disabled:opacity-50 uppercase tracking-wider"
             >
               Cancel
             </button>
             <button 
               onClick={handleSubmit}
               disabled={isSubmitting || !clinicalContext.trim()}
-              className="flex-[2] px-4 py-4 rounded-xl font-black text-white bg-amber-500 hover:bg-amber-600 shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:active:scale-100"
+              className="flex-[2] px-3 py-1.5 rounded-lg font-black text-white bg-amber-500 hover:bg-amber-600 text-[10px] shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:active:scale-100 uppercase tracking-widest"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={18} className="animate-spin" />
+                  <Loader2 size={12} className="animate-spin" />
                   <span>Submitting...</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 size={18} />
-                  <span>Submit Add-up Sheet</span>
+                  <CheckCircle2 size={12} />
+                  <span>Submit Sheet</span>
                 </>
               )}
             </button>
